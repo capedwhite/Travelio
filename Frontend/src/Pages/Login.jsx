@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Link, useNavigate, useSearchParams } from "react-router-dom"
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom"
 import api from "../api/axios.js"
 function LoginPage(){
     const login= async()=>{
@@ -32,8 +32,9 @@ function LoginPage(){
   }, [useparams]);
   
   const handleGoogleSignIn = () => {
-    window.location.href = "http://localhost:3000/auth/google";
+    window.location.href = "http://localhost:3000/auth/google?prompt=select_account";
   };
+
 
     return (
    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -119,5 +120,24 @@ function LoginPage(){
     </div>
   )
 }
+  export const GoogleSuccess = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
+
+    if (token) {
+
+      localStorage.setItem("authToken", token);
+      navigate("/explorepackges"); 
+    } else {
+      navigate("/login");
+    }
+  }, [location, navigate]);
+
+  return <p>Logging in...</p>;
+};
 
 export default LoginPage
