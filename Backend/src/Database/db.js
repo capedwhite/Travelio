@@ -16,7 +16,8 @@ const connection = ()=>{
         sequelize.sync({alter:true})
     }
     catch(e){
-        console.log("database connected sucessfully")
+        console.log(e.message)
+        console.log("db connection failed")
     }
 }
 export {sequelize,connection}

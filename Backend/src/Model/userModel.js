@@ -22,17 +22,22 @@ export const User = sequelize.define("users",{
            isEmail:true
         }
     },
+    usertype:{
+        type:DataTypes.STRING(100),
+        allowNull:true,
+        defaultValue:"User"
+    },
     password:{
         type:DataTypes.STRING(),
         allowNull:true
     },
     number:{
         type:DataTypes.STRING(100),
-        allowNull:false
+        allowNull:true
     },
     googleId:{
         type:DataTypes.STRING(),
         allowNull:true
-    }
+    },
 
 })
