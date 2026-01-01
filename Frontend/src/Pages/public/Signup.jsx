@@ -1,10 +1,10 @@
 
 import { Link, useNavigate } from "react-router-dom"
-import api from "../api/axios.js";
+import api from "../../api/axios.js";
 import {useForm} from "react-hook-form"
 import { useState } from "react";
 
-function SignupPage(){
+export default function SignupPage(){
       const{
         register,
         handleSubmit,
@@ -155,5 +155,3 @@ console.log(errors)
 </form>
   )
 }
-
-export default SignupPage

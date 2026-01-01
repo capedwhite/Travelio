@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom"
-import api from "../api/axios.js"
+import api from "../../api/axios.js"
 function LoginPage(){
     const login= async()=>{
         try {
             
         const res = await api.post("/auth/login",{username:username,password:password})
         alert(res.data.message)
+        localStorage.setItem("token",res.data.token)
       navigate("/explorepackages")
   
         } 

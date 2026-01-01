@@ -88,7 +88,5 @@ export const googleCallback = (req, res) => {
     res.redirect("http://localhost:5173/google-error");
   }
 };
-const getUser = async(req,res)=>{
 
-}
-export{login,signUp,getUser}
+export{login,signUp}

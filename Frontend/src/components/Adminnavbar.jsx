@@ -1,0 +1,35 @@
+import { Home, Package, ClipboardList, DollarSign, Award } from "lucide-react";
+import { NavLink } from "react-router-dom";
+
+export default function AdminSidebar({children}) {
+  const navItems = [
+    { name: "Dashboard", icon: <Home size={18} />, path: "/admin/dashboard" },
+    { name: "Packages", icon: <Package size={18} />, path: "/admin/createpackages" },
+    { name: "Bookings", icon: <ClipboardList size={18} />, path: "/admin/bookings" },
+    { name: "Bargain Requests", icon: <DollarSign size={18} />, path: "/admin/bargains" },
+    { name: "Challenges", icon: <Award size={18} />, path: "/admin/challenges" },
+  ];
+
+  return (
+    <div className="w-64 bg-[#3ab19d] h-screen text-white flex flex-col fixed">
+      <div className="p-6 text-2xl font-bold border-b border-gray-700">Admin Panel</div>
+      <nav className="mt-4 flex flex-col gap-1">
+        {navItems.map((item) => (
+          <NavLink
+            to={item.path}
+            key={item.name}
+            className={({ isActive }) =>
+              `flex items-center gap-3 p-3 mx-2 rounded-md hover:bg-[#69d0ac9e] transition ${
+                isActive ? "bg-[#69d0ac9e]" : ""
+              }`
+            }
+          >
+            {item.icon}
+            <span>{item.name}</span>
+          </NavLink>
+        ))}
+      </nav>
+    </div>
+
+  );
+}
