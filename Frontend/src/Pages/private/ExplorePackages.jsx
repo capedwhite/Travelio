@@ -1,88 +1,10 @@
 import { useState } from "react"
 import { MapPin, Clock, DollarSign, Sparkles, MessageSquare } from "lucide-react"
-
-// Fake Database
-const pkg = [
-  {
-    id: 1,
-    name: "Bali Paradise Escape",
-    location: "Bali, Indonesia",
-    duration: "5 Days 4 Nights",
-    price: 899,
-    image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&auto=format&fit=crop",
-    discount: "20% OFF",
-    tag: "Popular"
-  },
-  {
-    id: 2,
-    name: "Swiss Alps Adventure",
-    location: "Interlaken, Switzerland",
-    duration: "7 Days 6 Nights",
-    price: 1599,
-    image: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&auto=format&fit=crop",
-    discount: "15% OFF",
-    tag: "Premium"
-  },
-  {
-    id: 3,
-    name: "Maldives Beach Resort",
-    location: "Male, Maldives",
-    duration: "4 Days 3 Nights",
-    price: 1299,
-    image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&auto=format&fit=crop",
-    tag: "Luxury"
-  },
-  {
-    id: 4,
-    name: "Tokyo Culture Tour",
-    location: "Tokyo, Japan",
-    duration: "6 Days 5 Nights",
-    price: 1099,
-    image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&auto=format&fit=crop",
-    discount: "10% OFF",
-    tag: "Cultural"
-  },
-  {
-    id: 5,
-    name: "Santorini Sunset Getaway",
-    location: "Santorini, Greece",
-    duration: "5 Days 4 Nights",
-    price: 1199,
-    image: "https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=800&auto=format&fit=crop",
-    tag: "Romantic"
-  },
-  {
-    id: 6,
-    name: "Safari Wildlife Experience",
-    location: "Serengeti, Tanzania",
-    duration: "8 Days 7 Nights",
-    price: 2199,
-    image: "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800&auto=format&fit=crop",
-    discount: "25% OFF",
-    tag: "Adventure"
-  },
-  {
-    id: 7,
-    name: "Paris City Lights",
-    location: "Paris, France",
-    duration: "4 Days 3 Nights",
-    price: 1049,
-    image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&auto=format&fit=crop",
-    tag: "Romantic"
-  },
-  {
-    id: 8,
-    name: "Dubai Luxury Tour",
-    location: "Dubai, UAE",
-    duration: "5 Days 4 Nights",
-    price: 1399,
-    image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&auto=format&fit=crop",
-    discount: "18% OFF",
-    tag: "Luxury"
-  }
-]
+import api from "../../api/axios"
+import { useEffect } from "react"
 
 function ExplorePackages() {
+  const[pkg,setPackage]=useState([])
   const [bookingOpen, setBookingOpen] = useState(false)
   const [bargainOpen, setBargainOpen] = useState(false)
   const [bookingData, setBookingData] = useState({
@@ -104,37 +26,81 @@ function ExplorePackages() {
     setBookingOpen(false)
     setBookingData({ name: "", email: "", phone: "", travelers: 1, date: "" })
   }
-
+    const [activeFilter, setActiveFilter] = useState("All");
   const handleBargain = () => {
     console.log("Bargain submitted:", { package: pkg.name, ...bargainData })
     alert(`Bargain request submitted for ${pkg.name}! We'll get back to you soon.`)
     setBargainOpen(false)
     setBargainData({ offer: "", duration: "", notes: "" })
+
   }
+  useEffect(()=>{
+  const getallpackages= async()=>{
+    try {
+          const res = await api.get("/user/explorepackages")
+          console.log(res.data.data)
+          console.log(res.data.message)
+          setPackage(res.data.data)
+    } catch (error) {
+      console.log(error)
+      console.log(error.res.data.message)
+    }
+  }
+getallpackages()},[])
+
   return (
     <div className="min-h-screen bg-[#fcfcfc] p-4 sm:p-6 ">
       <div className="max-w-7xl mx-auto mt-[5%] pb-10">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Explore Packages</h1>
+    
+        <div className="h-80 rounded-3xl mb-10 bg-amber-900">
+<img></img>
+        </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Explore Packages</h1>
         <p className="text-gray-600 mb-6">Discover amazing travel destinations and book your dream vacation</p>
-        
+        <div className="w-200 rounded-xl h-9 bg-gray-100  border-1 border-gray-200 mb-4 p-1 gap-2 flex justify-center items-center ">
+ {["All", "Adventure", "Popular", "Luxury", "Budget"].map((filter) => (
+    <div
+      key={filter}
+      onClick={() => setActiveFilter(filter)}
+      className={`w-[20%] h-full rounded-lg flex justify-center items-center p-3 cursor-pointer transition
+        ${
+          activeFilter === filter
+            ? "bg-white text-[#3ab19d] shadow font-bold"
+            : "hover:bg-white text-gray-700"
+        }
+      `}
+    >
+      <span className="text-sm">{filter}</span>
+    </div>
+  ))}
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {pkg.map((pkg) => (
    <>
       <div className="group border border-1 border-[#3ab19d]/50 rounded-lg overflow-hidden shadow-sm hover:shadow-2xl hover:scale-103 transition duration-300 bg-white">
         <div className="relative overflow-hidden w-full" style={{ paddingTop: "56%" }}>
           <img
-            src={pkg.image}
-            alt={pkg.name}
+            src={`http://localhost:3000/${pkg.images.coverImage}`}
+            alt={pkg.title}
             className="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
-          {pkg.discount && (
+          
+          {pkg.seasonalDiscount.label && (
+            <>
             <div className="absolute top-2 right-2 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded">
-              {pkg.discount}
+              {pkg.seasonalDiscount.label}
             </div>
+                    <div className="absolute top-8 right-2 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded">
+              {pkg.seasonalDiscount.percentage+"%"}
+            </div>
+            </>
+            
           )}
-          {pkg.tag && (
-            <div className="absolute top-2 left-2 bg-[#ffea00] text-black text-xs px-1.5 py-0.5 rounded">
-              {pkg.tag}
+          {pkg.tags && (
+            <div className="absolute top-2 left-2 bg-[#ffea00] text-black text-xs px-1.5 py-0.5 rounded ">
+              {pkg.tags.map((tag)=>(
+              tag
+              ))}
             </div>
           )}
         </div>
@@ -144,7 +110,7 @@ function ExplorePackages() {
             <h3 className="text-sm font-semibold leading-tight line-clamp-1">{pkg.name}</h3>
             <div className="flex items-center gap-1 text-xs text-gray-600 mt-0.5">
               <MapPin className="w-3 h-3 flex-shrink-0" />
-              <span className="truncate">{pkg.location}</span>
+              <span className="truncate">{pkg.locations.city}</span>
             </div>
           </div>
 
@@ -155,7 +121,8 @@ function ExplorePackages() {
             </div>
             <div className="flex items-center gap-0.5 text-base font-bold text-green-600">
               <DollarSign className="w-4 h-4" />
-              <span>{pkg.price}</span>
+              <span>{pkg.price.originalPrice}</span>
+
             </div>
           </div>
 

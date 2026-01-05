@@ -10,14 +10,20 @@ import ExplorePackages from "./Pages/private/ExplorePackages";
 import AdminSidebar from "./components/Adminnavbar";
 import AdminDashboard from "./Pages/private/admindashboard";
 import CreatePackage from "./Pages/private/CreatePackage";
+import { AuthProvider } from "./context/authContext";
+import Landing from "./Pages/public/LandingPage";
+import PackageDetailsPage from "./Pages/private/packagedetails";
 
 function App() {
   return(
+    <AuthProvider>
 <BrowserRouter>
 <Routes >
+    <Route path="/landing" element={<Landing></Landing>}></Route>
   <Route path="/login" element={<LoginPage></LoginPage>}></Route>
     <Route path="/Signup" element={<SignupPage></SignupPage>}></Route>
     <Route path="/explorepackages" element={<NavBar><ExplorePackages></ExplorePackages></NavBar>}></Route>
+     <Route path="/explorepackages/id" element={<NavBar><PackageDetailsPage></PackageDetailsPage></NavBar>}></Route>
     <Route path="/forgetpassword" element={<ForgetPassword></ForgetPassword>}></Route>
     <Route path="auth/google/callback/google-success" element={<GoogleSuccess/>} />
     <Route path="/socialfeed" element={<NavBar><PackageSocialFeed></PackageSocialFeed></NavBar>}></Route>
@@ -26,6 +32,7 @@ function App() {
      <Route path="admin/createpackages" element={<CreatePackage></CreatePackage>}/>
 </Routes>
   </BrowserRouter>
+  </AuthProvider>
   )
 }
 

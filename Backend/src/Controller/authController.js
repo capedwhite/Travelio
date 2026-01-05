@@ -23,12 +23,12 @@ const user = await User.findOne({
 where:{username:body.username}
 })
 if(!user){
-    return res.status(200).send({message:"Invalid credentials"})
+    return res.status(500).send({message:"Invalid credentials"})
 }
 if(user){
     const isMatch = await bcrypt.compare(body.password,user.password)
         if(!isMatch){
-  return res.status(400).send({message:"Invalid credentials"})
+  return res.status(500).send({message:"Invalid credentials"})
         }
     res.status(200).send({token:generateToken(user),data:user,message:"logged in sucessfully"})
 }

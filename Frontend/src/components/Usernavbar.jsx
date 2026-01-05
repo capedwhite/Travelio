@@ -8,7 +8,7 @@ import { Link, useLocation } from "react-router-dom";
       <img
         src="/images/user.png"
         alt="Profile"
-        className="w-10 h-10 rounded-full cursor-pointer"
+        className="w-10 h-10 rounded-full cursor-pointer border-white border-1"
       />
 
       <div
@@ -73,14 +73,33 @@ export default function NavBar({ children })
   ];
   return (
     <div className="h-[100dvh] flex flex-col  ">
-      <nav className=" backdrop-blur-lg bg-[#3ab19d]/40 shadow-md text-black flex justify-between items-center fixed w-full pt-1 pl-10 pr-10 z-50">
-        <img src="/images/Logo.png" className="w-33 h-20"></img>
-        <div className="flex gap-4 p-1 pt-2 rounded-lg  text-black font-semibold">
+      <nav className=" backdrop-blur-xl
+  bg-gradient-to-r from-[#3ab19d]/40 to-[#2c9c8c]/90
+  shadow-lg
+  text-black
+  flex
+  justify-between
+  items-center
+  fixed
+  w-full
+  pl-10
+  pr-10
+  z-50
+">
+        <img src="/images/Logo.png" className="w-33 h-20 drop-shadow-md hover:scale-105 transition"></img>
+        <div className="flex gap-4 prounded-lg  text-black font-semibold">
           {navItems.map((item)=>(
 <Link key={item.name} to={item.path}
-                className={`h-full w-40  flex justify-center align-center rounded-sm p-3 transition-all duration-300
-                hover:bg-[#ffffff63] hover:shadow-md hover:-translate-y-1
-                ${isActive(item.path) ? "bg-[#ffffff63] shadow-md" : ""}`}
+                className={`h-full w-40
+    flex justify-center items-center
+    rounded-md
+    px-4 py-4
+    text-md
+    transition-all duration-300
+    hover:bg-white/70
+    hover:shadow-lg
+    hover:-translate-y-0.5
+                ${isActive(item.path) ? "bg-white/90 shadow-md text-[#2c9c8c] font-bold" : "text-black/90"}`}
               >
                 <h3>{item.name}</h3>
           </Link>
