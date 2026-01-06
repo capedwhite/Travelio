@@ -24,7 +24,7 @@ function App() {
     <Route path="/landing" element={<Landing></Landing>}></Route>
   <Route path="/login" element={<LoginPage></LoginPage>}></Route>
     <Route path="/Signup" element={<SignupPage></SignupPage>}></Route>
-        <Route path="/about" element={<AboutPage></AboutPage>}></Route>
+        <Route path="/about" element={<NavBar><AboutPage></AboutPage></NavBar>}></Route>
     <Route path="/explorepackages" element={<NavBar><ExplorePackages></ExplorePackages></NavBar>}></Route>
      <Route path="/explorepackages/:id" element={<NavBar><PackageDetailsPage></PackageDetailsPage></NavBar>}></Route>
     <Route path="/forgetpassword" element={<ForgetPassword></ForgetPassword>}></Route>

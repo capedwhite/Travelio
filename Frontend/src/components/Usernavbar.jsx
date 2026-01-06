@@ -73,8 +73,8 @@ export default function NavBar({ children })
   ];
   return (
     <div className="h-[100dvh] flex flex-col  ">
-      <nav className=" backdrop-blur-xl
-  bg-gradient-to-r from-[#3ab19d]/40 to-[#2c9c8c]/90
+      <nav className=" 
+
   shadow-lg
   text-black
   flex
@@ -85,21 +85,24 @@ export default function NavBar({ children })
   pl-10
   pr-10
   z-50
+  bg-white
 ">
         <img src="/images/Logo.png" className="w-33 h-20 drop-shadow-md hover:scale-105 transition"></img>
-        <div className="flex gap-4 prounded-lg  text-black font-semibold">
+        <div className="flex gap-4 prounded-lg p-1  font-semibold  bg-gradient-to-r from-[#9ee5da] to-[#3ab19d] rounded-full">
           {navItems.map((item)=>(
 <Link key={item.name} to={item.path}
-                className={`h-full w-40
+                className={` w-40
+                  
     flex justify-center items-center
-    rounded-md
-    px-4 py-4
+    rounded-full
+    px-2 py-3
     text-md
     transition-all duration-300
     hover:bg-white/70
     hover:shadow-lg
     hover:-translate-y-0.5
-                ${isActive(item.path) ? "bg-white/90 shadow-md text-[#2c9c8c] font-bold" : "text-black/90"}`}
+
+                ${isActive(item.path) ? "bg-white/90 rounded-full shadow-md text-[#2c9c8c] font-bold" : "text-black/90"}`}
               >
                 <h3>{item.name}</h3>
           </Link>

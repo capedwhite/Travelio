@@ -5,7 +5,7 @@ export default function AboutPage() {
     <div className="bg-gray-50">
 
       {/* HERO */}
-      <section className="bg-gradient-to-r from-[#3ab19d] to-[#1f7a6b] text-white py-20 px-6 text-center">
+      <section className="bg-gradient-to-r from-[#3ab19d] to-[#1f7a6b] text-white py-20 px-6 text-center mt-[5%]">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
 Turning Trips Into Memories 
         </h1>
@@ -81,10 +81,10 @@ Turning Trips Into Memories
         </div>
       </section>
 
-      {/* JOURNEY / TIMELINE */}
+
       <section className="py-16 px-6 max-w-5xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-12">
-          Our Story ✨
+          Our Story 
         </h2>
 
         <div className="space-y-8">
