@@ -43,7 +43,8 @@ export const Package = sequelize.define('package', {
 
   hotels: {
     type: DataTypes.JSONB,
-    defaultValue: []
+    defaultValue: [],
+    hotels:[]
   },
 
 
@@ -76,7 +77,7 @@ export const Package = sequelize.define('package', {
     defaultValue: {
       coverImage: '',
       tourist:[],
-      hotels:[]
+
     }
   },
 

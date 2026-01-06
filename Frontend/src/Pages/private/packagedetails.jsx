@@ -78,7 +78,9 @@ const handleBooking = () => {
        <p>{pkg.description}</p>
           </section>
           <section className=" rounded-2xl p-2 flex gap-10 items-center">
-<div className="p-2 bg-white shadow-md rounded-xl ">{pkg.duration}</div>
+            <div className="flex items-center gap-2">
+            <span className="text-sm font-bold">Trip duration:</span>
+<div className="p-2 bg-white shadow-md rounded-xl ">{pkg.duration}</div></div>
 <div className="flex items-center gap-2">
 <span className="text-sm font-bold">booking timeline:</span>
 <div className="p-2 bg-white shadow-md  rounded-xl">{pkg.availability.startDate}</div>
@@ -159,7 +161,7 @@ const handleBooking = () => {
                     <Hotel className="text-indigo-600" />
                     <div>
                       <p className="font-semibold">{hotel.name}</p>
-                      <p className="text-sm text-gray-500">{hotel.amenities}</p>
+                      <p className="text-sm text-gray-500">{hotel.location}</p>
                     </div>
                   </div>
                   {openHotel === idx ? <ChevronUp /> : <ChevronDown />}
@@ -168,13 +170,13 @@ const handleBooking = () => {
                 {openHotel === idx && (
                   <div className="pb-4 space-y-3">
                     <p className="text-gray-600">{hotel.amenities}</p>
-                    <p className="text-gray-600">{hotel.location}</p>
-                     <p className="text-gray-600">{hotel.rating}</p>
+                    <span className="flex items-center gap-2 font-bold">Location:<p className="text-gray-600 font-medium">{hotel.location}</p></span>
+                     <span className="flex items-center gap-2 font-bold">Rating:<p className="text-gray-600">{hotel.rating}</p></span> 
                     <div className="flex gap-3">
-                      {pkg.images.hotels.map((img, i) => (
+                      {hotel.hotelImages.map((img, i) => (
                         <img
                           key={i}
-                          src={img}
+                          src={`http://localhost:3000/${img}`}
                           className="h-32 w-48 object-cover rounded-lg shadow"
                         />
                       ))}
@@ -198,39 +200,39 @@ const handleBooking = () => {
               placeholder="Full Name"
               value={bookingData.name}
               onChange={(e) => setBookingData({ ...bookingData, name: e.target.value })}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none"
+              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#4cc9b4] focus:outline-none"
             />
             <input
               type="email"
               placeholder="Email"
               value={bookingData.email}
               onChange={(e) => setBookingData({ ...bookingData, email: e.target.value })}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none"
+              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#4cc9b4] focus:outline-none"
             />
             <input
               type="tel"
               placeholder="Phone"
               value={bookingData.phone}
               onChange={(e) => setBookingData({ ...bookingData, phone: e.target.value })}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none"
+              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#4cc9b4] focus:outline-none"
             />
             <input
               type="number"
               min={1}
               value={bookingData.travelers}
               onChange={(e) => setBookingData({ ...bookingData, travelers: e.target.value })}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none"
+              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#4cc9b4] focus:outline-none"
               placeholder="Number of Travelers"
             />
             <input
               type="date"
               value={bookingData.date}
               onChange={(e) => setBookingData({ ...bookingData, date: e.target.value })}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none"
+              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#4cc9b4] focus:outline-none"
             />
           </div>
           <button
-            className="mt-4 w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-300 shadow-md hover:shadow-xl"
+            className="mt-4 w-full bg-[#3ab19d] text-white px-4 py-2 rounded-lg hover:bg-[#4cc9b4] transition duration-300 shadow-md hover:shadow-xl"
             onClick={handleBooking}
           >
             Confirm Booking
@@ -265,7 +267,7 @@ const handleBooking = () => {
           />
         </div>
         <button
-          className="mt-4 bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition duration-300 shadow-md hover:shadow-xl"
+          className="mt-4 bg-[#dda169] text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition duration-300 shadow-md hover:shadow-xl"
           onClick={handleBargain}
         >
           Submit Request

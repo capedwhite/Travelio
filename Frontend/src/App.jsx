@@ -13,6 +13,8 @@ import CreatePackage from "./Pages/private/CreatePackage";
 import { AuthProvider } from "./context/authContext";
 import Landing from "./Pages/public/LandingPage";
 import PackageDetailsPage from "./Pages/private/packagedetails";
+import AdminBookingsPage from "./Pages/private/viewbookings";
+import AboutPage from "./Pages/public/aboutpage";
 
 function App() {
   return(
@@ -22,6 +24,7 @@ function App() {
     <Route path="/landing" element={<Landing></Landing>}></Route>
   <Route path="/login" element={<LoginPage></LoginPage>}></Route>
     <Route path="/Signup" element={<SignupPage></SignupPage>}></Route>
+        <Route path="/about" element={<AboutPage></AboutPage>}></Route>
     <Route path="/explorepackages" element={<NavBar><ExplorePackages></ExplorePackages></NavBar>}></Route>
      <Route path="/explorepackages/:id" element={<NavBar><PackageDetailsPage></PackageDetailsPage></NavBar>}></Route>
     <Route path="/forgetpassword" element={<ForgetPassword></ForgetPassword>}></Route>
@@ -30,6 +33,7 @@ function App() {
      <Route path="/Challenges" element={<NavBar><TravelChallenges></TravelChallenges></NavBar>}></Route>
      <Route path="admin/dashboard" element={<AdminDashboard></AdminDashboard>}/>
      <Route path="admin/createpackages" element={<CreatePackage></CreatePackage>}/>
+       <Route path="admin/bookings" element={<AdminBookingsPage></AdminBookingsPage>}/>
 </Routes>
   </BrowserRouter>
   </AuthProvider>

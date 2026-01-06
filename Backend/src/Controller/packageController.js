@@ -13,9 +13,22 @@ export const createPackage = async (req, res) => {
     const itinerary = JSON.parse(req.body.itinerary);
     const availability = JSON.parse(req.body.availability);
     const coverImage = req.files?.coverImage?.[0]?.path.replace(/\\/g, '/') || null;
-    const hotelImages = req.files?.hotelImages?.map(file => file.path.replace(/\\/g, '/'))|| []
     const touristImages = req.files?.touristImages?.map(file => file.path.replace(/\\/g, '/'))|| []
+if (req.files) {
+  Object.keys(req.files).forEach((key) => {
+    if (key.startsWith("hotelImages[")) {
+      const index = Number(key.match(/\[(\d+)\]/)[1]);
 
+      const imagePaths = req.files[key].map(file =>
+        file.path.replace(/\\/g, "/")
+      );
+
+      if (hotels[index]) {
+        hotels[index].hotelImages = imagePaths;
+      }
+    }
+  });
+}
     const insertPackage = await Package.create({
       title: basicInfo.title,
       description: basicInfo.description,
@@ -29,6 +42,7 @@ export const createPackage = async (req, res) => {
 
       locations,
       hotels,
+      
       touristSpots,
       itinerary,
 
@@ -42,7 +56,6 @@ export const createPackage = async (req, res) => {
 
       images: {
         coverImage,
-        hotels: hotelImages,
         tourist: touristImages,
       },
 

@@ -16,9 +16,10 @@ const buildPackageFormData = (packageData) => {
     formData.append("coverImage", packageData.media.coverImage);
   }
 
-  packageData.media.hotelImages.forEach((file) => {
-    formData.append("hotelImages", file);
-  });
+packageData.hotels?.forEach((hotel,hotelIndex) => {
+  hotel.hotelImages?.forEach((file) => {
+    formData.append(`hotelImages[${hotelIndex}]`, file);
+  })});
 
   packageData.media.touristLocationImages.forEach((file) => {
     formData.append("touristImages", file);
@@ -49,7 +50,7 @@ export default function CreatePackage() {
       notes: "",
     },
     touristSpots: [
-      { spotname: "", location: "", description: "", LocationImages: [] },
+      { spotname: "", location: "", description: ""},
     ],
     itinerary: [{ title: "", description: "" }],
     hotels: [
@@ -64,7 +65,6 @@ export default function CreatePackage() {
     },
     media: {
       coverImage: null,
-
       touristLocationImages: [],
     },
   });
@@ -754,6 +754,33 @@ function LocationsSection({ data, setPackageData }) {
 }
 
 function PricingSection({ price, setPackageData }) {
+  const calculateDiscountedPrice = (original, percent) => {
+    const orig = parseFloat(original);
+    const discount = parseFloat(percent);
+    if (isNaN(orig) || isNaN(discount)) return "";
+    return (orig - (orig * discount) / 100).toFixed(2);
+  };
+   const handleOriginalPriceChange = (value) => {
+    setPackageData(prev => ({
+      ...prev,
+      pricing: {
+        ...prev.pricing,
+        originalPrice: value,
+        // recalc discounted price if discount percentage exists
+        discountedPrice: calculateDiscountedPrice(value, prev.pricing.discountpercentage)
+      }
+    }));
+  };
+    const handleDiscountPercentageChange = (value) => {
+    setPackageData(prev => ({
+      ...prev,
+      pricing: {
+        ...prev.pricing,
+        discountpercentage: value,
+        discountedPrice: calculateDiscountedPrice(prev.pricing.originalPrice, value)
+      }
+    }));
+  };
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold">Pricing & Discounts</h2>{" "}
@@ -762,23 +789,13 @@ function PricingSection({ price, setPackageData }) {
           className="p-3 border rounded-lg"
           placeholder="Original Price"
           value={price.originalPrice}
-          onChange={(e) => {
-            setPackageData((prev) => ({
-              ...prev,
-              pricing: { ...prev.pricing, originalPrice: e.target.value },
-            }));
-          }}
+          onChange={e => handleOriginalPriceChange(e.target.value)}
         />
         <input
           className="p-3 border rounded-lg"
           placeholder="Discounted Price"
           value={price.discountedPrice}
-          onChange={(e) => {
-            setPackageData((prev) => ({
-              ...prev,
-              pricing: { ...prev.pricing, discountedPrice: e.target.value },
-            }));
-          }}
+ readOnly
         />
       </div>
       <select
@@ -810,12 +827,7 @@ function PricingSection({ price, setPackageData }) {
           className="p-3 border rounded-lg w-full"
           placeholder="Percentage %"
           value={price.discountpercentage}
-          onChange={(e) => {
-            setPackageData((prev) => ({
-              ...prev,
-              pricing: { ...prev.pricing, discountpercentage: e.target.value },
-            }));
-          }}
+          onChange={e => handleDiscountPercentageChange(e.target.value)}
         />
       </div>
     </div>
