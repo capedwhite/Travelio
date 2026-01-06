@@ -1,8 +1,13 @@
-import { useState } from "react"
-import { ChevronDown, ChevronUp, Calendar, Hotel } from "lucide-react"
+import { useEffect, useState } from "react"
+import { ChevronDown, ChevronUp, Calendar, Hotel, Map } from "lucide-react"
+import api from "../../api/axios";
+import { useParams } from "react-router-dom";
 
 export default function PackageDetailsPage() {
+  
+  const[pkg,setPackage]=useState()
   const [openItinerary, setOpenItinerary] = useState(null)
+  const [ openTourist,setOpenTourist]=useState(null)
   const [openHotel, setOpenHotel] = useState(null)
    const [bookingData, setBookingData] = useState({
     name: "",
@@ -18,84 +23,41 @@ export default function PackageDetailsPage() {
     notes: ""
   });
 
+
+const {id: packageid}=useParams();
+console.log(packageid)
+useEffect(()=>{
+const getPackagebyid=async()=>{
+  console.log("function running")
+  try{
+  const res = await api.get(`/user/explorepackages/${packageid}`)
+  console.log(res.data)
+  console.log(res.data.message)
+  setPackage(res.data.data)
+  }
+  catch(error){
+    console.log(error.response.data.message)
+  }
+}
+getPackagebyid()},[packageid])
+
+if (!pkg) {
+  return <div className="mt-20 text-center">Loading package details...</div>;
+}
 const handleBooking = () => {
-    console.log("Booking submitted:", { package: pkg.name, ...bookingData });
-    alert(`Booking confirmed for ${pkg.name}!`);
+    console.log("Booking submitted:", {  ...bookingData });
+    alert(`Booking confirmed for ${pkg.title}!`);
     setBookingData({ name: "", email: "", phone: "", travelers: 1, date: "" });
   }
     const handleBargain = () => {
-    console.log("Bargain submitted:", { package: pkg.name, ...bargainData });
-    alert(`Bargain request submitted for ${pkg.name}! We'll get back to you soon.`);
+    console.log("Bargain submitted:", { package: pkg.title, ...bargainData });
+    alert(`Bargain request submitted for ${pkg.title}! We'll get back to you soon.`);
     setBargainData({ offer: "", duration: "", notes: "" });
   };
 
-
-  const pkg = {
-    name: "Bali Paradise Escape",
-    heroImages: [
-      "https://images.unsplash.com/photo-1537996194471-e657df975ab4",
-      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
-      "https://images.unsplash.com/photo-1519125323398-675f0ddb6308"
-    ],
-    itinerary: [
-      {
-        day: 1,
-        title: "Arrival & Beach Resort Check-in",
-        description:
-          "Arrive in Bali, private airport pickup, welcome drink, and relax at a beachfront resort."
-      },
-      {
-        day: 2,
-        title: "Island Hopping & Snorkeling",
-        description:
-          "Explore nearby islands with guided snorkeling, lunch on the boat, and sunset views."
-      },
-      {
-        day: 3,
-        title: "Ubud Cultural Tour",
-        description:
-          "Visit temples, rice terraces, traditional villages, and enjoy local cuisine."
-      }
-    ],
-    hotels: [
-      {
-        type: "Luxury Resort",
-        name: "Bali Beach Resort",
-        details:
-          "5-star resort with ocean views, spa, infinity pool, and private beach access.",
-        images: [
-          "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb",
-          "https://images.unsplash.com/photo-1566073771259-6a8506099945"
-        ]
-      },
-      {
-        type: "Boutique Hotel",
-        name: "Ubud Retreat",
-        details:
-          "Nature-surrounded boutique stay with yoga sessions and organic dining.",
-        images: [
-          "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267"
-        ]
-      }
-    ],
-        inclusions: [
-    "Airport pickup and drop-off",
-    "Daily breakfast at the hotel",
-    "Guided snorkeling tour on Day 2",
-    "Cultural tour in Ubud with local guide",
-    "All taxes and service charges included"
-  ],
-    exclusions: [
-    "Airport pickup and drop-off",
-    "Daily breakfast at the hotel",
-    "Guided snorkeling tour on Day 2",
-    "Cultural tour in Ubud with local guide",
-    "All taxes and service charges included"
-  ]
-  }
-
   return (
-    <div className="min-h-screen bg-[#f9fafb] p-6 mt-20">
+    
+    <div className="min-h-screen bg-[#f9fafb] p-6 mt-20 ">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* LEFT MAIN CONTENT */}
@@ -103,15 +65,55 @@ const handleBooking = () => {
 
           {/* HERO IMAGES */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {pkg.heroImages.map((img, i) => (
+            {pkg.images.tourist.map((img, i) => (
               <img
                 key={i}
-                src={img}
+                src={`http://localhost:3000/${img}`}
                 className="h-64 w-full object-cover rounded-2xl shadow-lg hover:scale-105 transition"
               />
             ))}
           </div>
+          <section className="bg-white rounded-2xl shadow-xl p-6">
+       <h2 className="text-2xl font-bold mb-4">Description</h2>
+       <p>{pkg.description}</p>
+          </section>
+          <section className=" rounded-2xl p-2 flex gap-10 items-center">
+<div className="p-2 bg-white shadow-md rounded-xl ">{pkg.duration}</div>
+<div className="flex items-center gap-2">
+<span className="text-sm font-bold">booking timeline:</span>
+<div className="p-2 bg-white shadow-md  rounded-xl">{pkg.availability.startDate}</div>
+<div className="p-2 bg-white shadow-md  rounded-xl">{pkg.availability.endDate}</div>
+</div>
+<div className="flex items-center gap-2 ">
+<span className="text-sm font-bold">Max bookings:</span>
+<div className="p-2 bg-white shadow-md rounded-xl">{pkg.availability.maxBookings}</div>
+</div>
+          </section>
 
+<section className="bg-white rounded-2xl shadow-xl p-6">
+<h2 className="text-2xl font-bold mb-4">Tourist Attractions</h2>
+{pkg.touristSpots.map((spot,idx)=>(
+<div key={idx} className="border-b last:border-none">
+  <button onClick={()=>setOpenTourist(openTourist===idx? null:idx)}
+  className="w-full flex justify-between items-center py-4 text-left"
+  >
+       <div className="flex items-center gap-3">
+                    <Map className="text-purple-500" />
+                    <span className="font-semibold">
+                     Name : {spot.spotname}
+                    </span>
+                       <p className="text-sm text-gray-500">{spot.location}</p>
+                  </div>
+                  {openTourist ===idx?<ChevronUp /> : <ChevronDown />}
+  </button>
+  {openTourist === idx && (
+                  <p className="pb-4 text-gray-600 leading-relaxed">
+                    {spot.description}
+                  </p>
+                )}
+</div>
+))}
+</section>
           {/* ITINERARY */}
           <section className="bg-white rounded-2xl shadow-xl p-6">
             <h2 className="text-2xl font-bold mb-4">Itinerary</h2>
@@ -127,7 +129,7 @@ const handleBooking = () => {
                   <div className="flex items-center gap-3">
                     <Calendar className="text-green-600" />
                     <span className="font-semibold">
-                      Day {item.day}: {item.title}
+                      Day {idx+1}: {item.title}
                     </span>
                   </div>
                   {openItinerary === idx ? <ChevronUp /> : <ChevronDown />}
@@ -157,7 +159,7 @@ const handleBooking = () => {
                     <Hotel className="text-indigo-600" />
                     <div>
                       <p className="font-semibold">{hotel.name}</p>
-                      <p className="text-sm text-gray-500">{hotel.type}</p>
+                      <p className="text-sm text-gray-500">{hotel.amenities}</p>
                     </div>
                   </div>
                   {openHotel === idx ? <ChevronUp /> : <ChevronDown />}
@@ -165,9 +167,11 @@ const handleBooking = () => {
 
                 {openHotel === idx && (
                   <div className="pb-4 space-y-3">
-                    <p className="text-gray-600">{hotel.details}</p>
+                    <p className="text-gray-600">{hotel.amenities}</p>
+                    <p className="text-gray-600">{hotel.location}</p>
+                     <p className="text-gray-600">{hotel.rating}</p>
                     <div className="flex gap-3">
-                      {hotel.images.map((img, i) => (
+                      {pkg.images.hotels.map((img, i) => (
                         <img
                           key={i}
                           src={img}
@@ -181,12 +185,11 @@ const handleBooking = () => {
             ))}
           </section>
         </div>
-{/* INCLUSIONS & EXCLUSIONS */}
 
 
         <div className="space-y-6 sticky top-24 h-fit">
           <div className="bg-white rounded-2xl shadow-xl p-6">
-<h2 className="text-2xl font-semibold mb-4 border-b pb-2 border-gray-200">
+            <h2 className="text-2xl font-semibold mb-4 border-b pb-2 border-gray-200">
             Book This Package
           </h2>
           <div className="space-y-3">
@@ -234,14 +237,14 @@ const handleBooking = () => {
           </button>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-xl p-6">
- <h2 className="text-2xl font-semibold mb-4 border-b pb-2 border-gray-200">
+          <div className="bg-white rounded-2xl shadow-xl p-6 ">
+           <h2 className="text-2xl font-semibold mb-4 border-b pb-2 border-gray-200">
           Negotiate / Bargain
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          </h2>
+          <div className="flex flex-col gap-3 ">
           <input
             type="number"
-            placeholder={`Your Offer (Original: $${pkg.price})`}
+            placeholder={`Your Offer (Original: $${pkg.price.originalprice})`}
             value={bargainData.offer}
             onChange={(e) => setBargainData({ ...bargainData, offer: e.target.value })}
             className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
@@ -269,7 +272,7 @@ const handleBooking = () => {
         </button>
           </div>
         </div>
-        <section className="bg-white rounded-2xl shadow-xl p-6">
+        <section className="bg-white rounded-2xl shadow-xl p-6 w-210">
   <h2 className="text-2xl font-bold mb-4">Inclusions</h2>
   <ul className="list-disc list-inside space-y-2 text-gray-700">
     {pkg.inclusions?.length > 0 ? (

@@ -1,9 +1,11 @@
-import { useState } from "react"
+import { useState} from "react"
 import { MapPin, Clock, DollarSign, Sparkles, MessageSquare } from "lucide-react"
 import api from "../../api/axios"
 import { useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 
 function ExplorePackages() {
+
   const[pkg,setPackage]=useState([])
   const [bookingOpen, setBookingOpen] = useState(false)
   const [bargainOpen, setBargainOpen] = useState(false)
@@ -19,6 +21,7 @@ function ExplorePackages() {
     duration: "",
     notes: ""
   })
+
 
   const handleBooking = () => {
     console.log("Booking submitted:", { package: pkg.name, ...bookingData })
@@ -47,7 +50,7 @@ function ExplorePackages() {
     }
   }
 getallpackages()},[])
-
+const navigate = useNavigate()
   return (
     <div className="min-h-screen bg-[#fcfcfc] p-4 sm:p-6 ">
       <div className="max-w-7xl mx-auto mt-[5%] pb-10">
@@ -77,7 +80,8 @@ getallpackages()},[])
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {pkg.map((pkg) => (
    <>
-      <div className="group border border-1 border-[#3ab19d]/50 rounded-lg overflow-hidden shadow-sm hover:shadow-2xl hover:scale-103 transition duration-300 bg-white">
+      <div className="group border border-1 border-[#3ab19d]/50 rounded-lg overflow-hidden shadow-sm hover:shadow-2xl hover:scale-103 transition duration-300 bg-white" 
+      onClick={()=>{navigate(`/explorepackages/${pkg.id}`)}}>
         <div className="relative overflow-hidden w-full" style={{ paddingTop: "56%" }}>
           <img
             src={`http://localhost:3000/${pkg.images.coverImage}`}

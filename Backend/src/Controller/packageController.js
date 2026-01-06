@@ -87,3 +87,15 @@ export const getPackage = async(req,res)=>{
 
 
 }
+ export const getPackageByid = async(req,res)=>{
+  try{
+    console.log("getpackage api hit")
+    const {id} = req.params
+    const packages = await Package.findOne({where:{id:id}})
+    console.log("packages are",packages)
+    res.status(200).send({data:packages,message:"fetched package by id sucessfully"})
+  }
+  catch(error){
+    res.status(500).send({message:error.messaege})
+  }
+ }

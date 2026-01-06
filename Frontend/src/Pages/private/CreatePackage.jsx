@@ -12,7 +12,6 @@ const buildPackageFormData = (packageData) => {
   formData.append("itinerary", JSON.stringify(packageData.itinerary));
   formData.append("availability", JSON.stringify(packageData.availability));
 
-
   if (packageData.media.coverImage) {
     formData.append("coverImage", packageData.media.coverImage);
   }
@@ -28,22 +27,20 @@ const buildPackageFormData = (packageData) => {
   return formData;
 };
 export default function CreatePackage() {
-
-
   const [active, setActive] = useState("Basic Info");
   const [packageData, setPackageData] = useState({
     basicInfo: {
       title: "",
       description: "",
       tag: "Budget Friendly",
-      duration:""
+      duration: "",
     },
     pricing: {
       originalPrice: "",
       discountedPrice: "",
       currency: "USD",
-      label:"",
-      discountpercentage:""
+      label: "",
+      discountpercentage: "",
     },
     locations: {
       country: "",
@@ -51,9 +48,13 @@ export default function CreatePackage() {
       pickup: "",
       notes: "",
     },
-    touristSpots: [{ spotname: "", location: "", description: "" }],
+    touristSpots: [
+      { spotname: "", location: "", description: "", LocationImages: [] },
+    ],
     itinerary: [{ title: "", description: "" }],
-    hotels: [{ name: "", location: "", rating: "", amenities: "" }],
+    hotels: [
+      { name: "", location: "", rating: "", amenities: "", hotelImages: [] },
+    ],
     availability: {
       startDate: "",
       endDate: "",
@@ -63,8 +64,8 @@ export default function CreatePackage() {
     },
     media: {
       coverImage: null,
-    hotelImages: [],               
-  touristLocationImages: [],  
+
+      touristLocationImages: [],
     },
   });
 
@@ -113,10 +114,12 @@ export default function CreatePackage() {
           />
         );
       case "Media":
-        return <MediaSection 
+        return (
+          <MediaSection
             data={packageData.media}
-    setPackageData={setPackageData}
-        />;
+            setPackageData={setPackageData}
+          />
+        );
       case "Availability":
         return (
           <AvailabilitySection
@@ -129,7 +132,6 @@ export default function CreatePackage() {
       default:
         return null;
     }
-
   };
 
   return (
@@ -243,7 +245,7 @@ function BasicInfoSection({ data, setPackageData }) {
 }
 function AvailabilitySection({ data, setPackageData }) {
   const updateAvailability = (field, value) => {
-    setPackageData(prev => ({
+    setPackageData((prev) => ({
       ...prev,
       availability: {
         ...prev.availability,
@@ -256,7 +258,6 @@ function AvailabilitySection({ data, setPackageData }) {
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold">Availability</h2>
 
-    
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium">Start Date</label>
@@ -279,7 +280,6 @@ function AvailabilitySection({ data, setPackageData }) {
         </div>
       </div>
 
-
       <div>
         <label className="block text-sm font-medium">Max Bookings</label>
         <input
@@ -291,7 +291,6 @@ function AvailabilitySection({ data, setPackageData }) {
         />
       </div>
 
-
       <div>
         <label className="block text-sm font-medium">Inclusion</label>
         <textarea
@@ -302,7 +301,6 @@ function AvailabilitySection({ data, setPackageData }) {
           onChange={(e) => updateAvailability("inclusion", e.target.value)}
         />
       </div>
-
 
       <div>
         <label className="block text-sm font-medium">Exclusion</label>
@@ -373,12 +371,12 @@ function TouristSpotsSection({ spots, setPackageData }) {
       ],
     }));
   };
-const removetourist = (index) => {
-    setPackageData(prev => ({
+  const removetourist = (index) => {
+    setPackageData((prev) => ({
       ...prev,
       touristSpots: prev.touristSpots.filter((_, i) => i !== index),
     }));
-  }
+  };
   const updateSpot = (index, field, value) => {
     setPackageData((prev) => {
       const updated = [...prev.touristSpots];
@@ -393,9 +391,9 @@ const removetourist = (index) => {
 
       {spots.map((spot, index) => (
         <div key={index} className="border rounded-xl p-4 space-y-3">
-           <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center">
             <h3 className="font-medium">tourist spot{index + 1}</h3>
-             {spots.length > 1 && (
+            {spots.length > 1 && (
               <button
                 className="text-red-500 text-sm"
                 onClick={() => removetourist(index)}
@@ -403,13 +401,12 @@ const removetourist = (index) => {
                 Remove
               </button>
             )}
-            </div>
+          </div>
           <input
             className="p-3 border rounded-lg w-full"
             placeholder="Spot Name"
             value={spot.spotname}
             onChange={(e) => updateSpot(index, "spotname", e.target.value)}
-            
           />
 
           <input
@@ -435,9 +432,8 @@ const removetourist = (index) => {
   );
 }
 function MediaSection({ data, setPackageData }) {
-
   const removeImage = (type, index) => {
-    setPackageData(prev => {
+    setPackageData((prev) => {
       const updated = [...prev.media[type]];
       updated.splice(index, 1);
 
@@ -452,7 +448,7 @@ function MediaSection({ data, setPackageData }) {
   };
 
   const addMultipleImages = (type, files) => {
-    setPackageData(prev => ({
+    setPackageData((prev) => ({
       ...prev,
       media: {
         ...prev.media,
@@ -471,7 +467,7 @@ function MediaSection({ data, setPackageData }) {
           type="file"
           accept="image/*"
           onChange={(e) =>
-            setPackageData(prev => ({
+            setPackageData((prev) => ({
               ...prev,
               media: {
                 ...prev.media,
@@ -490,7 +486,7 @@ function MediaSection({ data, setPackageData }) {
             />
             <button
               onClick={() =>
-                setPackageData(prev => ({
+                setPackageData((prev) => ({
                   ...prev,
                   media: { ...prev.media, coverImage: null },
                 }))
@@ -502,7 +498,6 @@ function MediaSection({ data, setPackageData }) {
           </div>
         )}
       </div>
-
 
       <div className="border rounded-xl p-4 space-y-3">
         <h3 className="font-medium">Tourist Location Images</h3>
@@ -525,9 +520,7 @@ function MediaSection({ data, setPackageData }) {
               >
                 <span className="truncate">{file.name}</span>
                 <button
-                  onClick={() =>
-                    removeImage("touristLocationImages", index)
-                  }
+                  onClick={() => removeImage("touristLocationImages", index)}
                   className="text-red-500 font-medium"
                 >
                   Remove
@@ -541,70 +534,51 @@ function MediaSection({ data, setPackageData }) {
   );
 }
 
-
 function HotelsSection({ hotels, setPackageData }) {
-
-
-  const addHotel = () => {
-    setPackageData(prev => ({
+  const addHotel = () =>
+    setPackageData((prev) => ({
       ...prev,
       hotels: [
         ...prev.hotels,
-        { name: "", nights: "", rating: "", roomType: "" },
+        { name: "", location: "", rating: "", amenities: "", hotelImages: [] },
       ],
     }));
-  };
-  const removeImage = (type, index) => {
-    setPackageData(prev => {
-      const updated = [...prev.media[type]];
-      updated.splice(index, 1);
-
-      return {
-        ...prev,
-        media: {
-          ...prev.media,
-          [type]: updated,
-        },
-      };
-    });
-  };
-  const updateHotel = (index, field, value) => {
-    setPackageData(prev => {
-      const updatedHotels = [...prev.hotels];
-      updatedHotels[index] = {
-        ...updatedHotels[index],
-        [field]: value,
-      };
-      return { ...prev, hotels: updatedHotels };
-    });
-  };
-
-  const addMultipleImages = (type, files) => {
-    setPackageData(prev => ({
-      ...prev,
-      media: {
-        ...prev.media,
-        [type]: [...prev.media[type], ...Array.from(files)],
-      },
-    }));
-  };
-  const removeHotel = (index) => {
-    setPackageData(prev => ({
+  const removeHotel = (index) =>
+    setPackageData((prev) => ({
       ...prev,
       hotels: prev.hotels.filter((_, i) => i !== index),
     }));
-  };
+  const updateHotel = (index, field, value) =>
+    setPackageData((prev) => {
+      const updatedHotels = [...prev.hotels];
+      updatedHotels[index] = { ...updatedHotels[index], [field]: value };
+      return { ...prev, hotels: updatedHotels };
+    });
+  const addHotelImages = (hotelIndex, files) =>
+    setPackageData((prev) => {
+      const updatedHotels = [...prev.hotels];
+      updatedHotels[hotelIndex].hotelImages.push(...Array.from(files));
+      return { ...prev, hotels: updatedHotels };
+    });
+  const removeHotelImage = (hotelIndex, imageIndex) =>
+    setPackageData((prev) => {
+      const updatedHotels = [...prev.hotels];
+      const updatedImages = [...updatedHotels[hotelIndex].hotelImages];
+      updatedImages.splice(imageIndex, 1);
+      updatedHotels[hotelIndex] = {
+        ...updatedHotels[hotelIndex],
+        hotelImages: updatedImages,
+      };
+      return { ...prev, hotels: updatedHotels };
+    });
 
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold">Hotels</h2>
-
       {hotels.map((hotel, index) => (
         <div key={index} className="border rounded-xl p-4 space-y-4">
-
           <div className="flex justify-between items-center">
             <h3 className="font-medium">Hotel {index + 1}</h3>
-
             {hotels.length > 1 && (
               <button
                 className="text-red-500 text-sm"
@@ -614,84 +588,62 @@ function HotelsSection({ hotels, setPackageData }) {
               </button>
             )}
           </div>
-
           <input
             className="p-3 border rounded-lg w-full"
             placeholder="Hotel Name"
             value={hotel.name}
-            onChange={(e) =>
-              updateHotel(index, "name", e.target.value)
-            }
+            onChange={(e) => updateHotel(index, "name", e.target.value)}
           />
-
           <div className="grid grid-cols-2 gap-4">
             <input
               className="p-3 border rounded-lg"
-              placeholder="location"
+              placeholder="Location"
               value={hotel.location}
-              onChange={(e) =>
-                updateHotel(index, "location", e.target.value)
-              }
+              onChange={(e) => updateHotel(index, "location", e.target.value)}
             />
-
             <input
               className="p-3 border rounded-lg"
               placeholder="Rating (5 Star)"
               value={hotel.rating}
-              onChange={(e) =>
-                updateHotel(index, "rating", e.target.value)
-              }
+              onChange={(e) => updateHotel(index, "rating", e.target.value)}
             />
           </div>
-
           <input
             className="p-3 border rounded-lg w-full"
-            placeholder="Room Type (Deluxe, Suite...)"
+            placeholder="Room Type / Amenities"
             value={hotel.amenities}
-            onChange={(e) =>
-              updateHotel(index, "amenities", e.target.value)
-            }
+            onChange={(e) => updateHotel(index, "amenities", e.target.value)}
           />
-          
-      <div className="border rounded-xl p-4 space-y-3">
-        <h3 className="font-medium">Hotel Images</h3>
-
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={(e) =>
-            addMultipleImages("hotelImages", e.target.files)
-          }
-        />
-
-        {hotels.hotelImages.length > 0 && (
-          <ul className="space-y-2 mt-3">
-            {hotels.hotelImages.map((file, index) => (
-              <li
-                key={index}
-                className="flex justify-between items-center border px-3 py-2 rounded-lg text-sm"
-              >
-                <span className="truncate">{file.name}</span>
-                <button
-                  onClick={() => removeImage("hotelImages", index)}
-                  className="text-red-500 font-medium"
-                >
-                  Remove
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+          <div className="border rounded-xl p-4 space-y-3">
+            <h3 className="font-medium">Hotel Images</h3>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => addHotelImages(index, e.target.files)}
+            />
+            {hotel.hotelImages.length > 0 && (
+              <ul className="space-y-2 mt-3">
+                {hotel.hotelImages.map((file, idx) => (
+                  <li
+                    key={idx}
+                    className="flex justify-between items-center border px-3 py-2 rounded-lg text-sm"
+                  >
+                    <span className="truncate">{file.name}</span>
+                    <button
+                      onClick={() => removeHotelImage(index, idx)}
+                      className="text-red-500 font-medium"
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
-        
       ))}
-
-      <button
-        className="text-[#3ab19d] font-medium"
-        onClick={addHotel}
-      >
+      <button className="text-[#3ab19d] font-medium" onClick={addHotel}>
         + Add Another Hotel
       </button>
     </div>
@@ -699,10 +651,9 @@ function HotelsSection({ hotels, setPackageData }) {
 }
 
 function PublishSection({ packageData }) {
-
   const handlePublish = async () => {
     try {
-      const formData =  buildPackageFormData(packageData);
+      const formData = buildPackageFormData(packageData);
 
       const res = await api.post("admin/addpackages", formData, {
         headers: {
@@ -713,7 +664,6 @@ function PublishSection({ packageData }) {
 
       alert(res.data.message);
       console.log(res.data);
-
     } catch (error) {
       console.error(error);
       alert(error.response?.data?.message || "Failed to create package");
@@ -743,7 +693,7 @@ function LocationsSection({ data, setPackageData }) {
           placeholder="Country"
           value={data.country}
           onChange={(e) =>
-            setPackageData(prev => ({
+            setPackageData((prev) => ({
               ...prev,
               locations: {
                 ...prev.locations,
@@ -758,7 +708,7 @@ function LocationsSection({ data, setPackageData }) {
           placeholder="City / Region"
           value={data.city}
           onChange={(e) =>
-            setPackageData(prev => ({
+            setPackageData((prev) => ({
               ...prev,
               locations: {
                 ...prev.locations,
@@ -774,7 +724,7 @@ function LocationsSection({ data, setPackageData }) {
         placeholder="Pickup Location"
         value={data.pickup}
         onChange={(e) =>
-          setPackageData(prev => ({
+          setPackageData((prev) => ({
             ...prev,
             locations: {
               ...prev.locations,
@@ -790,7 +740,7 @@ function LocationsSection({ data, setPackageData }) {
         placeholder="Additional notes"
         value={data.notes}
         onChange={(e) =>
-          setPackageData(prev => ({
+          setPackageData((prev) => ({
             ...prev,
             locations: {
               ...prev.locations,
@@ -803,28 +753,44 @@ function LocationsSection({ data, setPackageData }) {
   );
 }
 
-function PricingSection({price,setPackageData}) {
-
+function PricingSection({ price, setPackageData }) {
   return (
     <div className="space-y-6">
-
       <h2 className="text-2xl font-semibold">Pricing & Discounts</h2>{" "}
       <div className="grid grid-cols-2 gap-4">
-
         <input
           className="p-3 border rounded-lg"
           placeholder="Original Price"
           value={price.originalPrice}
-          onChange={(e)=>{setPackageData(prev=>({...prev,pricing:{...prev.pricing,originalPrice:e.target.value}}))}}
+          onChange={(e) => {
+            setPackageData((prev) => ({
+              ...prev,
+              pricing: { ...prev.pricing, originalPrice: e.target.value },
+            }));
+          }}
         />
         <input
           className="p-3 border rounded-lg"
           placeholder="Discounted Price"
           value={price.discountedPrice}
-          onChange={(e)=>{setPackageData(prev=>({...prev,pricing:{...prev.pricing,discountedPrice:e.target.value}}))}}
+          onChange={(e) => {
+            setPackageData((prev) => ({
+              ...prev,
+              pricing: { ...prev.pricing, discountedPrice: e.target.value },
+            }));
+          }}
         />
       </div>
-      <select className="p-3 border rounded-lg w-40" value={price.currency} onChange={(e)=>{setPackageData(prev=>({...prev,pricing:{...prev.pricing,currency:e.target.value}}))}}>
+      <select
+        className="p-3 border rounded-lg w-40"
+        value={price.currency}
+        onChange={(e) => {
+          setPackageData((prev) => ({
+            ...prev,
+            pricing: { ...prev.pricing, currency: e.target.value },
+          }));
+        }}
+      >
         <option>USD</option> <option>INR</option> <option>EUR</option>{" "}
       </select>
       <div className="border rounded-xl p-4 space-y-3">
@@ -833,19 +799,22 @@ function PricingSection({price,setPackageData}) {
           className="p-3 border rounded-lg w-full"
           placeholder="Label (Summer Sale)"
           value={price.label}
-          onChange={(e)=>{
-            setPackageData(prev=>({...prev,pricing:{...prev.pricing,label:e.target.value}}))
+          onChange={(e) => {
+            setPackageData((prev) => ({
+              ...prev,
+              pricing: { ...prev.pricing, label: e.target.value },
+            }));
           }}
-
         />
         <input
           className="p-3 border rounded-lg w-full"
           placeholder="Percentage %"
           value={price.discountpercentage}
-          onChange={(e)=>{
-            setPackageData(prev=>({
-              ...prev,pricing:{...prev.pricing,discountpercentage:e.target.value}
-            }))
+          onChange={(e) => {
+            setPackageData((prev) => ({
+              ...prev,
+              pricing: { ...prev.pricing, discountpercentage: e.target.value },
+            }));
           }}
         />
       </div>
