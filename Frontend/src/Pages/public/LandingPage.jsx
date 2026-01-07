@@ -1,5 +1,6 @@
 import { ArrowRight, Globe, Trophy, MessageSquare, Sparkles } from "lucide-react"
 import { Link } from "react-router-dom"
+import { useAuth } from "../../context/authContext"
 
 export default function Landing() {
   return (
@@ -25,16 +26,16 @@ export default function Landing() {
 
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/explorepackages"
+              to="/login"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#3ab19d] text-white font-semibold shadow-lg hover:bg-[#2c9c8c] transition"
-            >
+            replace >
               Explore Packages <ArrowRight />
             </Link>
 
             <Link
-              to="/challenges"
+              to="/login"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 transition"
-            >
+           replace >
               View Challenges
             </Link>
           </div>
@@ -85,8 +86,7 @@ export default function Landing() {
           </div>
         </div>
       </section>
-
-      {/* ================= HOW IT WORKS ================= */}
+      
       <section className="py-24 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center mb-12">
@@ -112,7 +112,7 @@ export default function Landing() {
           </p>
 
           <Link
-            to="/home"
+            to="/login"
             className="inline-flex items-center gap-2 px-8 py-3 bg-white text-[#2c9c8c] font-bold rounded-xl hover:bg-gray-100 transition"
           >
             Get Started <ArrowRight />

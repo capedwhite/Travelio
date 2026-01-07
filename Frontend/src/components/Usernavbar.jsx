@@ -1,8 +1,10 @@
 import { User, LogOut, BookOpen, LucideClipboardPen,Award,Save} from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/authContext";
 
 
  function ProfileHoverMenu() {
+  const {logout}=useAuth()
   return (
     <div className="relative group">
       <img
@@ -30,7 +32,6 @@ import { Link, useLocation } from "react-router-dom";
         <ul className="py-2">
           <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <User size={18} />
-
             My Profile
         
           </li>
@@ -50,7 +51,7 @@ import { Link, useLocation } from "react-router-dom";
             <Save size={18} />
           Saved Packages
           </li>
-          <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-red-600 cursor-pointer">
+          <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-red-600 cursor-pointer" onClick={logout}>
             <LogOut size={18} />
             Logout
           </li>
@@ -88,21 +89,23 @@ export default function NavBar({ children })
   bg-white
 ">
         <img src="/images/Logo.png" className="w-33 h-20 drop-shadow-md hover:scale-105 transition"></img>
-        <div className="flex gap-4 prounded-lg p-1  font-semibold  bg-gradient-to-r from-[#9ee5da] to-[#3ab19d] rounded-full">
+        <div className="flex gap-4 prounded-lg p-1  font-semibold  bg-[#3ab19d] rounded-full shadow-sm">
           {navItems.map((item)=>(
 <Link key={item.name} to={item.path}
                 className={` w-40
                   
     flex justify-center items-center
     rounded-full
+
     px-2 py-3
     text-md
     transition-all duration-300
     hover:bg-white/70
+    hover:text-[#2c9c8c]
     hover:shadow-lg
     hover:-translate-y-0.5
 
-                ${isActive(item.path) ? "bg-white/90 rounded-full shadow-md text-[#2c9c8c] font-bold" : "text-black/90"}`}
+                ${isActive(item.path) ? "bg-white/90 rounded-full shadow-md text-[#2c9c8c] font-bold transition" : "text-    text-white"}`}
               >
                 <h3>{item.name}</h3>
           </Link>

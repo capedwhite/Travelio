@@ -17,6 +17,7 @@ const [eyeretype,setEyeretype]=useState("")
       const onsubmit =async(data)=>{
   try {
       const res = await api.post("/auth/signup", data);
+      localStorage.setItem("authtoken",res.data.token)
       alert(res.data.message);
       navigate("/explorepackages");
     } catch (err) {

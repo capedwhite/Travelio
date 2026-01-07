@@ -42,7 +42,7 @@ const mockBookings = [
   },
 ];
 
-export default function AdminBookingsPage() {
+function AdminBookingsPage() {
   const [expandedPackage, setExpandedPackage] = useState(null);
 
   return (
@@ -140,3 +140,4 @@ function BookingsTable({ bookings }) {
     
   );
 }
+export default AdminBookingsPage

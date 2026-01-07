@@ -27,7 +27,7 @@ packageData.hotels?.forEach((hotel,hotelIndex) => {
 
   return formData;
 };
-export default function CreatePackage() {
+ function CreatePackage() {
   const [active, setActive] = useState("Basic Info");
   const [packageData, setPackageData] = useState({
     basicInfo: {
@@ -833,3 +833,4 @@ function PricingSection({ price, setPackageData }) {
     </div>
   );
 }
+export default CreatePackage

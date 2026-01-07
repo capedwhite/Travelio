@@ -55,7 +55,7 @@ const navigate = useNavigate()
     <div className="min-h-screen bg-[#fcfcfc] p-4 sm:p-6 ">
       <div className="max-w-7xl mx-auto mt-[5%] pb-10">
     
-        <div className="h-80 rounded-3xl mb-10 bg-amber-900">
+        <div className="h-80 rounded-3xl mb-10 bg-white shadow-md">
 <img></img>
         </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Explore Packages</h1>

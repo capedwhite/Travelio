@@ -112,12 +112,12 @@ function PostCard({ post, onLike, onComment }) {
   );
 }
 
-export default function PackageSocialFeed() {
+ function PackageSocialFeed() {
   const [posts, setPosts] = useState(initialPosts);
   const [newPostOpen, setNewPostOpen] = useState(false);
   const [newPostText, setNewPostText] = useState("");
 
-  // ❤️ Like handler
+
   const toggleLike = (postId) => {
     setPosts(posts.map(post =>
       post.id === postId
@@ -213,3 +213,4 @@ export default function PackageSocialFeed() {
     </div>
   );
 }
+export default PackageSocialFeed

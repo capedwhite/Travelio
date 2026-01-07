@@ -11,11 +11,12 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("authtoken");
 
     if (token) {
       try {
         const decoded = jwtDecode(token);
+        console.log(decoded)
         setUser(decoded);
       } catch (err) {
         localStorage.removeItem("token");
@@ -27,12 +28,18 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const logout = () => {
-    localStorage.removeItem("token");
+    console.log("logout function calling")
+    try{
+    localStorage.removeItem("authtoken");
     setUser(null);
+    }
+    catch(error){
+        console.log(error)
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading,logout }}>
+    <AuthContext.Provider value={{ user,loading,logout }}>
       {children}
     </AuthContext.Provider>
   );

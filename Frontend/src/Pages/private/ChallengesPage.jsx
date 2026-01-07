@@ -34,7 +34,7 @@ const challenges = [
 
 
 
-export default function TravelChallenges() {
+function TravelChallenges() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       
@@ -98,3 +98,4 @@ export default function TravelChallenges() {
     </div>
   );
 }
+export default  TravelChallenges

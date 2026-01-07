@@ -20,7 +20,7 @@ function DashboardCard({ title, value, color }) {
   );
 }
 
- export default function AdminDashboard() {
+function AdminDashboard() {
   const stats = [
     { title: "Total Packages", value: 12, color: "bg-[#10b981]" },
     { title: "Bookings Today", value: 5, color: "bg-[#3b82f6]" },
@@ -53,3 +53,4 @@ function DashboardCard({ title, value, color }) {
     </div>
   );
 }
+ export default AdminDashboard

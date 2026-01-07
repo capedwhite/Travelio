@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp, Calendar, Hotel, Map } from "lucide-react"
 import api from "../../api/axios";
 import { useParams } from "react-router-dom";
 
-export default function PackageDetailsPage() {
+function PackageDetailsPage() {
   
   const[pkg,setPackage]=useState()
   const [openItinerary, setOpenItinerary] = useState(null)
@@ -302,3 +302,4 @@ const handleBooking = () => {
     </div>
   )
 }
+export default PackageDetailsPage
