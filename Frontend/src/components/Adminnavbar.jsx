@@ -1,13 +1,16 @@
-import { Home, Package, ClipboardList, DollarSign, Award } from "lucide-react";
+import { Home, Package, ClipboardList, DollarSign, Award, LogOut } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../context/authContext";
 
 export default function AdminSidebar({children}) {
+  const{logout}=useAuth()
   const navItems = [
     { name: "Dashboard", icon: <Home size={18} />, path: "/admin/dashboard" },
     { name: "Packages", icon: <Package size={18} />, path: "/admin/createpackages" },
     { name: "Bookings", icon: <ClipboardList size={18} />, path: "/admin/bookings" },
     { name: "Bargain Requests", icon: <DollarSign size={18} />, path: "/admin/bargains" },
     { name: "Challenges", icon: <Award size={18} />, path: "/admin/challenges" },
+   
   ];
 
   return (
@@ -27,7 +30,17 @@ export default function AdminSidebar({children}) {
             {item.icon}
             <span>{item.name}</span>
           </NavLink>
+          
         ))}
+       <div className="mt-75 p-3">
+  <button
+    onClick={logout}
+    className="w-full flex items-center gap-3 p-3 rounded-md hover:bg-[#69d0ac9e] transition"
+  >
+    <LogOut />
+    <span>Logout</span>
+  </button>
+</div>
       </nav>
     </div>
 

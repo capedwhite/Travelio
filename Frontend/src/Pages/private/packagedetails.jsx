@@ -2,6 +2,10 @@ import { useEffect, useState } from "react"
 import { ChevronDown, ChevronUp, Calendar, Hotel, Map } from "lucide-react"
 import api from "../../api/axios";
 import { useParams } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { bargainSchema } from "./schema/bargainSchema";
+import { bookingSchema } from "./schema/bookingSchema";
 
 function PackageDetailsPage() {
   
@@ -9,19 +13,8 @@ function PackageDetailsPage() {
   const [openItinerary, setOpenItinerary] = useState(null)
   const [ openTourist,setOpenTourist]=useState(null)
   const [openHotel, setOpenHotel] = useState(null)
-   const [bookingData, setBookingData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    travelers: 1,
-    date: ""
-  });
-
-  const [bargainData, setBargainData] = useState({
-    offer: "",
-    duration: "",
-    notes: ""
-  });
+  const {register:bookingregister,handleSubmit:bookingsubmit,formState:{errors:bookingerror}}=useForm({resolver:zodResolver(bookingSchema)})
+  const {register:bargainregister,handleSubmit:bargainsubmit,formState:{errors:bargainerror}}=useForm({resolver:zodResolver(bargainSchema)})
 
 
 const {id: packageid}=useParams();
@@ -44,15 +37,36 @@ getPackagebyid()},[packageid])
 if (!pkg) {
   return <div className="mt-20 text-center">Loading package details...</div>;
 }
-const handleBooking = () => {
-    console.log("Booking submitted:", {  ...bookingData });
-    alert(`Booking confirmed for ${pkg.title}!`);
-    setBookingData({ name: "", email: "", phone: "", travelers: 1, date: "" });
+const handleBooking = async(data) => {
+console.log("handling booking submission ",data)
+try {
+  const payload={
+    ...data,
+    packageid
   }
-    const handleBargain = () => {
-    console.log("Bargain submitted:", { package: pkg.title, ...bargainData });
-    alert(`Bargain request submitted for ${pkg.title}! We'll get back to you soon.`);
-    setBargainData({ offer: "", duration: "", notes: "" });
+  const res = await api.post("/user/explorepackages/booking",payload)
+console.log(res.data?.data)
+alert(res.data?.message)
+} catch (error) {
+  console.log(error.message)
+  alert(error.response?.data?.message)
+}
+
+  }
+    const handleBargain = async(data) => {
+  try {
+      const payload={
+    ...data,
+    packageid
+  }
+    const res = await api.post("/user/explorepackages/bargain",payload)
+    console.log(res.data.data)
+    alert(res.data.message)
+  } catch (error) {
+    console.log(error)
+    alert(error.res.data.message)
+  }
+
   };
 
   return (
@@ -60,10 +74,9 @@ const handleBooking = () => {
     <div className="min-h-screen bg-[#f9fafb] p-6 mt-20 ">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-        {/* LEFT MAIN CONTENT */}
         <div className="lg:col-span-2 space-y-10">
 
-          {/* HERO IMAGES */}
+
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {pkg.images.tourist.map((img, i) => (
               <img
@@ -76,6 +89,7 @@ const handleBooking = () => {
           <section className="bg-white rounded-2xl shadow-xl p-6">
        <h2 className="text-2xl font-bold mb-4">Description</h2>
        <p>{pkg.description}</p>
+
           </section>
           <section className=" rounded-2xl p-2 flex gap-10 items-center">
             <div className="flex items-center gap-2">
@@ -190,90 +204,101 @@ const handleBooking = () => {
 
 
         <div className="space-y-6 sticky top-24 h-fit">
+          <form onSubmit={bookingsubmit(handleBooking)}>
           <div className="bg-white rounded-2xl shadow-xl p-6">
             <h2 className="text-2xl font-semibold mb-4 border-b pb-2 border-gray-200">
             Book This Package
           </h2>
           <div className="space-y-3">
+            <label>Full name : </label>
             <input
               type="text"
-              placeholder="Full Name"
-              value={bookingData.name}
-              onChange={(e) => setBookingData({ ...bookingData, name: e.target.value })}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#4cc9b4] focus:outline-none"
+              placeholder="Enter your Full Name"
+              {...bookingregister("fullname")}
+              className="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-[#4cc9b4] focus:outline-none"
             />
+            {bookingerror.name && <p className="text-[red] text-sm ">{bookingerror.name.message}</p>}
+                     <label>Email : </label>
+            
             <input
               type="email"
-              placeholder="Email"
-              value={bookingData.email}
-              onChange={(e) => setBookingData({ ...bookingData, email: e.target.value })}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#4cc9b4] focus:outline-none"
+              placeholder="Enter your Email"
+            {...bookingregister("email")}
+              className="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-[#4cc9b4] focus:outline-none"
             />
+            {bookingerror.email && <p className="text-[red] text-sm">{bookingerror.email.message}</p>}
+             <label>Phone: </label>
             <input
               type="tel"
-              placeholder="Phone"
-              value={bookingData.phone}
-              onChange={(e) => setBookingData({ ...bookingData, phone: e.target.value })}
+              placeholder="Enter your Phone no"
+               {...bookingregister("phone")}
               className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#4cc9b4] focus:outline-none"
             />
+            {bookingerror.phone && <p className="text-[red] text-sm">{bookingerror.phone.message}</p>}
+              <label>Travelers:</label>
             <input
               type="number"
               min={1}
-              value={bookingData.travelers}
-              onChange={(e) => setBookingData({ ...bookingData, travelers: e.target.value })}
+  {...bookingregister("travelers")}
               className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#4cc9b4] focus:outline-none"
               placeholder="Number of Travelers"
             />
+                     {bookingerror.travelers && <p className="text-[red] text-sm">{bookingerror.travelers.message}</p>}
+                        <label>Date:</label>
             <input
               type="date"
-              value={bookingData.date}
-              onChange={(e) => setBookingData({ ...bookingData, date: e.target.value })}
+        {...bookingregister("date")}
               className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#4cc9b4] focus:outline-none"
             />
+                            {bookingerror.date && <p className="text-[red] text-sm" >{bookingerror.date.message}</p>}
           </div>
           <button
             className="mt-4 w-full bg-[#3ab19d] text-white px-4 py-2 rounded-lg hover:bg-[#4cc9b4] transition duration-300 shadow-md hover:shadow-xl"
-            onClick={handleBooking}
+           type="submit"
           >
             Confirm Booking
           </button>
           </div>
-
+</form>
+<form onSubmit={bargainsubmit(handleBargain)}>
           <div className="bg-white rounded-2xl shadow-xl p-6 ">
            <h2 className="text-2xl font-semibold mb-4 border-b pb-2 border-gray-200">
           Negotiate / Bargain
           </h2>
           <div className="flex flex-col gap-3 ">
+            <label className="text-lg font-semibold text-[#4cc9b4]">Original price : {pkg.price.originalPrice}</label> 
           <input
             type="number"
-            placeholder={`Your Offer (Original: $${pkg.price.originalprice})`}
-            value={bargainData.offer}
-            onChange={(e) => setBargainData({ ...bargainData, offer: e.target.value })}
+            placeholder={`Your Offer (Original: $${pkg.price.originalPrice})`}
+            {...bargainregister("offerprice")}
             className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
           />
+          {bargainerror.offerprice && <p className="text-[red] text-sm">{bargainerror.offerprice.message}</p>}
           <input
             type="text"
             placeholder={`Preferred Duration (Current: ${pkg.duration})`}
-            value={bargainData.duration}
-            onChange={(e) => setBargainData({ ...bargainData, duration: e.target.value })}
+     {...bargainregister("offerdate")}
             className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
           />
+             {bargainerror.offerdate && <p className="text-[red] text-sm">{bargainerror.offerdate.message}</p>}
           <input
             type="text"
             placeholder="Notes / Changes"
-            value={bargainData.notes}
-            onChange={(e) => setBargainData({ ...bargainData, notes: e.target.value })}
+            {...bargainregister("notes")}
             className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
           />
+          {bargainerror.notes && <p className="text-[red] text-sm">{bargainerror.notes.message}</p>}
         </div>
         <button
           className="mt-4 bg-[#dda169] text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition duration-300 shadow-md hover:shadow-xl"
-          onClick={handleBargain}
+        type="submit"
         >
           Submit Request
         </button>
           </div>
+          </form>
         </div>
+        
         <section className="bg-white rounded-2xl shadow-xl p-6 w-210">
   <h2 className="text-2xl font-bold mb-4">Inclusions</h2>
   <ul className="list-disc list-inside space-y-2 text-gray-700">

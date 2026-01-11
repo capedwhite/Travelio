@@ -81,12 +81,13 @@ const navigate = useNavigate()
           {pkg.map((pkg) => (
    <>
       <div className="group border border-1 border-[#3ab19d]/50 rounded-lg overflow-hidden shadow-sm hover:shadow-2xl hover:scale-103 transition duration-300 bg-white" 
-      onClick={()=>{navigate(`/explorepackages/${pkg.id}`)}}>
+     >
         <div className="relative overflow-hidden w-full" style={{ paddingTop: "56%" }}>
           <img
             src={`http://localhost:3000/${pkg.images.coverImage}`}
             alt={pkg.title}
             className="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+             onClick={()=>{navigate(`/explorepackages/${pkg.id}`)}}
           />
           
           {pkg.seasonalDiscount.label && (
@@ -156,36 +157,27 @@ const navigate = useNavigate()
               <input
                 type="text"
                 placeholder="Full Name"
-                value={bookingData.name}
-                onChange={(e) => setBookingData({ ...bookingData, name: e.target.value })}
                 className="w-full border rounded px-3 py-2"
               />
               <input
                 type="email"
                 placeholder="Email"
-                value={bookingData.email}
-                onChange={(e) => setBookingData({ ...bookingData, email: e.target.value })}
                 className="w-full border rounded px-3 py-2"
               />
               <input
                 type="tel"
                 placeholder="Phone Number"
-                value={bookingData.phone}
-                onChange={(e) => setBookingData({ ...bookingData, phone: e.target.value })}
+
                 className="w-full border rounded px-3 py-2"
               />
               <input
                 type="number"
                 placeholder="Number of Travelers"
                 min={1}
-                value={bookingData.travelers}
-                onChange={(e) => setBookingData({ ...bookingData, travelers: e.target.value })}
                 className="w-full border rounded px-3 py-2"
               />
               <input
                 type="date"
-                value={bookingData.date}
-                onChange={(e) => setBookingData({ ...bookingData, date: e.target.value })}
                 className="w-full border rounded px-3 py-2"
               />
             </div>
@@ -207,7 +199,7 @@ const navigate = useNavigate()
         </div>
       )}
 
-      {/* Bargain Modal */}
+
       {bargainOpen && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto">

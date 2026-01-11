@@ -1,23 +1,28 @@
 
 import { Link, useNavigate } from "react-router-dom"
+import { zodResolver } from "@hookform/resolvers/zod";
 import api from "../../api/axios.js";
 import {useForm} from "react-hook-form"
 import { useState } from "react";
+import { useAuth } from "../../context/authContext.jsx";
+import { signupSchema } from "./schema/signupschema.jsx";
 
 export default function SignupPage(){
+  
       const{
         register,
         handleSubmit,
         formState:{errors},
         getValues
-      }=useForm()
+      }=useForm({resolver: zodResolver(signupSchema)})
+        const {login} = useAuth()
 const navigate =useNavigate();
 const [eyepass,setEyepass]=useState("");
 const [eyeretype,setEyeretype]=useState("")
       const onsubmit =async(data)=>{
   try {
       const res = await api.post("/auth/signup", data);
-      localStorage.setItem("authtoken",res.data.token)
+    login(res.data.token)
       alert(res.data.message);
       navigate("/explorepackages");
     } catch (err) {
@@ -49,7 +54,7 @@ console.log(errors)
             placeholder="Enter your username"
               className="h-[50px] border border-gray-400 rounded-md px-4 focus:outline-none focus:ring-1 focus:ring-[#3ab19d]"
               type="text"
-              {...register("username",{required:"username field is required"})}
+              {...register("username")}
             />
             {errors.username &&(
               <p className="text-[red] text-xs">{errors.username.message}</p>
@@ -59,7 +64,7 @@ console.log(errors)
             placeholder="Enter your email"
               className="h-[50px] border border-gray-400 rounded-md px-4 focus:outline-none focus:ring-1 focus:ring-[#3ab19d]"
               type="text"
-              {...register("email",{required:"Email field is required"})}
+              {...register("email")}
             />
               {errors.email &&(
               <p className="text-[red] text-xs">{errors.email.message}</p>
@@ -71,7 +76,7 @@ console.log(errors)
             max={10}
               className="h-[50px] border border-gray-400 rounded-md px-4 focus:outline-none focus:ring-1 focus:ring-[#3ab19d]"
               type="text"
-              {...register("number",{required:"number field is required"})}
+              {...register("number")}
             />
               {errors.number &&(
               <p className="text-[red] text-xs">{errors.number.message}</p>
@@ -83,7 +88,7 @@ console.log(errors)
             placeholder="Enter your password"
               className="h-[50px] border border-gray-400 rounded-md px-4 focus:outline-none focus:ring-1 focus:ring-[#3ab19d] "
               type={eyepass?"text":"password"}
-              {...register("password",{required:"password field is required"})}
+              {...register("password")}
               
             />
             <button type="button" className="absolute right-2 bottom-3" onClick={()=>setEyepass(!eyepass)}>
@@ -110,7 +115,7 @@ console.log(errors)
             placeholder="Re-type your password"
               className="h-[50px] border border-gray-400 rounded-md px-4 focus:outline-none focus:ring-1 focus:ring-[#3ab19d]"
               type={eyeretype?"text":"password"}
-             {...register("retype",{required:"Re-enter your password",validate:(value)=>value===getValues("password")||"passwords dont match"})}
+             {...register("retype")}
             />
                 <button type="button" className="absolute right-2 bottom-3" onClick={()=>setEyeretype(!eyeretype)}>
         {!eyeretype?<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="grey" class="size-6">

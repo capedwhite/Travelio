@@ -1,240 +1,142 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useForm, FormProvider, useFormContext, useFieldArray } from "react-hook-form";
 import AdminSidebar from "../../components/Adminnavbar";
 import api from "../../api/axios";
-const buildPackageFormData = (packageData) => {
+
+const buildPackageFormData = (data) => {
   const formData = new FormData();
+  formData.append("basicInfo", JSON.stringify(data.basicInfo));
+  formData.append("pricing", JSON.stringify(data.pricing));
+  formData.append("locations", JSON.stringify(data.locations));
+  formData.append("touristSpots", JSON.stringify(data.touristSpots));
+  formData.append("itinerary", JSON.stringify(data.itinerary));
+  formData.append("hotels", JSON.stringify(data.hotels));
+  formData.append("availability", JSON.stringify(data.availability));
 
-  formData.append("basicInfo", JSON.stringify(packageData.basicInfo));
-  formData.append("pricing", JSON.stringify(packageData.pricing));
-  formData.append("locations", JSON.stringify(packageData.locations));
-  formData.append("hotels", JSON.stringify(packageData.hotels));
-  formData.append("touristSpots", JSON.stringify(packageData.touristSpots));
-  formData.append("itinerary", JSON.stringify(packageData.itinerary));
-  formData.append("availability", JSON.stringify(packageData.availability));
-
-  if (packageData.media.coverImage) {
-    formData.append("coverImage", packageData.media.coverImage);
-  }
-
-packageData.hotels?.forEach((hotel,hotelIndex) => {
-  hotel.hotelImages?.forEach((file) => {
-    formData.append(`hotelImages[${hotelIndex}]`, file);
-  })});
-
-  packageData.media.touristLocationImages.forEach((file) => {
-    formData.append("touristImages", file);
-  });
-
+  if (data.media.coverImage) formData.append("coverImage", data.media.coverImage);
+  data.media.touristLocationImages.forEach((file) => formData.append("touristImages", file));
+  data.hotels.forEach((hotel) =>
+    hotel.hotelImages.forEach((file) =>
+      formData.append("hotelImages", file)
+    )
+  );
   return formData;
 };
- function CreatePackage() {
-  const [active, setActive] = useState("Basic Info");
-  const [packageData, setPackageData] = useState({
-    basicInfo: {
-      title: "",
-      description: "",
-      tag: "Budget Friendly",
-      duration: "",
-    },
-    pricing: {
-      originalPrice: "",
-      discountedPrice: "",
-      currency: "USD",
-      label: "",
-      discountpercentage: "",
-    },
-    locations: {
-      country: "",
-      city: "",
-      pickup: "",
-      notes: "",
-    },
-    touristSpots: [
-      { spotname: "", location: "", description: ""},
-    ],
-    itinerary: [{ title: "", description: "" }],
-    hotels: [
-      { name: "", location: "", rating: "", amenities: "", hotelImages: [] },
-    ],
-    availability: {
-      startDate: "",
-      endDate: "",
-      maxBookings: "",
-      inclusion: "",
-      exclusion: "",
-    },
-    media: {
-      coverImage: null,
-      touristLocationImages: [],
-    },
-  });
 
+const defaultValues = {
+  basicInfo: { title: "", description: "", tag: "Budget Friendly", duration: "" },
+  pricing: { originalPrice: "", discountedPrice: "", currency: "USD", label: "", discountpercentage: "" },
+  locations: { country: "", city: "", pickup: "", notes: "" },
+  touristSpots: [{ spotname: "", location: "", description: "" }],
+  itinerary: [{ title: "", description: "" }],
+  hotels: [{ name: "", location: "", rating: "", amenities: "", hotelImages: [] }],
+  availability: { startDate: "", endDate: "", maxBookings: "", inclusion: "", exclusion: "" },
+  media: { coverImage: null, touristLocationImages: [] },
+};
+
+function CreatePackage() {
+  const methods = useForm({ defaultValues });
+  const { handleSubmit } = methods;
+  const [active, setActive] = useState("Basic Info");
+
+const onSubmit = async (data) => {
+  try {
+    const formData = buildPackageFormData(data);
+    const res = await api.post("/admin/addpackages", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    alert(res.data.message);
+  } catch (err) {
+    console.error(err);
+    alert(err.response?.data?.message || "Failed to create package");
+  }
+};
   const renderSection = () => {
     switch (active) {
       case "Basic Info":
-        return (
-          <BasicInfoSection
-            data={packageData.basicInfo}
-            setPackageData={setPackageData}
-          />
-        );
+        return <BasicInfoSection />;
       case "Pricing":
-        return (
-          <PricingSection
-            price={packageData.pricing}
-            setPackageData={setPackageData}
-          />
-        );
+        return <PricingSection />;
       case "Locations":
-        return (
-          <LocationsSection
-            data={packageData.locations}
-            setPackageData={setPackageData}
-          />
-        );
-      case "Hotels":
-        return (
-          <HotelsSection
-            hotels={packageData.hotels}
-            setPackageData={setPackageData}
-          />
-        );
+        return <LocationsSection />;
       case "Tourist Spots":
-        return (
-          <TouristSpotsSection
-            spots={packageData.touristSpots}
-            setPackageData={setPackageData}
-          />
-        );
+        return <TouristSpotsSection />;
       case "Itinerary":
-        return (
-          <ItinerarySection
-            itinerary={packageData.itinerary}
-            setPackageData={setPackageData}
-          />
-        );
-      case "Media":
-        return (
-          <MediaSection
-            data={packageData.media}
-            setPackageData={setPackageData}
-          />
-        );
+        return <ItinerarySection />;
+      case "Hotels":
+        return <HotelsSection />;
       case "Availability":
-        return (
-          <AvailabilitySection
-            data={packageData.availability}
-            setPackageData={setPackageData}
-          />
-        );
+        return <AvailabilitySection />;
+      case "Media":
+        return <MediaSection />;
       case "Publish":
-        return <PublishSection packageData={packageData} />;
+        return <PublishSection onSubmit={handleSubmit(onSubmit)} />;
       default:
         return null;
     }
   };
 
   return (
+
     <>
-      <AdminSidebar />
-      <div className="ml-64 p-8 bg-[#f8fafc] min-h-screen">
-        <h1 className="text-3xl font-semibold mb-6">Create New Package</h1>
+    <AdminSidebar></AdminSidebar>
+    <div className=" ml-64 p-8 bg-gray-50 min-h-screen">
+      <h1 className="text-3xl font-semibold mb-6">Create New Package</h1>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="bg-white rounded-2xl shadow p-4 space-y-2">
+          {[
+            "Basic Info",
+            "Pricing",
+            "Locations",
+            "Hotels",
+            "Tourist Spots",
+            "Itinerary",
+            "Media",
+            "Availability",
+            "Publish",
+          ].map((step) => (
+            <button
+              key={step}
+              className={`w-full text-left px-4 py-3 rounded-lg transition ${
+                active === step ? "bg-teal-500/10 text-teal-700" : "hover:bg-teal-500/10"
+              }`}
+              onClick={() => setActive(step)}
+            >
+              {step}
+            </button>
+          ))}
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <div className="bg-white rounded-2xl shadow p-4 space-y-2">
-            {[
-              "Basic Info",
-              "Pricing",
-              "Locations",
-              "Hotels",
-              "Tourist Spots",
-              "Itinerary",
-              "Media",
-              "Availability",
-              "Publish",
-            ].map((step) => (
-              <button
-                key={step}
-                className={`w-full text-left px-4 py-3 rounded-lg transition ${
-                  active === step ? "bg-[#3ab19d]/10" : "hover:bg-[#3ab19d]/10"
-                }`}
-                onClick={() => setActive(step)}
-              >
-                {step}
-              </button>
-            ))}
-          </div>
-
+        <FormProvider {...methods}>
           <div className="lg:col-span-3 bg-white rounded-2xl shadow p-8">
             {renderSection()}
           </div>
-        </div>
+        </FormProvider>
       </div>
+    </div>
     </>
   );
 }
-function BasicInfoSection({ data, setPackageData }) {
-  const tags = [
-    "Budget Friendly",
-    "Adventure Package",
-    "Luxury",
-    "Family Friendly",
-    "Honeymoon Special",
-  ];
+
+function BasicInfoSection() {
+  const { register, watch, setValue } = useFormContext();
+  const tags = ["Budget Friendly", "Adventure Package", "Luxury", "Family Friendly", "Honeymoon Special"];
+  const selectedTag = watch("basicInfo.tag");
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Basic Information</h2>
-
-      <input
-        className="w-full p-3 border rounded-lg"
-        placeholder="Package Title"
-        value={data.title}
-        onChange={(e) =>
-          setPackageData((prev) => ({
-            ...prev,
-            basicInfo: { ...prev.basicInfo, title: e.target.value },
-          }))
-        }
-      />
-      <input
-        className="w-full p-3 border rounded-lg"
-        placeholder="Package Time duration"
-        value={data.duration}
-        onChange={(e) =>
-          setPackageData((prev) => ({
-            ...prev,
-            basicInfo: { ...prev.basicInfo, duration: e.target.value },
-          }))
-        }
-      />
-
-      <textarea
-        rows={5}
-        className="w-full p-3 border rounded-lg"
-        placeholder="Description"
-        value={data.description}
-        onChange={(e) =>
-          setPackageData((prev) => ({
-            ...prev,
-            basicInfo: { ...prev.basicInfo, description: e.target.value },
-          }))
-        }
-      />
-
+      <h2 className="text-2xl font-semibold">Basic Info</h2>
+      <input className="w-full p-3 border rounded-lg" placeholder="Title" {...register("basicInfo.title")} />
+      <input className="w-full p-3 border rounded-lg" placeholder="Duration" {...register("basicInfo.duration")} />
+      <textarea className="w-full p-3 border rounded-lg" rows={5} placeholder="Description" {...register("basicInfo.description")} />
       <div className="flex gap-2 flex-wrap">
         {tags.map((tag) => (
           <span
             key={tag}
-            onClick={() =>
-              setPackageData((prev) => ({
-                ...prev,
-                basicInfo: { ...prev.basicInfo, tag },
-              }))
-            }
             className={`px-3 py-1 border rounded-full text-sm cursor-pointer ${
-              data.tag === tag ? "bg-[#3ab19d]/40" : ""
+              selectedTag === tag ? "bg-teal-500/40 border-teal-500" : "hover:bg-gray-100"
             }`}
+            onClick={() => setValue("basicInfo.tag", tag)}
           >
             {tag}
           </span>
@@ -243,255 +145,330 @@ function BasicInfoSection({ data, setPackageData }) {
     </div>
   );
 }
-function AvailabilitySection({ data, setPackageData }) {
-  const updateAvailability = (field, value) => {
-    setPackageData((prev) => ({
-      ...prev,
-      availability: {
-        ...prev.availability,
-        [field]: value,
-      },
-    }));
+
+function PricingSection() {
+  const { register, watch, setValue } = useFormContext();
+  const original = watch("pricing.originalPrice");
+  const discount = watch("pricing.discountpercentage");
+
+  const calcDiscount = (orig, disc) => {
+    const o = parseFloat(orig);
+    const d = parseFloat(disc);
+    if (isNaN(o) || isNaN(d)) return "";
+    return (o - (o * d) / 100).toFixed(2);
   };
+  useEffect(() => {
+    const discounted = calcDiscount(original, discount);
+    setValue("pricing.discountedPrice", discounted, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  }, [original, discount, setValue]);
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Availability</h2>
-
+      <h2 className="text-2xl font-semibold">Pricing</h2>
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium">Start Date</label>
-          <input
-            type="date"
-            className="p-3 border rounded-lg w-full mt-2"
-            value={data.startDate}
-            onChange={(e) => updateAvailability("startDate", e.target.value)}
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium">End Date</label>
-          <input
-            type="date"
-            className="p-3 border rounded-lg w-full mt-2"
-            value={data.endDate}
-            onChange={(e) => updateAvailability("endDate", e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium">Max Bookings</label>
         <input
-          type="number"
-          className="p-3 border rounded-lg w-full mt-2"
-          placeholder="Max number of bookings"
-          value={data.maxBookings}
-          onChange={(e) => updateAvailability("maxBookings", e.target.value)}
+          placeholder="Original Price"
+          className="p-3 border rounded-lg"
+          {...register("pricing.originalPrice")}
         />
+        <input placeholder="Discounted Price" className="p-3 border rounded-lg" {...register("pricing.discountedPrice")} readOnly />
       </div>
-
-      <div>
-        <label className="block text-sm font-medium">Inclusion</label>
-        <textarea
-          rows={3}
-          className="p-3 border rounded-lg w-full mt-2"
-          placeholder="What's included in the package"
-          value={data.inclusion}
-          onChange={(e) => updateAvailability("inclusion", e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium">Exclusion</label>
-        <textarea
-          rows={3}
-          className="p-3 border rounded-lg w-full mt-2"
-          placeholder="What's not included in the package"
-          value={data.exclusion}
-          onChange={(e) => updateAvailability("exclusion", e.target.value)}
-        />
-      </div>
+      <select className="p-3 border rounded-lg w-40" {...register("pricing.currency")}>
+        <option>USD</option>
+        <option>INR</option>
+        <option>EUR</option>
+      </select>
+      <input placeholder="Label" className="p-3 border rounded-lg w-full" {...register("pricing.label")} />
+      <input
+        placeholder="Discount %"
+        className="p-3 border rounded-lg w-full"
+        {...register("pricing.discountpercentage", {
+          onChange: (e) => setValue("pricing.discountedPrice", calcDiscount(original, e.target.value)),
+        })}
+      />
     </div>
   );
 }
 
-function ItinerarySection({ itinerary, setPackageData }) {
-  const addDay = () => {
-    setPackageData((prev) => ({
-      ...prev,
-      itinerary: [...prev.itinerary, { title: "", description: "" }],
-    }));
-  };
-
-  const updateDay = (index, field, value) => {
-    setPackageData((prev) => {
-      const updated = [...prev.itinerary];
-      updated[index][field] = value;
-      return { ...prev, itinerary: updated };
-    });
-  };
-
+function LocationsSection() {
+  const { register } = useFormContext();
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Itinerary</h2>
-
-      {itinerary.map((day, index) => (
-        <div key={index} className="border rounded-xl p-4 space-y-3">
-          <input
-            className="p-3 border rounded-lg w-full"
-            placeholder={`Day ${index + 1} Title`}
-            value={day.title}
-            onChange={(e) => updateDay(index, "title", e.target.value)}
-          />
-
-          <textarea
-            rows={4}
-            className="p-3 border rounded-lg w-full"
-            placeholder="Describe activities..."
-            value={day.description}
-            onChange={(e) => updateDay(index, "description", e.target.value)}
-          />
-        </div>
-      ))}
-
-      <button onClick={addDay} className="text-[#3ab19d] font-medium">
-        + Add Another Day
-      </button>
+      <h2 className="text-2xl font-semibold">Locations</h2>
+      <input placeholder="Country" className="w-full p-3 border rounded-lg" {...register("locations.country")} />
+      <input placeholder="City" className="w-full p-3 border rounded-lg" {...register("locations.city")} />
+      <input placeholder="Pickup" className="w-full p-3 border rounded-lg" {...register("locations.pickup")} />
+      <textarea placeholder="Notes" rows={4} className="p-3 border rounded-lg w-full" {...register("locations.notes")} />
     </div>
   );
 }
-function TouristSpotsSection({ spots, setPackageData }) {
-  const addSpot = () => {
-    setPackageData((prev) => ({
-      ...prev,
-      touristSpots: [
-        ...prev.touristSpots,
-        { spotname: "", location: "", description: "" },
-      ],
-    }));
-  };
-  const removetourist = (index) => {
-    setPackageData((prev) => ({
-      ...prev,
-      touristSpots: prev.touristSpots.filter((_, i) => i !== index),
-    }));
-  };
-  const updateSpot = (index, field, value) => {
-    setPackageData((prev) => {
-      const updated = [...prev.touristSpots];
-      updated[index][field] = value;
-      return { ...prev, touristSpots: updated };
-    });
-  };
+
+function TouristSpotsSection() {
+  const { control, register } = useFormContext();
+  const { fields, append, remove } = useFieldArray({ control, name: "touristSpots" });
 
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold">Tourist Spots</h2>
-
-      {spots.map((spot, index) => (
-        <div key={index} className="border rounded-xl p-4 space-y-3">
+      {fields.map((f, i) => (
+        <div key={f.id} className="border rounded-xl p-4 space-y-3">
           <div className="flex justify-between items-center">
-            <h3 className="font-medium">tourist spot{index + 1}</h3>
-            {spots.length > 1 && (
+            <h3 className="font-medium">Spot {i + 1}</h3>
+            {fields.length > 1 && <button type="button" onClick={() => remove(i)} className="text-red-500 hover:text-red-700">Remove</button>}
+          </div>
+          <input placeholder="Spot Name" className="w-full p-3 border rounded-lg" {...register(`touristSpots.${i}.spotname`)} />
+          <input placeholder="Location" className="w-full p-3 border rounded-lg" {...register(`touristSpots.${i}.location`)} />
+          <textarea placeholder="Description" rows={3} className="w-full p-3 border rounded-lg" {...register(`touristSpots.${i}.description`)} />
+        </div>
+      ))}
+      <button type="button" onClick={() => append({ spotname: "", location: "", description: "" })} className="text-teal-600 hover:text-teal-700 font-medium">+ Add Spot</button>
+    </div>
+  );
+}
+
+function ItinerarySection() {
+  const { control, register } = useFormContext();
+  const { fields, append } = useFieldArray({ control, name: "itinerary" });
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-semibold">Itinerary</h2>
+      {fields.map((f, i) => (
+        <div key={f.id} className="border rounded-xl p-4 space-y-3">
+          <h3 className="font-medium">Day {i + 1}</h3>
+          <input placeholder={`Day ${i + 1} Title`} className="w-full p-3 border rounded-lg" {...register(`itinerary.${i}.title`)} />
+          <textarea placeholder="Description" rows={3} className="w-full p-3 border rounded-lg" {...register(`itinerary.${i}.description`)} />
+        </div>
+      ))}
+      <button type="button" onClick={() => append({ title: "", description: "" })} className="text-teal-600 hover:text-teal-700 font-medium">+ Add Day</button>
+    </div>
+  );
+}
+
+function HotelsSection() {
+  const { control, register, setValue, watch } = useFormContext();
+  const hotels = watch("hotels");
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "hotels",
+  });
+
+  // 🔥 local state for previews (keyed by hotel index)
+  const [hotelPreviews, setHotelPreviews] = useState({});
+
+  const handleFiles = (index, files) => {
+    const newFiles = Array.from(files);
+
+    // update RHF form state (for submit)
+    setValue(`hotels.${index}.hotelImages`, [
+      ...(hotels[index]?.hotelImages || []),
+      ...newFiles,
+    ]);
+
+    // update local preview state (for instant render)
+    setHotelPreviews((prev) => ({
+      ...prev,
+      [index]: [
+        ...(prev[index] || []),
+        ...newFiles.map((file) => URL.createObjectURL(file)),
+      ],
+    }));
+  };
+
+  const removeHotelImage = (hotelIndex, imgIndex) => {
+    // remove from form state
+    const updatedFiles = [...hotels[hotelIndex].hotelImages];
+    updatedFiles.splice(imgIndex, 1);
+    setValue(`hotels.${hotelIndex}.hotelImages`, updatedFiles);
+
+    // remove from preview state
+    setHotelPreviews((prev) => {
+      const updatedPreviews = [...prev[hotelIndex]];
+      updatedPreviews.splice(imgIndex, 1);
+      return { ...prev, [hotelIndex]: updatedPreviews };
+    });
+  };
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-semibold">Hotels</h2>
+
+      {fields.map((hotel, i) => (
+        <div key={hotel.id} className="border rounded-xl p-4 space-y-3">
+          <div className="flex justify-between items-center">
+            <h3 className="font-medium">Hotel {i + 1}</h3>
+            {fields.length > 1 && (
               <button
-                className="text-red-500 text-sm"
-                onClick={() => removetourist(index)}
+                type="button"
+                onClick={() => remove(i)}
+                className="text-red-500 hover:text-red-700"
               >
                 Remove
               </button>
             )}
           </div>
+
           <input
-            className="p-3 border rounded-lg w-full"
-            placeholder="Spot Name"
-            value={spot.spotname}
-            onChange={(e) => updateSpot(index, "spotname", e.target.value)}
+            placeholder="Name"
+            className="w-full p-3 border rounded-lg"
+            {...register(`hotels.${i}.name`)}
           />
 
           <input
-            className="p-3 border rounded-lg w-full"
             placeholder="Location"
-            value={spot.location}
-            onChange={(e) => updateSpot(index, "location", e.target.value)}
+            className="w-full p-3 border rounded-lg"
+            {...register(`hotels.${i}.location`)}
           />
-          <textarea
-            rows={3}
-            className="p-3 border rounded-lg w-full"
-            placeholder="Description"
-            value={spot.description}
-            onChange={(e) => updateSpot(index, "description", e.target.value)}
+
+          <input
+            placeholder="Rating"
+            className="w-full p-3 border rounded-lg"
+            {...register(`hotels.${i}.rating`)}
           />
+
+          <input
+            placeholder="Amenities"
+            className="w-full p-3 border rounded-lg"
+            {...register(`hotels.${i}.amenities`)}
+          />
+
+          <input
+            type="file"
+            multiple
+            onChange={(e) => handleFiles(i, e.target.files)}
+            className="w-full"
+          />
+
+          {/* 🔥 LIVE PREVIEWS */}
+          {hotelPreviews[i]?.length > 0 && (
+            <div className="flex flex-wrap gap-3 mt-2">
+              {hotelPreviews[i].map((src, imgIndex) => (
+                <div
+                  key={imgIndex}
+                  className="relative w-32 h-24 border rounded-xl overflow-hidden"
+                >
+                  <img
+                    src={src}
+                    alt="Hotel preview"
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeHotelImage(i, imgIndex)}
+                    className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       ))}
 
-      <button onClick={addSpot} className="text-[#3ab19d] font-medium">
-        + Add Another Tourist Spot
+      <button
+        type="button"
+        onClick={() =>
+          append({
+            name: "",
+            location: "",
+            rating: "",
+            amenities: "",
+            hotelImages: [],
+          })
+        }
+        className="text-teal-600 hover:text-teal-700 font-medium"
+      >
+        + Add Hotel
       </button>
     </div>
   );
 }
-function MediaSection({ data, setPackageData }) {
-  const removeImage = (type, index) => {
-    setPackageData((prev) => {
-      const updated = [...prev.media[type]];
-      updated.splice(index, 1);
 
-      return {
-        ...prev,
-        media: {
-          ...prev.media,
-          [type]: updated,
-        },
-      };
-    });
+
+function AvailabilitySection() {
+  const { register } = useFormContext();
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-semibold">Availability</h2>
+      <label>Start Date</label>
+      <input type="date" className="w-full p-3 border rounded-lg" placeholder="start date" {...register("availability.startDate")} />
+      <label>End Date</label>
+      <input type="date" className="w-full p-3 border rounded-lg" placeholder="end date" {...register("availability.endDate")} />
+      <input type="number" placeholder="Max Bookings" className="w-full p-3 border rounded-lg" {...register("availability.maxBookings")} />
+      <textarea placeholder="Inclusion" rows={3} className="w-full p-3 border rounded-lg" {...register("availability.inclusion")} />
+      <textarea placeholder="Exclusion" rows={3} className="w-full p-3 border rounded-lg" {...register("availability.exclusion")} />
+    </div>
+  );
+}
+
+function MediaSection() {
+  const { watch, setValue } = useFormContext();
+  const media = watch("media");
+
+  const [coverPreview, setCoverPreview] = useState(null);
+  const [touristPreviews, setTouristPreviews] = useState([]);
+
+  const handleCoverChange = (file) => {
+    setValue("media.coverImage", file);
+    setCoverPreview(URL.createObjectURL(file));
   };
 
-  const addMultipleImages = (type, files) => {
-    setPackageData((prev) => ({
-      ...prev,
-      media: {
-        ...prev.media,
-        [type]: [...prev.media[type], ...Array.from(files)],
-      },
-    }));
+  const handleTouristChange = (files) => {
+    const newFiles = Array.from(files);
+    setValue("media.touristLocationImages", [
+      ...media.touristLocationImages,
+      ...newFiles,
+    ]);
+    setTouristPreviews([
+      ...touristPreviews,
+      ...newFiles.map((f) => URL.createObjectURL(f)),
+    ]);
+  };
+
+  const removeTourist = (index) => {
+    const updatedFiles = [...media.touristLocationImages];
+    updatedFiles.splice(index, 1);
+    setValue("media.touristLocationImages", updatedFiles);
+
+    const updatedPreviews = [...touristPreviews];
+    updatedPreviews.splice(index, 1);
+    setTouristPreviews(updatedPreviews);
+  };
+
+  const removeCover = () => {
+    setValue("media.coverImage", null);
+    setCoverPreview(null);
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <h2 className="text-2xl font-semibold">Media</h2>
-      <div className="border rounded-xl p-4 space-y-3">
-        <h3 className="font-medium">Cover Image</h3>
 
+  
+      <div className="space-y-2">
+        <label className="block font-medium">Cover Image</label>
         <input
           type="file"
           accept="image/*"
-          onChange={(e) =>
-            setPackageData((prev) => ({
-              ...prev,
-              media: {
-                ...prev.media,
-                coverImage: e.target.files[0],
-              },
-            }))
-          }
+          onChange={(e) => handleCoverChange(e.target.files[0])}
+          className="w-full border p-2 rounded-lg cursor-pointer"
         />
-
-        {data.coverImage && (
-          <div className="relative">
+        {coverPreview && (
+          <div className="mt-2 relative w-64 h-40 border rounded-xl shadow overflow-hidden">
             <img
-              src={URL.createObjectURL(data.coverImage)}
+              src={coverPreview}
               alt="Cover Preview"
-              className="h-48 w-full object-cover rounded-lg mt-2"
+              className="w-full h-full object-cover"
             />
             <button
-              onClick={() =>
-                setPackageData((prev) => ({
-                  ...prev,
-                  media: { ...prev.media, coverImage: null },
-                }))
-              }
-              className="absolute top-2 right-2 bg-white text-red-500 px-2 py-1 rounded shadow"
+              type="button"
+              onClick={removeCover}
+              className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
             >
               ✕
             </button>
@@ -499,338 +476,46 @@ function MediaSection({ data, setPackageData }) {
         )}
       </div>
 
-      <div className="border rounded-xl p-4 space-y-3">
-        <h3 className="font-medium">Tourist Location Images</h3>
-
+      <div className="space-y-2">
+        <label className="block font-medium">Tourist Location Images</label>
         <input
           type="file"
           accept="image/*"
           multiple
-          onChange={(e) =>
-            addMultipleImages("touristLocationImages", e.target.files)
-          }
+          onChange={(e) => handleTouristChange(e.target.files)}
+          className="w-full border p-2 rounded-lg cursor-pointer"
         />
-
-        {data.touristLocationImages.length > 0 && (
-          <ul className="space-y-2 mt-3">
-            {data.touristLocationImages.map((file, index) => (
-              <li
-                key={index}
-                className="flex justify-between items-center border px-3 py-2 rounded-lg text-sm"
-              >
-                <span className="truncate">{file.name}</span>
+        {touristPreviews.length > 0 && (
+          <div className="flex flex-wrap gap-3 mt-2">
+            {touristPreviews.map((src, i) => (
+              <div key={i} className="relative w-32 h-24 border rounded-xl shadow overflow-hidden">
+                <img src={src} alt={`Tourist ${i}`} className="w-full h-full object-cover" />
                 <button
-                  onClick={() => removeImage("touristLocationImages", index)}
-                  className="text-red-500 font-medium"
+                  type="button"
+                  onClick={() => removeTourist(i)}
+                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
                 >
-                  Remove
+                  ✕
                 </button>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </div>
   );
 }
 
-function HotelsSection({ hotels, setPackageData }) {
-  const addHotel = () =>
-    setPackageData((prev) => ({
-      ...prev,
-      hotels: [
-        ...prev.hotels,
-        { name: "", location: "", rating: "", amenities: "", hotelImages: [] },
-      ],
-    }));
-  const removeHotel = (index) =>
-    setPackageData((prev) => ({
-      ...prev,
-      hotels: prev.hotels.filter((_, i) => i !== index),
-    }));
-  const updateHotel = (index, field, value) =>
-    setPackageData((prev) => {
-      const updatedHotels = [...prev.hotels];
-      updatedHotels[index] = { ...updatedHotels[index], [field]: value };
-      return { ...prev, hotels: updatedHotels };
-    });
-  const addHotelImages = (hotelIndex, files) =>
-    setPackageData((prev) => {
-      const updatedHotels = [...prev.hotels];
-      updatedHotels[hotelIndex].hotelImages.push(...Array.from(files));
-      return { ...prev, hotels: updatedHotels };
-    });
-  const removeHotelImage = (hotelIndex, imageIndex) =>
-    setPackageData((prev) => {
-      const updatedHotels = [...prev.hotels];
-      const updatedImages = [...updatedHotels[hotelIndex].hotelImages];
-      updatedImages.splice(imageIndex, 1);
-      updatedHotels[hotelIndex] = {
-        ...updatedHotels[hotelIndex],
-        hotelImages: updatedImages,
-      };
-      return { ...prev, hotels: updatedHotels };
-    });
 
+
+
+function PublishSection({ onSubmit }) {
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Hotels</h2>
-      {hotels.map((hotel, index) => (
-        <div key={index} className="border rounded-xl p-4 space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="font-medium">Hotel {index + 1}</h3>
-            {hotels.length > 1 && (
-              <button
-                className="text-red-500 text-sm"
-                onClick={() => removeHotel(index)}
-              >
-                Remove
-              </button>
-            )}
-          </div>
-          <input
-            className="p-3 border rounded-lg w-full"
-            placeholder="Hotel Name"
-            value={hotel.name}
-            onChange={(e) => updateHotel(index, "name", e.target.value)}
-          />
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              className="p-3 border rounded-lg"
-              placeholder="Location"
-              value={hotel.location}
-              onChange={(e) => updateHotel(index, "location", e.target.value)}
-            />
-            <input
-              className="p-3 border rounded-lg"
-              placeholder="Rating (5 Star)"
-              value={hotel.rating}
-              onChange={(e) => updateHotel(index, "rating", e.target.value)}
-            />
-          </div>
-          <input
-            className="p-3 border rounded-lg w-full"
-            placeholder="Room Type / Amenities"
-            value={hotel.amenities}
-            onChange={(e) => updateHotel(index, "amenities", e.target.value)}
-          />
-          <div className="border rounded-xl p-4 space-y-3">
-            <h3 className="font-medium">Hotel Images</h3>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={(e) => addHotelImages(index, e.target.files)}
-            />
-            {hotel.hotelImages.length > 0 && (
-              <ul className="space-y-2 mt-3">
-                {hotel.hotelImages.map((file, idx) => (
-                  <li
-                    key={idx}
-                    className="flex justify-between items-center border px-3 py-2 rounded-lg text-sm"
-                  >
-                    <span className="truncate">{file.name}</span>
-                    <button
-                      onClick={() => removeHotelImage(index, idx)}
-                      className="text-red-500 font-medium"
-                    >
-                      Remove
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-      ))}
-      <button className="text-[#3ab19d] font-medium" onClick={addHotel}>
-        + Add Another Hotel
-      </button>
+    <div className="text-center mt-6 space-y-4">
+      <p className="text-gray-600">Review all sections and click the button below to create your package.</p>
+      <button onClick={onSubmit} className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 rounded-xl transition">Create Package</button>
     </div>
   );
 }
 
-function PublishSection({ packageData }) {
-  const handlePublish = async () => {
-    try {
-      const formData = buildPackageFormData(packageData);
-
-      const res = await api.post("admin/addpackages", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      alert(res.data.message);
-      console.log(res.data);
-    } catch (error) {
-      console.error(error);
-      alert(error.response?.data?.message || "Failed to create package");
-    }
-  };
-
-  return (
-    <div className="text-center space-y-6">
-      <h2 className="text-2xl font-semibold">Ready to Publish?</h2>
-      <button
-        onClick={handlePublish}
-        className="bg-[#3ab19d] text-white px-8 py-3 rounded-xl"
-      >
-        Create Package
-      </button>
-    </div>
-  );
-}
-function LocationsSection({ data, setPackageData }) {
-  return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Locations</h2>
-
-      <div className="grid grid-cols-2 gap-4">
-        <input
-          className="p-3 border rounded-lg"
-          placeholder="Country"
-          value={data.country}
-          onChange={(e) =>
-            setPackageData((prev) => ({
-              ...prev,
-              locations: {
-                ...prev.locations,
-                country: e.target.value,
-              },
-            }))
-          }
-        />
-
-        <input
-          className="p-3 border rounded-lg"
-          placeholder="City / Region"
-          value={data.city}
-          onChange={(e) =>
-            setPackageData((prev) => ({
-              ...prev,
-              locations: {
-                ...prev.locations,
-                city: e.target.value,
-              },
-            }))
-          }
-        />
-      </div>
-
-      <input
-        className="p-3 border rounded-lg w-full"
-        placeholder="Pickup Location"
-        value={data.pickup}
-        onChange={(e) =>
-          setPackageData((prev) => ({
-            ...prev,
-            locations: {
-              ...prev.locations,
-              pickup: e.target.value,
-            },
-          }))
-        }
-      />
-
-      <textarea
-        rows={4}
-        className="p-3 border rounded-lg w-full"
-        placeholder="Additional notes"
-        value={data.notes}
-        onChange={(e) =>
-          setPackageData((prev) => ({
-            ...prev,
-            locations: {
-              ...prev.locations,
-              notes: e.target.value,
-            },
-          }))
-        }
-      />
-    </div>
-  );
-}
-
-function PricingSection({ price, setPackageData }) {
-  const calculateDiscountedPrice = (original, percent) => {
-    const orig = parseFloat(original);
-    const discount = parseFloat(percent);
-    if (isNaN(orig) || isNaN(discount)) return "";
-    return (orig - (orig * discount) / 100).toFixed(2);
-  };
-   const handleOriginalPriceChange = (value) => {
-    setPackageData(prev => ({
-      ...prev,
-      pricing: {
-        ...prev.pricing,
-        originalPrice: value,
-        // recalc discounted price if discount percentage exists
-        discountedPrice: calculateDiscountedPrice(value, prev.pricing.discountpercentage)
-      }
-    }));
-  };
-    const handleDiscountPercentageChange = (value) => {
-    setPackageData(prev => ({
-      ...prev,
-      pricing: {
-        ...prev.pricing,
-        discountpercentage: value,
-        discountedPrice: calculateDiscountedPrice(prev.pricing.originalPrice, value)
-      }
-    }));
-  };
-  return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Pricing & Discounts</h2>{" "}
-      <div className="grid grid-cols-2 gap-4">
-        <input
-          className="p-3 border rounded-lg"
-          placeholder="Original Price"
-          value={price.originalPrice}
-          onChange={e => handleOriginalPriceChange(e.target.value)}
-        />
-        <input
-          className="p-3 border rounded-lg"
-          placeholder="Discounted Price"
-          value={price.discountedPrice}
- readOnly
-        />
-      </div>
-      <select
-        className="p-3 border rounded-lg w-40"
-        value={price.currency}
-        onChange={(e) => {
-          setPackageData((prev) => ({
-            ...prev,
-            pricing: { ...prev.pricing, currency: e.target.value },
-          }));
-        }}
-      >
-        <option>USD</option> <option>INR</option> <option>EUR</option>{" "}
-      </select>
-      <div className="border rounded-xl p-4 space-y-3">
-        <h3 className="font-medium">Seasonal Discount</h3>
-        <input
-          className="p-3 border rounded-lg w-full"
-          placeholder="Label (Summer Sale)"
-          value={price.label}
-          onChange={(e) => {
-            setPackageData((prev) => ({
-              ...prev,
-              pricing: { ...prev.pricing, label: e.target.value },
-            }));
-          }}
-        />
-        <input
-          className="p-3 border rounded-lg w-full"
-          placeholder="Percentage %"
-          value={price.discountpercentage}
-          onChange={e => handleDiscountPercentageChange(e.target.value)}
-        />
-      </div>
-    </div>
-  );
-}
-export default CreatePackage
+export default CreatePackage;

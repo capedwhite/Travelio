@@ -1,7 +1,11 @@
 import { User } from "../Model/userModel.js";
 import { generateToken } from "../Utills/jwt.js";
 import bcrypt from "bcryptjs";
-
+(async () => {
+  const passwordd = "newadmin";
+  const hashedd = await bcrypt.hash(passwordd, 10);  // 10 is the salt rounds
+  console.log(hashedd);
+})();
 const validatePassword = (password) => {
   const errors = [];
   if (password.length < 6)

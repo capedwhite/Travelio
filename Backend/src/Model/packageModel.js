@@ -29,12 +29,11 @@ export const Package = sequelize.define('package', {
       currency: 'INR'
     }
   },
-
+  
   duration: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-
 
   locations: {
     type: DataTypes.JSONB,

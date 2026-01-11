@@ -38,6 +38,7 @@ import { useAuth } from "../context/authContext";
                  <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <BookOpen size={18} />
             My Bookings
+        
           </li>
                     <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <LucideClipboardPen size={18} />

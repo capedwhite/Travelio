@@ -1,14 +1,14 @@
 
 import './App.css'
+import { useAuth } from './context/authContext';
 import PrivateRoutes from './routes/privateroutes';
 import Publicroutes from './routes/publicroutes';
 
 
 function App() {
-  const token = localStorage.getItem("authtoken");
-  console.log(token)
+  const { user } = useAuth();
   return(
-token? <PrivateRoutes/>:<Publicroutes/>
+user? <PrivateRoutes/>:<Publicroutes/>
   )
 }
 export default App

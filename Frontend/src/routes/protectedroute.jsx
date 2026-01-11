@@ -6,7 +6,7 @@ const ProtectedRoute  = ({children,allowedroles})=>{
     console.log(user)
     console.log(allowedroles)
     if(!user){
-        return <Navigate to="/"/>
+        return <Navigate to="/" replace/>
     }
     if(!allowedroles.includes(user.usertype)){
         return <Navigate to = "/unauthorized"/>
