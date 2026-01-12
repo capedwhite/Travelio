@@ -1,5 +1,7 @@
 import Bargain from "../Model/bargainModel.js"
 import { Booking } from "../Model/bookingModel.js"
+import { Package } from "../Model/packageModel.js"
+import { User } from "../Model/userModel.js"
 
 export const bookpackage=async(req,res)=>{
 
@@ -48,5 +50,27 @@ res.status(200).send({data:bargaining,message:"sucessfully submitted bargain req
     }
     catch(error){
 res.status(500).send({message:error.message})
+    }
+}
+
+export const getAllbookings = async(req,res)=>{
+    console.log("api hitting")
+    try {
+        const getbookings = await Package.findAll({include:[{model:Booking,include:[{model:User}]}]})
+        console.log(getbookings)
+        res.status(200).send({data:getbookings,message:"sucessfully fetched all bookings"})
+    } catch (error) {
+        res.status(500).send({message:error.message})
+    }
+}
+
+export const getallbargains = async(req,res)=>{
+    console.log("api hit for bargain")
+    try {
+        const getbargains = await Package.findAll({include:[{model:Bargain,include:[{model:User}]}]})
+        console.log(getallbargains)
+        res.status(200).send({data:getbargains,message:"sucessfully fetched the bargain"})
+    } catch (error) {
+        res.status(500).send({message:error.message})
     }
 }

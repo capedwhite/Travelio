@@ -52,4 +52,11 @@ export const Booking = sequelize.define("booking",{
         type:DataTypes.DATE,
         allowNull:false
     }, 
+    status:{
+        type:DataTypes.STRING,
+        allowNull:false,
+        defaultValue:"Not paid"
+        
+
+    }
 })

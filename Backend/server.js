@@ -7,6 +7,7 @@ import passport from "passport";
 import { protect } from "./src/Middleware/authmiddleware.js";
 import adminRoutes from "./src/Routes/adminRoutes.js"
 import userRoutes from "./src/Routes/userRoutes.js"
+import "./src/Model/index.js"
 import { allowedroles } from "./src/Middleware/allowedrolesmiddlware.js";
 const app = express();
 const port="3000"
