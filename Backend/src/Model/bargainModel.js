@@ -33,6 +33,11 @@ offerdate:{
     type:DataTypes.STRING,
     allowNull:false
 },
+status:{
+    type:DataTypes.STRING,
+    defaultValue:"Pending",
+
+},
 notes:{
     type:DataTypes.STRING,
     allowNull:false

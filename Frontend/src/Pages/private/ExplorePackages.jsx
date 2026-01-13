@@ -1,42 +1,59 @@
 import { useState} from "react"
-import { MapPin, Clock, DollarSign, Sparkles, MessageSquare } from "lucide-react"
+import { MapPin, Clock, Sparkles, MessageSquare } from "lucide-react"
 import api from "../../api/axios"
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { bookingSchema } from "./schema/bookingSchema"
+import { bargainSchema } from "./schema/bargainSchema"
 
 function ExplorePackages() {
 
   const[pkg,setPackage]=useState([])
   const [bookingOpen, setBookingOpen] = useState(false)
   const [bargainOpen, setBargainOpen] = useState(false)
-  const [bookingData, setBookingData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    travelers: 1,
-    date: ""
-  })
-  const [bargainData, setBargainData] = useState({
-    offer: "",
-    duration: "",
-    notes: ""
-  })
+  const [packageid,setPackageid]=useState(null)
+  const[activeFilter,setActiveFilter]=useState(null)
+const {register:bookingregister,handleSubmit:bookingsubmit,formState:{errors:bookingerror},reset:bookingreset}=useForm({resolver:zodResolver(bookingSchema)})
+  const {register:bargainregister,handleSubmit:bargainsubmit,formState:{errors:bargainerror},reset:bargainreset}=useForm({resolver:zodResolver(bargainSchema)})
 
 
-  const handleBooking = () => {
-    console.log("Booking submitted:", { package: pkg.name, ...bookingData })
-    alert(`Booking confirmed for ${pkg.name}!`)
-    setBookingOpen(false)
-    setBookingData({ name: "", email: "", phone: "", travelers: 1, date: "" })
+
+const handleBooking = async(data) => {
+console.log("handling booking submission ",data)
+try {
+  const payload={
+    ...data,
+    packageid
   }
-    const [activeFilter, setActiveFilter] = useState("All");
-  const handleBargain = () => {
-    console.log("Bargain submitted:", { package: pkg.name, ...bargainData })
-    alert(`Bargain request submitted for ${pkg.name}! We'll get back to you soon.`)
-    setBargainOpen(false)
-    setBargainData({ offer: "", duration: "", notes: "" })
+  const res = await api.post("/user/explorepackages/booking",payload)
+console.log(res.data?.data)
+alert(res.data?.message)
+bookingreset()
+} catch (error) {
+  console.log(error.message)
+  alert(error.response?.data?.message)
+}
 
   }
+    const handleBargain = async(data) => {
+  try {
+      const payload={
+    ...data,
+    packageid
+  }
+    const res = await api.post("/user/explorepackages/bargain",payload)
+    console.log(res.data.data)
+    alert(res.data.message)
+bargainreset()
+  } catch (error) {
+    console.log(error)
+    alert(error.res.data.message)
+  }
+
+  };
+
   useEffect(()=>{
   const getallpackages= async()=>{
     try {
@@ -134,13 +151,13 @@ const navigate = useNavigate()
           <div className="flex gap-1.5 pt-1">
             <button
               className="flex-1 bg-[#3ab19d] text-white px-2 py-1.5 rounded text-xs flex items-center justify-center gap-1 hover:bg-[#3ab19d]/70 transition"
-              onClick={() => setBookingOpen(true)}
+              onClick={() => {setBookingOpen(true),console.log(pkg.id),setPackageid(pkg.id)}}
             >
               <Sparkles className="w-3 h-3" /> Book
             </button>
             <button
               className="flex-1 border border-gray-300 text-gray-700 px-2 py-1.5 rounded text-xs flex items-center justify-center gap-1 hover:bg-gray-100 transition"
-              onClick={() => setBargainOpen(true)}
+              onClick={() => {setBargainOpen(true),console.log(pkg.id),setPackageid(pkg.id)}}
             >
               <MessageSquare className="w-3 h-3" /> Bargain
             </button>
@@ -149,98 +166,107 @@ const navigate = useNavigate()
       </div>  
 
       {bookingOpen && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-semibold mb-2">Book {pkg.name}</h2>
-            <p className="text-gray-600 mb-4">Fill out your details to book this amazing package</p>
-            <div className="space-y-3">
-              <input
-                type="text"
-                placeholder="Full Name"
-                className="w-full border rounded px-3 py-2"
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                className="w-full border rounded px-3 py-2"
-              />
-              <input
-                type="tel"
-                placeholder="Phone Number"
+        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4 " onClick={()=>{setBookingOpen(false)}}>
+             <div className="bg-white rounded-lg w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto"  onClick={e=>e.stopPropagation()}>
+              <form onSubmit={bookingsubmit(handleBooking)}>
 
-                className="w-full border rounded px-3 py-2"
-              />
-              <input
-                type="number"
-                placeholder="Number of Travelers"
-                min={1}
-                className="w-full border rounded px-3 py-2"
-              />
-              <input
-                type="date"
-                className="w-full border rounded px-3 py-2"
-              />
-            </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                className="border px-4 py-2 rounded hover:bg-gray-100 transition"
-                onClick={() => setBookingOpen(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="bg-[#369d8c] text-white px-4 py-2 rounded hover:bg-[#369d8c]/20 transition"
-                onClick={handleBooking}
-              >
-                Confirm Booking
-              </button>
-            </div>
+            <h2 className="text-2xl font-semibold mb-4 border-b pb-2 border-gray-200">
+            Book This Package
+          </h2>
+          <div className="space-y-3">
+            <label>Full name : </label>
+            <input
+              type="text"
+              placeholder="Enter your Full Name"
+              {...bookingregister("fullname")}
+              className="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-[#4cc9b4] focus:outline-none"
+            />
+            {bookingerror.name && <p className="text-[red] text-sm ">{bookingerror.name.message}</p>}
+                     <label>Email : </label>
+            
+            <input
+              type="email"
+              placeholder="Enter your Email"
+            {...bookingregister("email")}
+              className="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-[#4cc9b4] focus:outline-none"
+            />
+            {bookingerror.email && <p className="text-[red] text-sm">{bookingerror.email.message}</p>}
+             <label>Phone: </label>
+            <input
+              type="tel"
+              placeholder="Enter your Phone no"
+               {...bookingregister("phone")}
+              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#4cc9b4] focus:outline-none"
+            />
+            {bookingerror.phone && <p className="text-[red] text-sm">{bookingerror.phone.message}</p>}
+              <label>Travelers:</label>
+            <input
+              type="number"
+              min={1}
+  {...bookingregister("travelers")}
+              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#4cc9b4] focus:outline-none"
+              placeholder="Number of Travelers"
+            />
+                     {bookingerror.travelers && <p className="text-[red] text-sm">{bookingerror.travelers.message}</p>}
+                        <label>Date:</label>
+            <input
+              type="date"
+        {...bookingregister("date")}
+              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#4cc9b4] focus:outline-none"
+            />
+                            {bookingerror.date && <p className="text-[red] text-sm" >{bookingerror.date.message}</p>}
           </div>
+          <button
+            className="mt-4 w-full bg-[#3ab19d] text-white px-4 py-2 rounded-lg hover:bg-[#4cc9b4] transition duration-300 shadow-md hover:shadow-xl"
+           type="submit"
+          >
+            Confirm Booking
+          </button>
+      
+</form>
+    </div>
         </div>
       )}
 
 
       {bargainOpen && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-semibold mb-2">Negotiate Package</h2>
-            <p className="text-gray-600 mb-4">Request a custom price or package modification</p>
-            <div className="space-y-3">
-              <input
-                type="number"
-                placeholder={`Your Offer (Original: $${pkg.price})`}
-                value={bargainData.offer}
-                onChange={(e) => setBargainData({ ...bargainData, offer: e.target.value })}
-                className="w-full border rounded px-3 py-2"
-              />
-              <input
-                type="text"
-                placeholder={`Preferred Duration (Current: ${pkg.duration})`}
-                value={bargainData.duration}
-                onChange={(e) => setBargainData({ ...bargainData, duration: e.target.value })}
-                className="w-full border rounded px-3 py-2"
-              />
-              <textarea
-                placeholder="Any specific changes you'd like to make..."
-                value={bargainData.notes}
-                onChange={(e) => setBargainData({ ...bargainData, notes: e.target.value })}
-                className="w-full border rounded px-3 py-2 min-h-[6rem]"
-              />
-            </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                className="border px-4 py-2 rounded hover:bg-gray-100 transition"
-                onClick={() => setBargainOpen(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
-                onClick={handleBargain}
-              >
-                Submit Request
-              </button>
-            </div>
+        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4" onClick={()=>{setBargainOpen(false)}}>
+           <div className="bg-white rounded-lg w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto " onClick={(e) => e.stopPropagation()}>
+<form onSubmit={bargainsubmit(handleBargain)}>
+           <h2 className="text-2xl font-semibold mb-4 border-b pb-2 border-gray-200">
+          Negotiate / Bargain
+          </h2>
+          <div className="flex flex-col gap-3 ">
+            <label className="text-lg font-semibold text-[#4cc9b4]">Original price : {pkg.price.originalPrice}</label> 
+          <input
+            type="number"
+            placeholder={`Your Offer (Original: $${pkg.price.originalPrice})`}
+            {...bargainregister("offerprice")}
+            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+          />
+          {bargainerror.offerprice && <p className="text-[red] text-sm">{bargainerror.offerprice.message}</p>}
+          <input
+            type="text"
+            placeholder={`Preferred Duration (Current: ${pkg.duration})`}
+     {...bargainregister("offerdate")}
+            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+          />
+             {bargainerror.offerdate && <p className="text-[red] text-sm">{bargainerror.offerdate.message}</p>}
+          <input
+            type="text"
+            placeholder="Notes / Changes"
+            {...bargainregister("notes")}
+            className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+          />
+          {bargainerror.notes && <p className="text-[red] text-sm">{bargainerror.notes.message}</p>}
+        </div>
+        <button
+          className="mt-4 bg-[#dda169] text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition duration-300 shadow-md hover:shadow-xl"
+        type="submit"
+        >
+          Submit Request
+        </button>
+          </form>
           </div>
         </div>
       )}

@@ -67,9 +67,8 @@ export default function NavBar({ children })
     const location = useLocation();
        const isActive = (path) => location.pathname === path;
      const navItems = [
-    { name: "Home", path: "/home" },
     { name: "Explorepackages", path: "/explorepackages" },
-    { name: "challenges", path: "/challenges" },
+    { name: "Challenges", path: "/challenges" },
     { name: "Social feed", path: "/socialfeed" },
     { name: "About", path: "/about" },
   ];

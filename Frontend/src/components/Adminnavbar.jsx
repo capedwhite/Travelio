@@ -8,7 +8,7 @@ export default function AdminSidebar({children}) {
     { name: "Dashboard", icon: <Home size={18} />, path: "/admin/dashboard" },
     { name: "Packages", icon: <Package size={18} />, path: "/admin/createpackages" },
     { name: "Bookings", icon: <ClipboardList size={18} />, path: "/admin/bookings" },
-    { name: "Bargain Requests", icon: <DollarSign size={18} />, path: "/admin/bargains" },
+    { name: "Bargain Requests", icon: <DollarSign size={18} />, path: "/admin/bargainrequest" },
     { name: "Challenges", icon: <Award size={18} />, path: "/admin/challenges" },
    
   ];

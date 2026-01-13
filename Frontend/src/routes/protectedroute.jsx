@@ -9,6 +9,7 @@ const ProtectedRoute  = ({children,allowedroles})=>{
         return <Navigate to="/" replace/>
     }
     if(!allowedroles.includes(user.usertype)){
+            console.log(" Access denied - userType not in allowed roles")
         return <Navigate to = "/unauthorized"/>
     }
     return children;

@@ -6,9 +6,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import api from "../../api/axios.js";
 import { useAuth } from "../../context/authContext.jsx";
 import { loginSchema } from "./schema/loginscema.jsx";
+import { jwtDecode } from "jwt-decode";
 
 function LoginPage() {
-  const { login, user } = useAuth();
+  const { login} = useAuth();
   const navigate = useNavigate();
   const [useparams] = useSearchParams();
 
@@ -31,13 +32,13 @@ function LoginPage() {
   const onSubmit = async (data) => {
     try {
       const res = await api.post("/auth/login", data);
+      const decoded = jwtDecode(res.data.token);
       login(res.data.token);
       alert(res.data.message);
-
-      if (user?.usertype === "User") {
+          if (decoded.usertype === "User") {
         navigate("/explorepackages");
       } else {
-        navigate("/explorepackages");
+        navigate("/admin/dashboard");
       }
     } catch (error) {
       console.log(error);
@@ -172,8 +173,8 @@ export const GoogleSuccess = () => {
     const params = new URLSearchParams(location.search);
     const token = params.get("token");
     if (token) {
-      localStorage.setItem("authToken", token);
-      navigate("/explorepackges");
+      localStorage.setItem("authtoken", token);
+      navigate("/explorepackages");
     } else {
       navigate("/login");
     }

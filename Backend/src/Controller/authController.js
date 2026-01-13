@@ -1,11 +1,8 @@
+
 import { User } from "../Model/userModel.js";
 import { generateToken } from "../Utills/jwt.js";
 import bcrypt from "bcryptjs";
-(async () => {
-  const passwordd = "newadmin";
-  const hashedd = await bcrypt.hash(passwordd, 10);  // 10 is the salt rounds
-  console.log(hashedd);
-})();
+
 const validatePassword = (password) => {
   const errors = [];
   if (password.length < 6)
@@ -34,10 +31,25 @@ if(user){
         if(!isMatch){
   return res.status(500).send({message:"Invalid credentials"})
         }
-    res.status(200).send({token:generateToken(user),data:user,message:"logged in sucessfully"})
+const token = generateToken(user);
+   if (user.role === "Admin") {
+      return res.status(200).send({
+        token,
+        data: user,
+        message: "Admin logged in successfully",
+      });
+    }
+
+    res.status(200).send({
+      token,
+      data: user,
+      message: "User logged in successfully",
+    });
 }
 }
 catch(e){
+     console.log(e.message)
+     console.log(e)
     res.status(500).send({message:e.message})
 }
 }

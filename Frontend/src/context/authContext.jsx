@@ -4,6 +4,7 @@ import { jwtDecode } from "jwt-decode";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
+
   const [user, setUser] = useState(() => {
     const token = localStorage.getItem("authtoken");
     return token ? jwtDecode(token) : null;
@@ -13,11 +14,13 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("authtoken", token);
     const decoded = jwtDecode(token);
     setUser(decoded); 
+
   };
 
   const logout = () => {
     localStorage.removeItem("authtoken");
     setUser(null); 
+    console.log(user.usertype)
   };
 
   return (
