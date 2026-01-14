@@ -143,7 +143,18 @@ const navigate = useNavigate()
             </div>
             <div className="flex items-center gap-1 text-base font-bold text-green-600">
               <span>{pkg.price.currency}</span>
-              <span>{pkg.price.originalPrice}</span>
+              <span> {Number(pkg.price.discountedPrice) === 0 ? (
+  <p className="font-semibold text-green-600">Free</p>
+) : (
+  <>
+    <p className="font-semibold text-gray-900">
+      ${pkg.price.discountedPrice}
+    </p>
+    <p className="text-sm text-gray-400 line-through">
+      ${pkg.price.originalPrice}
+    </p>
+  </>
+)}</span>
 
             </div>
           </div>

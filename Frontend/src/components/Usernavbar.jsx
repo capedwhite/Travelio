@@ -4,9 +4,9 @@ import { useAuth } from "../context/authContext";
 
 
  function ProfileHoverMenu() {
-  const {logout}=useAuth()
+  const {logout,user}=useAuth()
   return (
-    <div className="relative group">
+    <div className="relative group flex  justify-center items-center gap-2">
       <img
         src="/images/user.png"
         alt="Profile"
@@ -58,12 +58,15 @@ import { useAuth } from "../context/authContext";
           </li>
         </ul>
       </div>
+
+        <span className="m-0">{user.username}</span>
     </div>
+    
   );
 }
 export default function NavBar({ children }) 
 {
-
+  const {user}=useAuth()
     const location = useLocation();
        const isActive = (path) => location.pathname === path;
      const navItems = [
@@ -103,7 +106,7 @@ export default function NavBar({ children })
     hover:bg-white/70
     hover:text-[#2c9c8c]
     hover:shadow-lg
-    hover:-translate-y-0.5
+ 
 
                 ${isActive(item.path) ? "bg-white/90 rounded-full shadow-md text-[#2c9c8c] font-bold transition" : "text-    text-white"}`}
               >
@@ -113,6 +116,7 @@ export default function NavBar({ children })
           }
         </div>
         <ProfileHoverMenu></ProfileHoverMenu>
+      
       </nav>
 
       {children}

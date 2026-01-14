@@ -7,8 +7,10 @@ import api from "../../api/axios.js";
 import { useAuth } from "../../context/authContext.jsx";
 import { loginSchema } from "./schema/loginscema.jsx";
 import toast from "react-hot-toast";
+import { useLoading } from "../../context/loadingContext.jsx";
 
 function LoginPage() {
+  const {setLoading} = useLoading();
   const { login} = useAuth();
   const navigate = useNavigate();
   const [useparams] = useSearchParams();
@@ -32,6 +34,7 @@ function LoginPage() {
 
   const onSubmit = async (data) => {
     try {
+      setLoading(true)
       const res = await api.post("/auth/login", data);
 
       await login(res.data.token);
@@ -40,6 +43,9 @@ function LoginPage() {
     } catch (error) {
       console.log(error);
       toast.error(error.response?.data?.message)
+    }
+    finally{
+      setLoading(false)
     }
   };
 
@@ -126,19 +132,14 @@ function LoginPage() {
               </button>
             </div>
 
-            <button
+            <button 
               type="submit"
-              disabled={isSubmitting}
-              className={`w-full h-[50px] rounded-lg  mt-5 hover:opacity-70 transition ${isSubmitting?"bg-[#3ab19d]/70 text-gray-400 cursor-not-allowed":"bg-[#3ab19d] text-white"}`}
+              className={`w-full h-[50px] rounded-lg  mt-5 hover:opacity-70 transition ${setLoading===true?"bg-[#3ab19d]/70 text-gray-400 cursor-not-allowed":"bg-[#3ab19d] text-white"}`}
             >
-            {isSubmitting ? (
-    <div className="flex items-center gap-2">
-      <Spinner />
+
       Login
-    </div>
-  ) : (
-    "Create Package"
-  )}
+
+
             </button>
 
             <button

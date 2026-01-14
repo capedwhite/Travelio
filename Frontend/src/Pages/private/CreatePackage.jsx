@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, FormProvider, useFormContext, useFieldArray, useWatch} from "react-hook-form";
 import AdminSidebar from "../../components/Adminnavbar";
 import api from "../../api/axios";
-import { Check } from "lucide-react";
+import { Check, Edit2, Eye, Filter, Search, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
+import DataTable from "react-data-table-component";
 
 const buildPackageFormData = (data) => {
   const formData = new FormData();
@@ -18,8 +19,8 @@ const buildPackageFormData = (data) => {
   if (data.media.coverImage) formData.append("coverImage", data.media.coverImage);
   data.media.touristLocationImages.forEach((file) => formData.append("touristImages", file));
   data.hotels.forEach((hotel) =>
-    hotel.hotelImages.forEach((file) =>
-      formData.append("hotelImages", file)
+    hotel.hotelImages.forEach((file,ind) =>
+      formData.append(`hotelImages[${ind}]`, file)
     )
   );
   return formData;
@@ -49,12 +50,31 @@ const steps = [
 ];
 
 function CreatePackage() {
+
   const methods = useForm({ defaultValues, mode: "onChange" });
   const { handleSubmit, watch, control } = methods;
   const [activeIndex, setActiveIndex] = useState(0);
   const [completedSteps, setCompletedSteps] = useState(new Set());
   const formData = watch();
+  const[allpackages,setAllpackages]=useState([])
+ 
+    const getallpackages = async()=>{
+      try {
+             const res = await api.get("/admin/packagebooking")
+      setAllpackages(res.data.data)
+      console.log(res.data.data)
+      console.log(res.data.message)
+      } catch (error) {
+        console.log(error)
+        toast.error(error.response?.data?.message)
+      }
+ 
+    }
 
+  useEffect(()=>{
+
+   getallpackages()},[])
+  
   const validateSection = (stepName) => {
     switch (stepName) {
       case "Basic Info":
@@ -143,7 +163,7 @@ function CreatePackage() {
    <AdminSidebar/>
     <div className="p-8 bg-gray-50 min-h-screen ml-64">
    
-      <h1 className="text-3xl font-semibold mb-6">Create New Package</h1>
+      <h1 className="text-2xl font-semibold mb-6">Create and Manage New Package</h1>
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="bg-white rounded-2xl shadow p-4 space-y-2">
           {steps.map((step, index) => {
@@ -211,6 +231,7 @@ function CreatePackage() {
           </div>
         </FormProvider>
       </div>
+<AdminPackagesTable packages={allpackages} refetch={getallpackages}/>
     </div>
     </>
   );
@@ -525,6 +546,349 @@ function PublishSection({ onSubmit }) {
     <div className="text-center mt-6 space-y-4">
       <p className="text-gray-600">Review all sections and click the button below to create your package.</p>
       <button onClick={onSubmit} className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 rounded-xl transition">Create Package</button>
+    </div>
+  );
+}
+
+function AdminPackagesTable({packages,refetch}) {
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterTag, setFilterTag] = useState("All");
+  const [filterStatus, setFilterStatus] = useState("All");
+
+  const tags = ["All", "Budget Friendly", "Adventure Package", "Luxury", "Family Friendly", "Honeymoon Special"];
+  const statuses = ["All", "Active", "Inactive"];
+
+  const handleEdit = (id) => {
+
+    try {
+       console.log("Edit package:", id);
+       const res = api.put("/admin/addpackages",  { headers: { "Content-Type": "multipart/form-data" }, })
+       toast.success(res.data.message)
+
+    } catch (error) {
+      console.log(error)
+      toast.success(error.response?.data?.message)
+
+    }
+   
+ 
+  };
+
+  const handleDelete = async(id) => {
+try {
+
+   console.log("Delete package:", id);
+   const res= await api.delete(`/admin/addpackages/${id}`)
+   toast.success(res.data.message)
+  refetch()
+} catch (error) {
+  toast.error(error.response?.data?.message || "something went wrong")
+}
+   
+  };
+
+  const handleView = (id) => {
+    console.log("View package:", id);
+  };
+
+  const columns = [
+    {
+      name: "Package",
+      selector: row => row.title,
+      sortable: true,
+      cell: row => (
+        <div className="flex items-center gap-3 py-2">
+          <img
+            src={`http://localhost:3000/${row.images?.coverImage}`}
+            alt={row.title}
+            className="w-12 h-12 rounded-lg object-cover"
+          />
+          <div>
+            <p className="font-semibold text-gray-900">{row.title}</p>
+            <p className="text-sm text-gray-500">ID: #{row.id}</p>
+          </div>
+        </div>
+      ),
+      minWidth: "280px",
+    },
+    {
+      name: "Destination",
+      selector: row => row.locations.city,
+      sortable: true,
+      cell: row => <p className="text-gray-700">{row.locations.city}</p>,
+      minWidth: "180px",
+    },
+    {
+      name: "Duration",
+      selector: row => row.duration,
+      sortable: true,
+      cell: row => <p className="text-gray-700">{row.duration}</p>,
+      minWidth: "150px",
+    },
+    {
+      name: "Tag",
+      selector: row => row.tags?.[0],
+      sortable: true,
+      cell: row => (
+        
+        <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+          row.tags?.[0] === "Luxury" ? "bg-purple-100 text-purple-700" :
+          row.tags?.[0] === "Budget Friendly" ? "bg-green-100 text-green-700" :
+          row.tags?.[0] === "Adventure Package" ? "bg-orange-100 text-orange-700" :
+          row.tags?.[0] === "Family Friendly" ? "bg-blue-100 text-blue-700" :
+          "bg-pink-100 text-pink-700"
+        }`}>
+          {row.tags?.[0]}
+        </span>
+      ),
+      minWidth: "160px",
+    },
+    {
+      name: "Price",
+      selector: row => row.discountedPrice,
+      sortable: true,
+      cell: row => (
+        <div>
+         {Number(row.price.discountedPrice) === 0 ? (
+  <p className="font-semibold text-green-600">Free</p>
+) : (
+  <>
+    <p className="font-semibold text-gray-900">
+      ${row.price.discountedPrice}
+    </p>
+    <p className="text-sm text-gray-400 line-through">
+      ${row.price.originalPrice}
+    </p>
+  </>
+)}
+        </div>
+      ),
+      minWidth: "120px",
+    },
+    {
+      name: "Bookings",
+      selector: row => row.bookings.length,
+      sortable: true,
+      cell: row => <p className="font-medium text-gray-700">{row.bookings.length}</p>,
+      minWidth: "100px",
+    },
+    {
+      name: "Status",
+      selector: row => row.status,
+      sortable: true,
+      cell: row => (
+        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+          row.status === "Active" 
+            ? "bg-green-100 text-green-700" 
+            : "bg-gray-100 text-gray-700"
+        }`}>
+          {row.status}
+        </span>
+      ),
+      minWidth: "110px",
+    },
+    {
+      name: "Actions",
+      cell: row => (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => handleView(row.id)}
+            className="p-2 hover:bg-blue-50 text-blue-600 rounded-lg transition"
+            title="View"
+          >
+            <Eye className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => handleEdit(row.id)}
+            className="p-2 hover:bg-teal-50 text-teal-600 rounded-lg transition"
+            title="Edit"
+          >
+            <Edit2 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => handleDelete(row.id)}
+            className="p-2 hover:bg-red-50 text-red-600 rounded-lg transition"
+            title="Delete"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      ),
+      minWidth: "130px",
+      right: true,
+    },
+  ];
+
+  const filteredPackages = useMemo(() => {
+    return packages.filter(pkg => {
+      const matchesSearch = pkg.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           pkg.destination.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesTag = filterTag === "All" || pkg.tag === filterTag;
+      const matchesStatus = filterStatus === "All" || pkg.status === filterStatus;
+      return matchesSearch && matchesTag && matchesStatus;
+    });
+  }, [packages, searchTerm, filterTag, filterStatus]);
+
+  const customStyles = {
+    headRow: {
+      style: {
+        backgroundColor: '#F9FAFB',
+        borderBottom: '1px solid #E5E7EB',
+        fontSize: '14px',
+        fontWeight: '600',
+        color: '#374151',
+      },
+    },
+    headCells: {
+      style: {
+        paddingLeft: '24px',
+        paddingRight: '24px',
+      },
+    },
+    cells: {
+      style: {
+        paddingLeft: '24px',
+        paddingRight: '24px',
+        fontSize: '14px',
+      },
+    },
+    rows: {
+      style: {
+        minHeight: '72px',
+        '&:hover': {
+          backgroundColor: '#F9FAFB',
+          cursor: 'pointer',
+        },
+      },
+    },
+  };
+
+  return (
+    <div className="p-8 bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <p className="text-gray-500 mt-1">Manage all your travel packages</p>
+        </div>
+  
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm font-medium">Total Packages</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{packages.length}</p>
+            </div>
+            <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center">
+              <div className="w-6 h-6 bg-teal-600 rounded-lg"></div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm font-medium">Active Packages</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{packages.filter(p => p.status === "Active").length}</p>
+            </div>
+            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+              <div className="w-6 h-6 bg-green-600 rounded-lg"></div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm font-medium">Total Bookings</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{packages.reduce((sum, p) => sum + (p.bookings?.length || 0), 0)}</p>
+            </div>
+            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+              <div className="w-6 h-6 bg-blue-600 rounded-lg"></div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm font-medium">Revenue (Est.)</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{packages.reduce((sum, p) => {
+  const price = Number(p.price?.discountedPrice || 0);
+  return sum + price * (p.bookings?.length || 0);
+}, 0)}</p>
+            </div>
+            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+              <div className="w-6 h-6 bg-purple-600 rounded-lg"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* Search */}
+          <div className="flex-1 relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search packages by title or destination..."
+              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+
+          <div className="flex items-center gap-2">
+            <Filter className="w-5 h-5 text-gray-400" />
+            <select
+              className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              value={filterTag}
+              onChange={(e) => setFilterTag(e.target.value)}
+            >
+              {tags.map(tag => (
+                <option key={tag} value={tag}>{tag}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Status Filter */}
+          <select
+            className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            {statuses.map(status => (
+              <option key={status} value={status}>{status}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* DataTable */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <DataTable
+          columns={columns}
+          data={packages}
+          pagination
+          paginationPerPage={10}
+          paginationRowsPerPageOptions={[5, 10, 15, 20]}
+          highlightOnHover
+          customStyles={customStyles}
+          noDataComponent={
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-gray-500 font-medium">No packages found</p>
+              <p className="text-gray-400 text-sm mt-1">Try adjusting your search or filters</p>
+            </div>
+          }
+        />
+      </div>
     </div>
   );
 }

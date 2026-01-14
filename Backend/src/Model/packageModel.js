@@ -45,8 +45,10 @@ export const Package = sequelize.define('package', {
     defaultValue: [],
     hotels:[]
   },
-
-
+status:{
+  type:DataTypes.STRING,
+  defaultValue:"Active"
+},
   touristSpots: {
     type: DataTypes.JSONB,
     defaultValue: []
@@ -57,8 +59,7 @@ export const Package = sequelize.define('package', {
     type: DataTypes.JSONB,
     defaultValue: []
   },
-
-
+  
   inclusions: {
     type: DataTypes.ARRAY(DataTypes.TEXT),
     defaultValue: []

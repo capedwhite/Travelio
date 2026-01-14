@@ -1,6 +1,6 @@
 import express from "express"
 import upload from "../Config/multer.js";
-import { createPackage } from "../Controller/packageController.js"
+import { createPackage, deletePackage, updatePackage } from "../Controller/packageController.js"
 import { getallbargains, getAllbookings } from "../Controller/bookingController.js";
 const router = express.Router()
 router.post("/addpackages",upload.fields([
@@ -10,4 +10,6 @@ router.post("/addpackages",upload.fields([
 ]),createPackage)
 router.get("/packagebooking",getAllbookings)
 router.get("/packagebargain",getallbargains)
+router.delete("/addpackages/:id",deletePackage)
+router.put("/addpackages",updatePackage)
 export default router

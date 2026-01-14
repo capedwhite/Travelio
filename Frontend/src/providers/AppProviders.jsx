@@ -1,11 +1,14 @@
 import { BrowserRouter } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "../context/authContext";
-
+import { LoadingProvider, useLoading } from "../context/loadingContext";
+import {ClipLoader} from "react-spinners"
 const AppProviders = ({ children }) => {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <LoadingProvider>
+          <GlobalLoader/>
         {children}
         <Toaster
   position="top-center"
@@ -47,9 +50,24 @@ const AppProviders = ({ children }) => {
     }
   }}
 />
+
+</LoadingProvider>
       </AuthProvider>
     </BrowserRouter>
   );
+  
 };
+const GlobalLoader = () => {
+  const { loading } = useLoading();
+
+  if (!loading) return null; 
+
+  return (
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+      <ClipLoader color="white" loading={true} size={80} />
+    </div>
+  );
+}
+
 
 export default AppProviders;
