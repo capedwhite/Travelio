@@ -24,7 +24,6 @@ app.use('/uploads', express.static('uploads'));
 app.use(passport.initialize());
 app.use(express.json())
 app.use("/auth",authRoutes)
-
 app.use(protect)
 app.use("/user",userRoutes);
 app.use("/admin",adminRoutes)

@@ -12,11 +12,13 @@ export const signupSchema = z
       .email("Invalid email address"),
     number: z
       .string()
+      .nonempty("number cannot be empty")
       .min(10, "Number must be at least 10 digits")
       .max(15, "Number too long")
       .regex(/^\d+$/, "Number must contain only digits"),
     password: z
       .string()
+      .nonempty("password cannot be empty")
       .min(6, "Password must be at least 6 characters"),
     retype: z.string(),
   })

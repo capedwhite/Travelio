@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import api from "../../api/axios.js";
 import { useAuth } from "../../context/authContext.jsx";
 import { loginSchema } from "./schema/loginscema.jsx";
-import { jwtDecode } from "jwt-decode";
+import toast from "react-hot-toast";
 
 function LoginPage() {
   const { login} = useAuth();
@@ -17,6 +17,7 @@ function LoginPage() {
     register,
     handleSubmit,
     formState: { errors },
+    formState: { isSubmitting },
   } = useForm({ resolver: zodResolver(loginSchema) });
 
   const [Error, setError] = useState("");
@@ -32,17 +33,13 @@ function LoginPage() {
   const onSubmit = async (data) => {
     try {
       const res = await api.post("/auth/login", data);
-      const decoded = jwtDecode(res.data.token);
-      login(res.data.token);
-      alert(res.data.message);
-          if (decoded.usertype === "User") {
-        navigate("/explorepackages");
-      } else {
-        navigate("/admin/dashboard");
-      }
+
+      await login(res.data.token);
+      toast.success(res.data.message)
+     
     } catch (error) {
       console.log(error);
-      alert(error.response?.data?.message);
+      toast.error(error.response?.data?.message)
     }
   };
 
@@ -131,9 +128,17 @@ function LoginPage() {
 
             <button
               type="submit"
-              className="w-full h-[50px] rounded-lg bg-[#3ab19d] text-white mt-5 hover:opacity-70 transition"
+              disabled={isSubmitting}
+              className={`w-full h-[50px] rounded-lg  mt-5 hover:opacity-70 transition ${isSubmitting?"bg-[#3ab19d]/70 text-gray-400 cursor-not-allowed":"bg-[#3ab19d] text-white"}`}
             >
-              Login
+            {isSubmitting ? (
+    <div className="flex items-center gap-2">
+      <Spinner />
+      Login
+    </div>
+  ) : (
+    "Create Package"
+  )}
             </button>
 
             <button

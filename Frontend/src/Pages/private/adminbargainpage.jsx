@@ -33,7 +33,7 @@ const BargainRequests = () => {
             key={pkg.id}
             className="bg-white rounded-2xl shadow p-5 border space-y-4 mb-10"
           >
-            {/* PACKAGE INFO */}
+
             <div className="mb-4">
               <h2 className="text-xl font-semibold">{pkg.title}</h2>
               <p className="text-sm text-gray-600">

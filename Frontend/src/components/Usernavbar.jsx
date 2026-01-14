@@ -111,7 +111,6 @@ export default function NavBar({ children })
           </Link>
           ))
           }
-
         </div>
         <ProfileHoverMenu></ProfileHoverMenu>
       </nav>
