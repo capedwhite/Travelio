@@ -45,6 +45,16 @@ export const bookpackage = async (req, res) => {
 
     await pkg.save({ transaction });
 
+    const priceSnapshot = {
+      originalPrice: pkg.price.originalPrice,
+      discountedPrice: pkg.price.discountedPrice,
+      currency: pkg.price.currency,
+      perPerson: true,
+      total:
+        (pkg.price.discountedPrice ?? pkg.price.originalPrice) *
+        Number(travelers),
+    };
+
     const booking = await Booking.create(
       {
         packageId: packageid,
@@ -54,6 +64,7 @@ export const bookpackage = async (req, res) => {
         Travelers: travelers,
         Date: date,
         userId,
+        price: priceSnapshot,
       },
       { transaction }
     );

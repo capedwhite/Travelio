@@ -23,7 +23,7 @@ function buildPackageFormData(data, mode) {
   formData.append("locations", JSON.stringify(data.locations));
   formData.append("touristSpots", JSON.stringify(data.touristSpots));
   formData.append("itinerary", JSON.stringify(data.itinerary));
-
+   console.log(data.availability)
   const hotelsData = data.hotels.map((hotel) => ({
     name: hotel.name,
     location: hotel.location,
@@ -31,7 +31,6 @@ function buildPackageFormData(data, mode) {
     amenities: hotel.amenities,
   }));
   formData.append("hotels", JSON.stringify(hotelsData));
-
 
   data.hotels.forEach((hotel, index) => {
     if (hotel.hotelImages && hotel.hotelImages.length > 0) {
@@ -43,10 +42,9 @@ function buildPackageFormData(data, mode) {
     }
   });
 
-  formData.append("availability", JSON.stringify(data.availability.startDate));
+  formData.append("availability", JSON.stringify(data.availability));
 
 
-  // Media
   if (data.media.coverImage instanceof File) {
     formData.append("coverImage", data.media.coverImage);
   }
@@ -61,7 +59,7 @@ function buildPackageFormData(data, mode) {
       }
     });
   }
-
+console.log(formData)
   return formData;
 }
 
@@ -107,9 +105,10 @@ const steps = [
   "Publish",
 ];
 
-function PackageForm({ mode = "create", packageId = null ,onSuccess,refetch}) {
+function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,refetch,key}) {
   const [loading, setLoading] = useState(false);
   const [initialData, setInitialData] = useState(null);
+  const [formKey, setFormKey] = useState(0); 
 
   const methods = useForm({
     defaultValues: defaultValues,
@@ -119,7 +118,7 @@ function PackageForm({ mode = "create", packageId = null ,onSuccess,refetch}) {
   const { handleSubmit, watch, control, reset } = methods;
   const [activeIndex, setActiveIndex] = useState(0);
   const [completedSteps, setCompletedSteps] = useState(new Set());
-  const formData = watch();
+  const formData =watch()
 
   useEffect(() => {
     if (mode === "edit" && packageId) {
@@ -130,14 +129,10 @@ function PackageForm({ mode = "create", packageId = null ,onSuccess,refetch}) {
   const fetchPackageData = async () => {
     try {
       setLoading(true);
-        const res = await api.get(`/admin/addpackages/${packageId}`);
-      const packageData = res.data.data;
-
       const transformedData = transformPackageToForm(packageData);
       setInitialData(transformedData);
       reset(transformedData);
-
-      // Mark all steps as completed in edit mode
+      setFormKey(key);
       setCompletedSteps(new Set(steps.slice(0, -1)));
     } catch (error) {
       console.error(error);
@@ -147,7 +142,7 @@ function PackageForm({ mode = "create", packageId = null ,onSuccess,refetch}) {
     }
   };
 
-  // Transform backend data structure to form structure
+
   const transformPackageToForm = (data) => {
     return {
       basicInfo: {
@@ -200,8 +195,8 @@ function PackageForm({ mode = "create", packageId = null ,onSuccess,refetch}) {
         startDate: data.availability.startDate ? formatDateForInput(data.availability.startDate) : "",
         endDate: data.availability.endDate ? formatDateForInput(data.availability.endDate) : "",
         maxBookings: data.availability.maxBookings || "",
-        inclusion: data.availability.inclusion || "",
-        exclusion: data.availability.exclusion || "",
+        inclusion: data.inclusions.join("\n") || "",
+        exclusion: data.exclusions.join("\n") || "",
       },
       media: {
         coverImage: data.images.coverImage || null,
@@ -283,21 +278,28 @@ function PackageForm({ mode = "create", packageId = null ,onSuccess,refetch}) {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
+      console.log(data)
       const formData = buildPackageFormData(data, mode);
 
       let res;
       if (mode === "edit") {
-        res = await api.put(`/admin/packagebooking/${packageId}`, formData, {
+        console.log(packageId)
+        console.log(formData)
+        res = await api.put(`/admin/addpackages/${packageId}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         toast.success(res.data.message);
-        refetch
+        if (refetch) {
+          await refetch();
+        }
       } else {
         res = await api.post("/admin/addpackages", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         toast.success(res.data.message);
-     refetch
+        if (refetch) {
+          await refetch();
+        }
       }
       onSuccess?.()
     } catch (err) {
@@ -344,8 +346,8 @@ function PackageForm({ mode = "create", packageId = null ,onSuccess,refetch}) {
   }
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-      <h1 className="text-lg font-semibold mb-6">
+    <div className="pl-8 pr-8 pt-8 pb-6 bg-gray-50 min-h-screen">
+      <h1 className="text-gray-500 mt-1 text-lg mb-6">
         {mode === "edit" ? "Edit Package" : "Create New Package"}
       </h1>
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -377,7 +379,7 @@ function PackageForm({ mode = "create", packageId = null ,onSuccess,refetch}) {
           })}
         </div>
 
-        <FormProvider {...methods}>
+        <FormProvider {...methods} key={formKey}>
           <div className="lg:col-span-3 bg-white rounded-2xl shadow p-8">
             {renderSection()}
 
@@ -453,7 +455,7 @@ function CreatePackage() {
 }
 
 function BasicInfoSection() {
-  const { register, setValue, control } = useFormContext();
+  const { register, setValue, control,watch } = useFormContext();
   const tags = [
     "Budget Friendly",
     "Adventure Package",
@@ -465,7 +467,8 @@ function BasicInfoSection() {
     control,
     name: "basicInfo.tag",
   });
-
+const titleValue = watch("basicInfo.title");
+console.log("Current title value:", titleValue);
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold">Basic Info</h2>
@@ -1077,6 +1080,7 @@ function AdminPackagesTable({ packages, refetch }) {
   const [filterTag, setFilterTag] = useState("All");
   const [filterStatus, setFilterStatus] = useState("All");
   const[selectedpackageId,setPackageid]=useState(null)
+  const [editPackage, setEditPackage] = useState(null);
 
   const tags = [
     "All",
@@ -1090,6 +1094,8 @@ function AdminPackagesTable({ packages, refetch }) {
 
   const handleEdit = async(id) => {
     try {
+       const res = await api.get(`/admin/addpackages/${id}`);
+    setEditPackage(res.data.data);
       console.log("Edit package:", id);
       setPackageid(id)
       setShowdialog(true);
@@ -1111,9 +1117,7 @@ function AdminPackagesTable({ packages, refetch }) {
     }
   };
 
-  const handleView = (id) => {
-    console.log("View package:", id);
-  };
+
 
   const columns = [
     {
@@ -1224,13 +1228,7 @@ function AdminPackagesTable({ packages, refetch }) {
       name: "Actions",
       cell: (row) => (
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => handleView(row.id)}
-            className="p-2 hover:bg-blue-50 text-blue-600 rounded-lg transition"
-            title="View"
-          >
-            <Eye className="w-4 h-4" />
-          </button>
+         
           <button
             onClick={() => handleEdit(row.id)}
             className="p-2 hover:bg-teal-50 text-teal-600 rounded-lg transition"
@@ -1299,26 +1297,29 @@ function AdminPackagesTable({ packages, refetch }) {
   };
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
+    <div className="pr-8 pl-8 pt-6 pb-8 bg-gray-50 min-h-screen">
       {/* Header */}
       
       <div className="flex justify-between items-center mb-8">
         <div>
-          <p className="text-gray-500 mt-1">Manage all your travel packages</p>
+          <p className="text-gray-500 mt-1 text-lg">Manage all your travel packages</p>
         </div>
       </div>
  {
-        showdialog && <Modal
+        showdialog && editPackage && ( <Modal
   isOpen={showdialog}
   onClose={() => setShowdialog(false)}
   title="Edit Package"
 >
   <PackageForm
+     key={selectedpackageId} 
     mode="edit"
+    packageData={editPackage}
     packageId={selectedpackageId}
     onSuccess={() => setShowdialog(false)}
+    refetch={refetch}
   />
-</Modal>}
+</Modal>)}
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">

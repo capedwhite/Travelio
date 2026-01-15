@@ -7,6 +7,6 @@ router.post("/addpackages",upload.any(),createPackage)
 router.get("/packagebooking",getAllbookings)
 router.get("/packagebargain",getallbargains)
 router.delete("/addpackages/:id",deletePackage)
-router.put("/addpackages",updatePackage)
+router.put("/addpackages/:id",upload.any(),updatePackage)
 router.get("/addpackages/:id",getPackageByid)
 export default router

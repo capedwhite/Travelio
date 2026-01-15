@@ -154,31 +154,23 @@ export const updatePackage = async (req, res) => {
     const itinerary = req.body.itinerary ? JSON.parse(req.body.itinerary) : null;
     const availability = req.body.availability ? JSON.parse(req.body.availability) : null;
 
-    let coverImage = pkg.images.coverImage; 
-    let touristImages = pkg.images.tourist; 
+    let coverImage = null;
+    let touristImages = [];
+req.files.forEach(file => {
+      if (file.fieldname === "coverImage") {
+        coverImage = file.path.replace(/\\/g, "/");
+      } else if (file.fieldname === "touristImages") {
+        touristImages.push(file.path.replace(/\\/g, "/"));
+      } else {
 
-    if (req.files?.coverImage?.[0]) {
-      coverImage = req.files.coverImage[0].path.replace(/\\/g, '/');
-    }
-
-    if (req.files?.touristImages) {
-      touristImages = req.files.touristImages.map(file => file.path.replace(/\\/g, '/'));
-    }
-
-    if (req.files && hotels) {
-      Object.keys(req.files).forEach((key) => {
-        if (key.startsWith("hotelImages[")) {
-          const index = Number(key.match(/\[(\d+)\]/)[1]);
-          const imagePaths = req.files[key].map(file =>
-            file.path.replace(/\\/g, "/")
-          );
-
-          if (hotels[index]) {
-            hotels[index].hotelImages = imagePaths;
-          }
+        const match = file.fieldname.match(/hotelImages\[(\d+)\]/);
+        if (match) {
+          const hotelIndex = Number(match[1]);
+          if (!hotels[hotelIndex].hotelImages) hotels[hotelIndex].hotelImages = [];
+          hotels[hotelIndex].hotelImages.push(file.path.replace(/\\/g, "/"));
         }
-      });
-    }
+      }
+    });
 
     const updateData = {};
 
@@ -204,7 +196,13 @@ export const updatePackage = async (req, res) => {
     }
 
     if (locations) updateData.locations = locations;
-    if (hotels) updateData.hotels = hotels;
+
+    if (hotels) {hotels.forEach((hotel, index) => {
+    const existingHotelImages = pkg.hotels[index]?.hotelImages || [];
+    const newHotelImages = hotel.hotelImages || [];
+    hotel.hotelImages = [...existingHotelImages, ...newHotelImages];
+  })};
+  updateData.hotels = hotels;
     if (touristSpots) updateData.touristSpots = touristSpots;
     if (itinerary) updateData.itinerary = itinerary;
 
@@ -226,8 +224,8 @@ export const updatePackage = async (req, res) => {
     }
 
     updateData.images = {
-      coverImage,
-      tourist: touristImages,
+ coverImage: coverImage || pkg.images.coverImage,
+  tourist: [...(pkg.images.tourist || []), ...touristImages],
     };
 
     await pkg.update(updateData);
@@ -236,6 +234,7 @@ export const updatePackage = async (req, res) => {
       message: "Package updated successfully",
       data: pkg,
     });
+    await pkg.reload();
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });

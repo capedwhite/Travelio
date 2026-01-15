@@ -58,5 +58,14 @@ export const Booking = sequelize.define("booking",{
         defaultValue:"Not paid"
         
 
-    }
+    },
+    price: {
+    type: DataTypes.JSONB,
+    allowNull: false,
+    defaultValue: {
+      originalPrice: 0,
+      discountedPrice: null,
+      currency: "INR",
+    },
+}
 })
