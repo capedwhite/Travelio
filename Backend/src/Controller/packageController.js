@@ -4,7 +4,6 @@ import { Package } from "../Model/packageModel.js";
 export const createPackage = async (req, res) => {
   console.log("api hit for create package")
   try {
-
     const basicInfo = JSON.parse(req.body.basicInfo);
     const pricing = JSON.parse(req.body.pricing);
     const locations = JSON.parse(req.body.locations);
@@ -12,23 +11,23 @@ export const createPackage = async (req, res) => {
     const touristSpots = JSON.parse(req.body.touristSpots);
     const itinerary = JSON.parse(req.body.itinerary);
     const availability = JSON.parse(req.body.availability);
-    const coverImage = req.files?.coverImage?.[0]?.path.replace(/\\/g, '/') || null;
-    const touristImages = req.files?.touristImages?.map(file => file.path.replace(/\\/g, '/'))|| []
-if (req.files) {
-  Object.keys(req.files).forEach((key) => {
-    if (key.startsWith("hotelImages[")) {
-      const index = Number(key.match(/\[(\d+)\]/)[1]);
+ let coverImage = null;
+    let touristImages = [];
+req.files.forEach(file => {
+      if (file.fieldname === "coverImage") {
+        coverImage = file.path.replace(/\\/g, "/");
+      } else if (file.fieldname === "touristImages") {
+        touristImages.push(file.path.replace(/\\/g, "/"));
+      } else {
 
-      const imagePaths = req.files[key].map(file =>
-        file.path.replace(/\\/g, "/")
-      );
-
-      if (hotels[index]) {
-        hotels[index].hotelImages = imagePaths;
+        const match = file.fieldname.match(/hotelImages\[(\d+)\]/);
+        if (match) {
+          const hotelIndex = Number(match[1]);
+          if (!hotels[hotelIndex].hotelImages) hotels[hotelIndex].hotelImages = [];
+          hotels[hotelIndex].hotelImages.push(file.path.replace(/\\/g, "/"));
+        }
       }
-    }
-  });
-}
+    });
     const insertPackage = await Package.create({
       title: basicInfo.title,
       description: basicInfo.description,
@@ -222,7 +221,7 @@ export const updatePackage = async (req, res) => {
         startDate: availability.startDate || pkg.availability.startDate,
         endDate: availability.endDate || pkg.availability.endDate,
         maxBookings: availability.maxBookings || pkg.availability.maxBookings,
-        currentBookings: pkg.availability.currentBookings, // Keep existing bookings
+        currentBookings: pkg.availability.currentBookings, 
       };
     }
 
@@ -244,7 +243,7 @@ export const updatePackage = async (req, res) => {
 };
  export const getPackageByid = async(req,res)=>{
   try{
-    console.log("getpackage api hit")
+    console.log("getpackage api hiting")
     const {id} = req.params
     const packages = await Package.findOne({where:{id:id}})
     console.log("packages are",packages)
