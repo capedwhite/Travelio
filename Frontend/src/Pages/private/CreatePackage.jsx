@@ -902,7 +902,7 @@ function MediaSection({ mode }) {
 
   useEffect(() => {
     if (mode === "edit") {
-      // Handle existing cover image
+    
       if (media.existingCoverImage && !coverPreview) {
         const imageUrl = typeof media.existingCoverImage === 'string' 
           ? `http://localhost:3000/${media.existingCoverImage}`

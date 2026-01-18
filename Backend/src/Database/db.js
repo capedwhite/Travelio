@@ -12,6 +12,7 @@ const sequelize = new Sequelize(
 );
 const connection = () => {
   try {
+    
   sequelize.authenticate();
     console.log("database connected succesfully");
 sequelize.sync({ alter: true });
@@ -20,4 +21,5 @@ sequelize.sync({ alter: true });
     console.log("db connection failed");
   }
 };
+
 export { sequelize, connection };

@@ -13,6 +13,7 @@ const TravelChallenges=React.lazy(()=>import("../Pages/private/ChallengesPage"))
 const AdminDashboard=React.lazy(()=>import("../Pages/private/admindashboard"))
 const AdminBookingsPage =React.lazy(()=>import("../Pages/private/viewbookings"))
 const BargainRequests = React.lazy(()=>import("../Pages/private/adminbargainpage"))
+const AddChallenges = React.lazy(()=>import("../Pages/private/AddChalleges"))
 const PrivateRoutes = () => {
   return (
     <Suspense fallback={<div>Loading</div>}>
@@ -102,6 +103,17 @@ const PrivateRoutes = () => {
             </ProtectedRoute>
           }
         />
+                <Route
+          path="/admin/addchallenges"
+          element={
+            <ProtectedRoute allowedroles={["Admin"]}>
+
+          
+<AddChallenges></AddChallenges>
+            </ProtectedRoute>
+          }
+        />
+
 
         <Route
           path="/unauthorized"
