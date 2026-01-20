@@ -1,101 +1,270 @@
-import { Trophy, Users, Upload } from "lucide-react";
-const challenges = [
-  {
-    id: 1,
-    title: "Best Sunset Photo",
-    description:
-      "Capture the most stunning sunset from your travels. Show us those golden hour magic moments!",
-    reward: "Winner gets $500 Travel Voucher",
-    participants: 342,
-    endDate: "Dec 31, 2025",
-    badge: "voucher",
-  },
-  {
-    id: 2,
-    title: "Most Adventurous Activity",
-    description:
-      "Share your most thrilling adventure experience. Skydiving? Bungee jumping? Scuba diving?",
-    reward: "Winner gets GoPro Hero 12",
-    participants: 218,
-    endDate: "Jan 15, 2026",
-    badge: "gopro",
-  },
-  {
-    id: 3,
-    title: "Hidden Gem Discovery",
-    description:
-      "Found a secret spot that tourists rarely visit? Share your hidden gem with the community!",
-    reward: "Community Spotlight",
-    participants: 189,
-    endDate: "Jan 20, 2026",
-    badge: "spotlight",
-  },
-];
-
-
+import { Trophy, Users, Upload, Clock } from "lucide-react";
+import { useEffect, useState } from "react";
+import api from "../../api/axios";
 
 function TravelChallenges() {
+  const [challenges, setChallenges] = useState([]);
+  const [showSubmissionModal, setShowSubmissionModal] = useState(false);
+  const [activeChallenge, setActiveChallenge] = useState(null);
+  const [caption, setCaption] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+
+  const getallChallenges = async () => {
+    const res = await api.get("/admin/getchallenges");
+    console.log(res.data.data);
+    setChallenges(res.data.data);
+  };
+
+  useEffect(() => {
+    getallChallenges();
+  }, []);
+
+  const openSubmissionModal = (challenge) => {
+    setActiveChallenge(challenge);
+    setCaption("");
+    setImageFile(null);
+    setImagePreview(null);
+    setShowSubmissionModal(true);
+  };
+
+  const closeSubmissionModal = () => {
+    setShowSubmissionModal(false);
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      setImageFile(null);
+      setImagePreview(null);
+      return;
+    }
+    setImageFile(file);
+    const url = URL.createObjectURL(file);
+    setImagePreview(url);
+  };
+
+  const handleSubmitEntry = (e) => {
+    e.preventDefault();
+    // Placeholder for now – you can hook this up to your submissions API later
+    console.log("Submitting entry for challenge:", activeChallenge);
+    console.log("Caption:", caption);
+    console.log("Image file:", imageFile);
+    setShowSubmissionModal(false);
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      
-      {/* HEADER */}
-      <div className="mb-8 mt-[5%] pb-10">
-        <h1 className="text-3xl font-bold">Travel Challenges</h1>
-        <p className="text-gray-600 mt-1">
-          Join challenges, compete with fellow travelers, and win amazing prizes
-        </p>
+    <div className="px-4 md:px-10 py-10">
+      <div className="max-w-7xl mx-auto flex gap-8">
+        {/* MAIN COLUMN - challenges list aligned more to the left */}
+        <div className="flex-1 min-w-0">
+          {/* HEADER */}
+          <div className="mb-6 mt-6 flex flex-col gap-3">
+            <span className="inline-flex items-center gap-2 self-start rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700">
+              <Trophy className="w-4 h-4" />
+              Travel Challenges
+            </span>
+            <h1 className="text-[20px] md:text-[22px] font-semibold text-gray-900">
+              Compete, explore, and win rewards
+            </h1>
+            <p className="text-sm text-gray-600 max-w-2xl">
+              Join curated travel challenges, share your experiences, and stand a
+              chance to earn exciting awards for your journeys.
+            </p>
+          </div>
+
+          {/* GRID */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {challenges.map((challenge,index) => (
+              <ChallengeCard
+                key={challenge.id}
+                challenge={challenge}
+                index={index}
+                onSubmitClick={() => openSubmissionModal(challenge)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* RIGHT SIDEBAR - placeholder for top participants layout */}
+        <aside className="hidden lg:block w-72">
+          <div className="sticky top-24 bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <h2 className="text-sm font-semibold text-gray-900 mb-2">
+              Top Participants
+            </h2>
+            <p className="text-xs text-gray-500 mb-4">
+              You can show the top travelers who participated in these challenges
+              here later.
+            </p>
+            <div className="space-y-3 text-xs text-gray-600">
+              <div className="h-9 rounded-lg bg-gray-50 border border-dashed border-gray-200 flex items-center justify-center">
+                Placeholder row
+              </div>
+              <div className="h-9 rounded-lg bg-gray-50 border border-dashed border-gray-200 flex items-center justify-center">
+                Placeholder row
+              </div>
+              <div className="h-9 rounded-lg bg-gray-50 border border-dashed border-gray-200 flex items-center justify-center">
+                Placeholder row
+              </div>
+            </div>
+          </div>
+        </aside>
       </div>
 
-      {/* GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {challenges.map((challenge) => (
-          <ChallengeCard key={challenge.id} challenge={challenge} />
-        ))}
-      </div>
+      {/* Submission Modal */}
+      {showSubmissionModal && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 relative">
+            <h2 className="text-base font-semibold text-gray-900 mb-1">
+              Submit your entry
+            </h2>
+            <p className="text-xs text-gray-500 mb-4">
+              {activeChallenge?.challengeName
+                ? `Challenge: ${activeChallenge.challengeName}`
+                : "Share your best travel moment for this challenge."}
+            </p>
 
+            <form onSubmit={handleSubmitEntry} className="space-y-4">
+              {/* Caption */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                  Caption
+                </label>
+                <textarea
+                  rows={3}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                  placeholder="Write a short caption about your entry..."
+                  value={caption}
+                  onChange={(e) => setCaption(e.target.value)}
+                />
+              </div>
+
+              {/* Image upload */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                  Image
+                </label>
+                <div className="flex items-center gap-3">
+                  <label className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-dashed border-teal-300 bg-teal-50/40 px-4 py-2 text-xs font-medium text-teal-700 hover:bg-teal-50">
+                    <Upload className="w-3.5 h-3.5 mr-2" />
+                    <span>Upload image</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageChange}
+                    />
+                  </label>
+                  {imageFile && (
+                    <span className="text-[11px] text-gray-600 truncate max-w-[140px]">
+                      {imageFile.name}
+                    </span>
+                  )}
+                </div>
+
+                {imagePreview && (
+                  <div className="mt-3">
+                    <div className="relative w-32 h-24 rounded-lg overflow-hidden border border-gray-200">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-end gap-2 pt-3">
+                <button
+                  type="button"
+                  onClick={closeSubmissionModal}
+                  className="rounded-lg border border-gray-200 px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-lg bg-teal-600 px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-1"
+                >
+                  Submit entry
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
- function ChallengeCard({ challenge }) {
+
+function ChallengeCard({ challenge ,index, onSubmitClick }) {
+
+  
+  const deadlineLabel = challenge.submissionDeadline
+    ? new Date(challenge.submissionDeadline).toLocaleDateString()
+    : "No deadline";
+
   return (
-    <div className="bg-white border rounded-xl shadow-sm hover:shadow-md transition p-6 flex flex-col justify-between">
-      
-      {/* TOP */}
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <Trophy className="text-orange-500 w-6 h-6" />
-          <span className="text-xs bg-orange-100 text-orange-600 px-3 py-1 rounded-full">
-            {challenge.reward}
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all p-5 flex flex-col">
+      {/* Top badge + award */}
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center w-9 h-9 rounded-full bg-teal-50 text-teal-600">
+            <Trophy className="w-4 h-4" />
+          </div>
+          <span className="text-[11px] font-medium uppercase tracking-wide text-teal-700 bg-teal-50 px-2.5 py-1 rounded-full">
+            Challenge {index+1}
           </span>
         </div>
-
-        <h2 className="text-lg font-semibold">{challenge.title}</h2>
-        <p className="text-gray-600 text-sm mt-2">
-          {challenge.description}
-        </p>
+        {challenge.award && (
+          <span className="text-[11px] font-medium text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full">
+            {challenge.award}
+          </span>
+        )}
       </div>
 
-      {/* INFO */}
-      <div className="mt-6 space-y-3 text-sm text-gray-700">
-        <div className="flex items-center gap-2">
-          <Users className="w-4 h-4" />
-          <span>{challenge.participants} participants</span>
+      {/* Title + description */}
+      <div className="flex-1">
+        <h2 className="text-base font-semibold text-gray-900 line-clamp-2">
+          {challenge.challengeName}
+        </h2>
+        {challenge.description && (
+          <p className="mt-2 text-sm text-gray-600 line-clamp-3">
+            {challenge.description}
+          </p>
+        )}
+      </div>
+
+      {/* Info row */}
+      <div className="mt-4 space-y-2 text-xs text-gray-700">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 text-gray-600">
+            <Clock className="w-3.5 h-3.5" />
+            <span className="font-medium text-gray-700">Ends</span>
+            <span className="text-gray-600">{deadlineLabel}</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-gray-600">
+            <Users className="w-3.5 h-3.5" />
+            <span className="text-gray-600">
+              {(challenge.participants ?? 0) || 0} joined
+            </span>
+          </div>
         </div>
-
-        <p>
-          Ends: <span className="font-medium">{challenge.endDate}</span>
-        </p>
       </div>
 
-      {/* ACTION */}
+      {/* Action button */}
       <button
-        className="mt-6 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg font-medium"
+        className="mt-5 inline-flex items-center justify-center gap-2 rounded-lg bg-teal-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-1 transition"
+        onClick={onSubmitClick}
       >
         <Upload className="w-4 h-4" />
-        Submit Entry
+        Submit entry
       </button>
-
     </div>
   );
 }
-export default  TravelChallenges
+
+export default TravelChallenges;

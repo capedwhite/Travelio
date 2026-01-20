@@ -32,7 +32,7 @@ export default function AdminSidebar({children}) {
           </NavLink>
           
         ))}
-       <div className="mt-75 p-3">
+       <div className="mt-auto p-3">
   <button
     onClick={logout}
     className="w-full flex items-center gap-3 p-3 rounded-md hover:bg-[#69d0ac9e] transition"

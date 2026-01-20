@@ -31,7 +31,7 @@ console.log(res.data.data)
 <>
 <AdminSidebar></AdminSidebar>
     <div className=" ml-64 p-8 space-y-6">
-      <h1 className="text-3xl font-bold flex items-center gap-4"><Package className="size-10 text-[#69d0ac]"></Package>Package Bookings</h1>
+      <h1 className="text-[20px]  flex items-center gap-4"><Package className="size-10 text-[#69d0ac]"></Package>Package Bookings</h1>
 
       {allBookings.map((pkg) => {
   const totalRevenue =
@@ -44,7 +44,7 @@ console.log(res.data.data)
 
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-xl font-semibold">{pkg.title}</h2>
+                <h2 className="text-[16px] font-semibold">{pkg.title}</h2>
                       <p className="text-sm text-gray-500 mt-1">
                 Created At:   {new Date(pkg.createdAt).toLocaleDateString()}
                 </p>

@@ -26,16 +26,16 @@ const BargainRequests = () => {
     <>
       <AdminSidebar />
       <div className="ml-64 p-6 bg-[#f9fafb] min-h-screen">
-        <h1 className="text-2xl font-bold mb-6">Bargain Requests</h1>
+        <h1 className="text-[20px]  mb-6">Bargain Requests</h1>
 
         {bargainsData.map((pkg) => (
           <div
             key={pkg.id}
-            className="bg-white rounded-2xl shadow p-5 border space-y-4 mb-10"
+            className="bg-white rounded-2xl shadow p-5 shadow-md space-y-4 mb-10"
           >
 
             <div className="mb-4">
-              <h2 className="text-xl font-semibold">{pkg.title}</h2>
+              <h2 className="text-lg font-semibold">{pkg.title}</h2>
               <p className="text-sm text-gray-600">
                 Original Price: ${pkg.price.discountedPrice}
               </p>
@@ -47,12 +47,12 @@ const BargainRequests = () => {
               pkg.bargains.map((bargainItem) => (
                 <div
                   key={bargainItem.bargainId}
-                  className="bg-gray-50 p-4 rounded-xl space-y-2 mb-4"
+                  className="bg-gray-100 p-4 rounded-xl space-y-2 mb-4"
                 >
                   {/* USER INFO + STATUS */}
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="text-lg font-semibold">
+                      <h3 className="text-md ">
                         {bargainItem.user?.username || "Unknown User"}
                       </h3>
                       <p className="text-sm text-gray-500">

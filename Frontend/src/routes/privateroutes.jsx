@@ -108,12 +108,10 @@ const PrivateRoutes = () => {
           element={
             <ProtectedRoute allowedroles={["Admin"]}>
 
-          
-<AddChallenges></AddChallenges>
+               <AddChallenges></AddChallenges>
             </ProtectedRoute>
           }
         />
-
 
         <Route
           path="/unauthorized"

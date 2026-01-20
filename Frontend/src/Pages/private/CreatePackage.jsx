@@ -155,7 +155,7 @@ function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,
         originalPrice: data.price.originalPrice || "",
         discountedPrice: data.price.discountedPrice || "",
         currency: data.price.currency || "USD",
-        label: data.seasonalDiscount.percentage || "",
+        label: data.seasonalDiscount.label || "",
         discountpercentage: data.seasonalDiscount.percentage || "",
       },
       locations: {
@@ -442,10 +442,7 @@ function CreatePackage() {
     <>
       <AdminSidebar />
 
-      <div className="p-8 bg-gray-50 min-h-screen ml-64">
-        <h1 className="text-2xl font-semibold mb-6">
-          Create and Manage Packages
-        </h1>
+      <div className="p-8 pt-2 bg-gray-50 min-h-screen ml-64">
         <PackageForm refetch={getallpackages}/>
 
         <AdminPackagesTable packages={allpackages} refetch={getallpackages} />

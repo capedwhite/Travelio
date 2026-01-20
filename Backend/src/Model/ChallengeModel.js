@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../Database/db";
+import { sequelize } from "../Database/db.js";
 
 export const challenge = sequelize.define("challenge", {
   id: {
@@ -13,17 +13,10 @@ export const challenge = sequelize.define("challenge", {
     type: DataTypes.STRING(100),
     allowNull: false
   },
-
-  title: {
-    type: DataTypes.STRING(100),
-    allowNull: false
-  },
-
   submissionDeadline: {
     type: DataTypes.DATE,
     allowNull: false
   },
-
   description: {
     type: DataTypes.TEXT,
     allowNull: false
@@ -38,4 +31,5 @@ export const challenge = sequelize.define("challenge", {
     type: DataTypes.TEXT,
     allowNull: false
   }
+  
 })

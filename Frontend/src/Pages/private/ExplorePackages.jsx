@@ -70,7 +70,7 @@ getallpackages()},[])
 const navigate = useNavigate()
   return (
     <div className="min-h-screen bg-[#fcfcfc] p-4 sm:p-6 ">
-      <div className="max-w-7xl mx-auto mt-[5%] pb-10">
+      <div className="max-w-7xl mx-auto  pb-10">
     
         <div className="h-80 rounded-3xl mb-10 bg-white shadow-md">
 <img></img>
@@ -110,10 +110,7 @@ const navigate = useNavigate()
           {pkg.seasonalDiscount.label && (
             <>
             <div className="absolute top-2 right-2 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded">
-              {pkg.seasonalDiscount.label}
-            </div>
-                    <div className="absolute top-8 right-2 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded">
-              {pkg.seasonalDiscount.percentage+"%"}
+              {pkg.seasonalDiscount.label}   {pkg.seasonalDiscount.percentage+"%"}
             </div>
             </>
             
@@ -142,16 +139,16 @@ const navigate = useNavigate()
               <span>{pkg.duration}</span>
             </div>
             <div className="flex items-center gap-1 text-base font-bold text-green-600">
-              <span>{pkg.price.currency}</span>
+              <span className="text-sm">{pkg.price.currency}</span>
               <span> {Number(pkg.price.discountedPrice) === 0 ? (
   <p className="font-semibold text-green-600">Free</p>
 ) : (
   <>
     <p className="font-semibold text-gray-900">
-      ${pkg.price.discountedPrice}
+      {pkg.price.discountedPrice}
     </p>
     <p className="text-sm text-gray-400 line-through">
-      ${pkg.price.originalPrice}
+      {pkg.price.originalPrice}
     </p>
   </>
 )}</span>

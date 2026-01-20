@@ -76,7 +76,7 @@ export default function NavBar({ children })
     { name: "About", path: "/about" },
   ];
   return (
-    <div className="h-[100dvh] flex flex-col  ">
+    <div className="h-[100dvh] flex flex-col">
       <nav className=" 
 
   shadow-lg
@@ -119,7 +119,9 @@ export default function NavBar({ children })
       
       </nav>
 
-      {children}
+      <main className=" mt-20 ">
+  {children}
+</main>
     </div>
   );
 }
