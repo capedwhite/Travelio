@@ -30,6 +30,20 @@ export const challenge = sequelize.define("challenge", {
   awardDetail: {
     type: DataTypes.TEXT,
     allowNull: false
-  }
+  },
   
+  result: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "pending"
+  },
+  
+  winnerId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: "users",
+      key: "id"
+    }
+  }
 })

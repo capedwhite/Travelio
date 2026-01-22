@@ -29,7 +29,7 @@ import { sequelize } from "../Database/db.js";
             allowNull:true,
         },
         images: {
-            type: DataTypes.STRING,
+            type: DataTypes.ARRAY(DataTypes.STRING),
             allowNull: true
           },
         submissionDate:{
