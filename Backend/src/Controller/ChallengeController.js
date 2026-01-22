@@ -148,7 +148,6 @@ export const getTopChallengeUsers = async (req, res) => {
           model: Submission,
           as: "submissions",
           attributes: [],
-          required: false, // include users with 0 submissions
         },
       ],
       attributes: [

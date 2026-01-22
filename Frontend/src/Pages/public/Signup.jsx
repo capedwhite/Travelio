@@ -22,8 +22,8 @@ const [eyeretype,setEyeretype]=useState("")
       const onsubmit =async(data)=>{
   try {
       const res = await api.post("/auth/signup", data);
-    login(res.data.token)
-      alert(res.data.message);
+    await login(res.data.token)
+    toast.success(res.data.message)
       navigate("/explorepackages");
     } catch (err) {
       console.log(err);

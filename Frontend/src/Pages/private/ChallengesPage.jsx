@@ -29,6 +29,16 @@ function TravelChallenges() {
     setChallenges(data);
   };
 
+  // Calculate challenge stats
+  const challengeStats = {
+    totalCompleted: challenges.filter(ch => ch.hasSubmitted).length,
+    remaining: challenges.filter(ch => !ch.hasSubmitted).length,
+    won: challenges.filter(ch => ch.result === "published" && ch.winnerId === challenges.find(c => c.hasSubmitted)?.userId).length,
+  };
+
+  // Get completed challenges for the sidebar
+  const completedChallenges = challenges.filter(ch => ch.hasSubmitted);
+
   const gettopusers = async () => {
     try {
       const res = await api.get(`/user/gettopusers`);
@@ -129,6 +139,45 @@ function TravelChallenges() {
             </p>
           </div>
 
+          {/* CHALLENGE STATS OVERVIEW */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-teal-50">
+                  <Upload className="w-5 h-5 text-teal-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-gray-900">{challengeStats.totalCompleted}</p>
+                  <p className="text-xs text-gray-500">Completed</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-amber-50">
+                  <Clock className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-gray-900">{challengeStats.remaining}</p>
+                  <p className="text-xs text-gray-500">Remaining</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-yellow-50">
+                  <Award className="w-5 h-5 text-yellow-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-gray-900">{challengeStats.won}</p>
+                  <p className="text-xs text-gray-500">Won</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* GRID */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {challenges.map((challenge, index) => (
@@ -150,8 +199,8 @@ function TravelChallenges() {
               Top Participants
             </h2>
             <p className="text-xs text-gray-500 mb-4">
-              You can show the top travelers who participated in these challenges
-              here later.
+           Top 3 travelers who participated 
+  
             </p>
             {!topusers || topusers.length === 0 ? (
               <div className="space-y-3 text-xs text-gray-600">
@@ -186,6 +235,65 @@ function TravelChallenges() {
                 ))}
               </div>
             )}
+
+            {/* COMPLETED CHALLENGES SECTION */}
+            <div className="mt-6 pt-4 border-t border-gray-100">
+              <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <Trophy className="w-4 h-4 text-green-600" />
+                Your Completed Challenges
+              </h3>
+
+              {completedChallenges.length === 0 ? (
+                <div className="text-center py-6">
+                  <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Trophy className="w-6 h-6 text-gray-400" />
+                  </div>
+                  <p className="text-xs text-gray-500">No challenges completed yet</p>
+                  <p className="text-[10px] text-gray-400 mt-1">Start participating to see your progress!</p>
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {completedChallenges.slice(0, 5).map((challenge, idx) => (
+                    <div
+                      key={challenge.id}
+                      className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100 rounded-lg p-3 hover:bg-green-100/50 transition-colors cursor-pointer"
+                      onClick={() => openDetailsModal(challenge)}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
+                              <span className="text-[10px] font-bold text-green-700">✓</span>
+                            </div>
+                            <p className="text-xs font-medium text-gray-900 truncate">
+                              {challenge.challengeName}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2 text-[10px] text-gray-500">
+                            <Users className="w-3 h-3" />
+                            <span>{challenge.participantsCount} participants</span>
+                            {challenge.result === "published" && challenge.winnerId && (
+                              <>
+                                <span>•</span>
+                                <span className="text-amber-600 font-medium">Winner announced!</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {completedChallenges.length > 5 && (
+                    <div className="text-center py-2">
+                      <p className="text-xs text-gray-500">
+                        +{completedChallenges.length - 5} more completed challenges
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </aside>
       </div>
@@ -277,8 +385,8 @@ function TravelChallenges() {
 
       {/* Challenge Details Modal */}
       {showDetailsModal && challengeDetails && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={closeDetailsModal}>
+          <div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 relative" onClick={(e)=>e.stopPropagation()}>
             <button
               onClick={closeDetailsModal}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
@@ -460,28 +568,28 @@ function ChallengeCard({ challenge, index, onSubmitClick, onViewDetails }) {
 
   return (
     <div
-      className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all p-5 flex flex-col relative"
+      className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all p-5 pt-10 flex flex-col relative"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Result Badge */}
+      {/* Result Badge - positioned on left side */}
       {challenge.result && (
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-3 left-3 z-20">
           <span
-            className={`px-2 py-1 rounded-full text-[10px] font-medium ${
+            className={`px-2.5 py-1 rounded-full text-[10px] font-medium ${
               challenge.result === "published"
-                ? "bg-green-100 text-green-700"
-                : "bg-amber-100 text-amber-700"
+                ? "bg-blue-100 text-blue-700"
+                : "bg-purple-100 text-purple-700"
             }`}
           >
-            {challenge.result === "published" ? "Published" : "Pending"}
+            Result: {challenge.result === "published" ? "Published" : "Pending"}
           </span>
         </div>
       )}
 
-      {/* Hover Overlay */}
+      {/* Hover Overlay - excludes button area */}
       {isHovered && (
-        <div className="absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center z-10">
+        <div className="absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center z-10" style={{bottom: '5rem'}}>
           <button
             onClick={onViewDetails}
             className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-teal-700 transition"
