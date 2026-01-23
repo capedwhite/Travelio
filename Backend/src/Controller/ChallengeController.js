@@ -309,6 +309,71 @@ export const deleteChallenge = async (req, res) => {
   }
 };
 
+// Get all challenges with detailed submissions and user info (for admin)
+export const getAllChallengesWithSubmissions = async (req, res) => {
+  try {
+    const challenges = await challenge.findAll({
+      include: [
+        {
+          model: Submission,
+          required: false,
+          include: [
+            {
+              model: User,
+              attributes: ["id", "username", "email", "name", "profileImage"],
+            },
+          ],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.status(200).send({
+      data: challenges,
+      message: "Challenges with submissions fetched successfully",
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send({ message: error.message });
+  }
+};
+
+// Update challenge winner
+export const setChallengeWinner = async (req, res) => {
+  try {
+    const { challengeId, winnerId } = req.params;
+
+    const challengeData = await challenge.findByPk(challengeId);
+    if (!challengeData) {
+      return res.status(404).send({ message: "Challenge not found" });
+    }
+
+    // Check if the winner has submitted to this challenge
+    const winnerSubmission = await Submission.findOne({
+      where: {
+        challengeId,
+        userId: winnerId,
+      },
+    });
+
+    if (!winnerSubmission) {
+      return res.status(400).send({ message: "Selected user has not submitted to this challenge" });
+    }
+
+    challengeData.winnerId = winnerId;
+    challengeData.result = "published";
+    await challengeData.save();
+
+    res.status(200).send({
+      data: challengeData,
+      message: "Challenge winner set successfully",
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send({ message: error.message });
+  }
+};
+
 
 
 

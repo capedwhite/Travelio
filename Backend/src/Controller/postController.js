@@ -4,6 +4,72 @@ import { Comment } from "../Model/Comments.js";
 import { Follow } from "../Model/Follow.js";
 import { User } from "../Model/userModel.js";
 
+// User profile management functions
+export const getProfile = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).send({ message: "User not authenticated" });
+    }
+
+    const user = await User.findByPk(userId, {
+      attributes: ["id", "username", "email", "name", "bio", "profileImage", "usertype"],
+    });
+
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    res.status(200).send({
+      data: user,
+      message: "Profile fetched successfully",
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send({ message: error.message });
+  }
+};
+
+export const updateUserProfile = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    const { username, email, name, bio } = req.body;
+
+    if (!userId) {
+      return res.status(401).send({ message: "User not authenticated" });
+    }
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    // Handle profile image upload
+    let profileImagePath = user.profileImage; // Keep existing image by default
+    if (req.file) {
+      profileImagePath = req.file.path.replace(/\\/g, "/");
+    }
+
+    // Update fields
+    if (username) user.username = username;
+    if (email) user.email = email;
+    if (name) user.name = name;
+    if (bio !== undefined) user.bio = bio;
+    user.profileImage = profileImagePath;
+
+    await user.save();
+
+    res.status(200).send({
+      data: user,
+      message: "Profile updated successfully",
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send({ message: error.message });
+  }
+};
+
 // Create a new post
 export const createPost = async (req, res) => {
   try {
@@ -359,6 +425,162 @@ export const getUserProfile = async (req, res) => {
     res.status(200).send({
       data: userData,
       message: "User profile fetched successfully",
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send({ message: error.message });
+  }
+};
+
+// Get posts from users that current user follows
+export const getFollowedPosts = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).send({ message: "User not authenticated" });
+    }
+
+    // First get the users that current user follows
+    const followedUsers = await User.findAll({
+      include: [
+        {
+          model: User,
+          as: "Followers",
+          where: { id: userId },
+          attributes: [],
+          through: { attributes: [] },
+        },
+      ],
+      attributes: ["id"],
+    });
+
+    const followedUserIds = followedUsers.map(user => user.id);
+
+    if (followedUserIds.length === 0) {
+      return res.status(200).send({
+        data: [],
+        message: "No followed posts found",
+      });
+    }
+
+    // Get posts from followed users
+    const posts = await Post.findAll({
+      where: {
+        userId: followedUserIds,
+      },
+      include: [
+        {
+          model: User,
+          attributes: ["id", "username", "email"],
+        },
+        {
+          model: Like,
+          required: false,
+          attributes: [],
+        },
+        {
+          model: Comment,
+          required: false,
+          attributes: [],
+        },
+      ],
+      attributes: [
+        "id",
+        "content",
+        "image",
+        "userId",
+        "createdAt",
+        [
+          User.sequelize.fn("COUNT", User.sequelize.fn("DISTINCT", User.sequelize.col("likes.id"))),
+          "likeCount",
+        ],
+        [
+          User.sequelize.fn("COUNT", User.sequelize.fn("DISTINCT", User.sequelize.col("comments.id"))),
+          "commentCount",
+        ],
+      ],
+      group: ["posts.id", "user.id"],
+      order: [["createdAt", "DESC"]],
+      limit: 20, // Limit to prevent too many posts
+      subQuery: false,
+    });
+
+    res.status(200).send({
+      data: posts,
+      message: "Followed posts found successfully",
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send({ message: error.message });
+  }
+};
+
+// Update a post (only by owner)
+export const updatePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { content } = req.body;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).send({ message: "User not authenticated" });
+    }
+
+    const post = await Post.findOne({
+      where: { id: postId, userId },
+    });
+
+    if (!post) {
+      return res.status(404).send({ message: "Post not found or you don't have permission to edit it" });
+    }
+
+    // Handle image update if provided
+    let imagePath = post.image; // Keep existing image by default
+    if (req.file) {
+      imagePath = req.file.path.replace(/\\/g, "/");
+    }
+
+    post.content = content || post.content;
+    post.image = imagePath;
+    await post.save();
+
+    res.status(200).send({
+      data: post,
+      message: "Post updated successfully",
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send({ message: error.message });
+  }
+};
+
+// Delete a post (only by owner)
+export const deletePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).send({ message: "User not authenticated" });
+    }
+
+    const post = await Post.findOne({
+      where: { id: postId, userId },
+    });
+
+    if (!post) {
+      return res.status(404).send({ message: "Post not found or you don't have permission to delete it" });
+    }
+
+    // Delete associated likes and comments first
+    await Like.destroy({ where: { postId } });
+    await Comment.destroy({ where: { postId } });
+
+    await post.destroy();
+
+    res.status(200).send({
+      message: "Post deleted successfully",
     });
   } catch (error) {
     console.log(error.message);

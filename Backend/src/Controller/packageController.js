@@ -1,5 +1,6 @@
 
 import { Package } from "../Model/packageModel.js";
+import { PackageRequest } from "../Model/requestModel.js";
 
 export const createPackage = async (req, res) => {
   console.log("api hit for create package")
@@ -252,3 +253,38 @@ req.files.forEach(file => {
     res.status(500).send({message:error.messaege})
   }
  }
+
+export const createPackageRequest = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).send({ message: "User not authenticated" });
+    }
+
+    const { destination, duration, travelers, budget, travelDate, specialRequests } = req.body;
+
+    // Validate required fields
+    if (!destination || !duration || !travelers || !budget || !travelDate) {
+      return res.status(400).send({ message: "All fields are required" });
+    }
+
+    const packageRequest = await PackageRequest.create({
+      userId,
+      destination,
+      duration,
+      travelers: Number(travelers),
+      budget,
+      travelDate,
+      specialRequests: specialRequests || null,
+    });
+
+    res.status(201).send({
+      message: "Package request submitted successfully! We'll get back to you soon.",
+      data: packageRequest,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: error.message });
+  }
+};

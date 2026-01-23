@@ -39,5 +39,17 @@ export const User = sequelize.define("users",{
         type:DataTypes.STRING(),
         allowNull:true
     },
+    profileImage:{
+        type:DataTypes.STRING(),
+        allowNull:true
+    },
+    bio:{
+        type:DataTypes.TEXT,
+        allowNull:true
+    },
+    name:{
+        type:DataTypes.STRING(100),
+        allowNull:true
+    },
 
 })

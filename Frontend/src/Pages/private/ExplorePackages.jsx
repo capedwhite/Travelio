@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { bookingSchema } from "./schema/bookingSchema"
 import { bargainSchema } from "./schema/bargainSchema"
+import PackageRequest from "./packageRequest"
 
 function ExplorePackages() {
 
@@ -70,31 +71,37 @@ getallpackages()},[])
 const navigate = useNavigate()
   return (
     <div className="min-h-screen bg-[#fcfcfc] p-4 sm:p-6 ">
-      <div className="max-w-7xl mx-auto  pb-10">
-    
+      <div className="max-w-7xl mx-auto pb-10">
+        {/* Header Section */}
         <div className="h-80 rounded-3xl mb-10 bg-white shadow-md">
-<img></img>
+          <img></img>
         </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Explore Packages</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Explore Packages</h1>
         <p className="text-gray-600 mb-6">Discover amazing travel destinations and book your dream vacation</p>
-        <div className="w-200 rounded-xl h-9 bg-gray-100  border-1 border-gray-200 mb-4 p-1 gap-2 flex justify-center items-center ">
- {["All", "Adventure", "Popular", "Luxury", "Budget"].map((filter) => (
-    <div
-      key={filter}
-      onClick={() => setActiveFilter(filter)}
-      className={`w-[20%] h-full rounded-lg flex justify-center items-center p-3 cursor-pointer transition
-        ${
-          activeFilter === filter
-            ? "bg-white text-[#3ab19d] shadow font-bold"
-            : "hover:bg-white text-gray-700"
-        }
-      `}
-    >
-      <span className="text-sm">{filter}</span>
-    </div>
-  ))}
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+        {/* Main Content - Two Column Layout */}
+        <div className="flex gap-8">
+          {/* Left Side - Packages */}
+          <div className="flex-1">
+            <div className="w-200 rounded-xl h-9 bg-gray-100 border-1 border-gray-200 mb-6 p-1 gap-2 flex justify-center items-center">
+              {["All", "Adventure", "Popular", "Luxury", "Budget"].map((filter) => (
+                <div
+                  key={filter}
+                  onClick={() => setActiveFilter(filter)}
+                  className={`w-[20%] h-full rounded-lg flex justify-center items-center p-3 cursor-pointer transition
+                    ${
+                      activeFilter === filter
+                        ? "bg-white text-[#3ab19d] shadow font-bold"
+                        : "hover:bg-white text-gray-700"
+                    }
+                  `}
+                >
+                  <span className="text-sm">{filter}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {pkg.map((pkg) => (
    <>
       <div className="group border border-1 border-[#3ab19d]/50 rounded-lg overflow-hidden shadow-sm hover:shadow-2xl hover:scale-103 transition duration-300 bg-white" 
@@ -280,6 +287,13 @@ const navigate = useNavigate()
       )}
     </>
           ))}
+            </div>
+          </div>
+
+          {/* Right Side - Package Request Form */}
+          <div className="hidden lg:block w-96">
+            <PackageRequest />
+          </div>
         </div>
       </div>
     </div>

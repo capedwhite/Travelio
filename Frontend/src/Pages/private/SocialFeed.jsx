@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Heart, MessageCircle, Plus, User, Send, UserPlus, UserCheck } from "lucide-react";
+import { Heart, MessageCircle, Plus, User, Send, UserPlus, UserCheck, Edit2, Trash2 } from "lucide-react";
 import api from "../../api/axios";
 import toast from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
+import { useAuth } from "../../context/authContext";
 
-function PostCard({ post, onLike, onComment, onUserClick }) {
+function PostCard({ post, onLike, onComment, onUserClick, onEdit, onDelete, isOwnPost, deleteLoading }) {
   const [commentText, setCommentText] = useState("");
   const [showComments, setShowComments] = useState(false);
 
@@ -30,9 +31,34 @@ function PostCard({ post, onLike, onComment, onUserClick }) {
             {post.user.username}
           </button>
         </div>
-        <span className="text-xs text-gray-500">
-          {new Date(post.createdAt).toLocaleDateString()}
-        </span>
+        <div className="flex items-center gap-2">
+          {isOwnPost && (
+            <>
+              <button
+                onClick={() => onEdit(post)}
+                className="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                title="Edit post"
+              >
+                <Edit2 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => onDelete(post.id)}
+                disabled={deleteLoading === post.id}
+                className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition disabled:opacity-50"
+                title="Delete post"
+              >
+                {deleteLoading === post.id ? (
+                  <ClipLoader size={14} color="#dc2626" />
+                ) : (
+                  <Trash2 className="w-4 h-4" />
+                )}
+              </button>
+            </>
+          )}
+          <span className="text-xs text-gray-500">
+            {new Date(post.createdAt).toLocaleDateString()}
+          </span>
+        </div>
       </div>
 
       {/* CONTENT */}
@@ -126,6 +152,7 @@ function PostCard({ post, onLike, onComment, onUserClick }) {
 function UserProfileModal({ user, isOpen, onClose, onFollow }) {
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
 
   useEffect(() => {
     if (user && isOpen) {
@@ -135,14 +162,26 @@ function UserProfileModal({ user, isOpen, onClose, onFollow }) {
 
   const fetchUserDetails = async () => {
     if (!user?.id) return;
-    setLoading(true);
+    
     try {
       const res = await api.get(`/user/users/${user.id}`);
       setUserDetails(res.data.data);
     } catch (error) {
       toast.error("Failed to load user profile");
     } finally {
-      setLoading(false);
+
+    }
+  };
+
+  const handleFollowClick = async () => {
+    setFollowLoading(true);
+    try {
+      await onFollow(user.id);
+      await fetchUserDetails();
+    } catch (error) {
+      // Error already handled in onFollow
+    } finally {
+      setFollowLoading(false);
     }
   };
 
@@ -150,7 +189,7 @@ function UserProfileModal({ user, isOpen, onClose, onFollow }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto" onClick={e=>e.stopPropagation(e)}>
+      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto" onClick={e=>e.stopPropagation()}>
         <div className="p-6">
           <button
             onClick={onClose}
@@ -160,7 +199,9 @@ function UserProfileModal({ user, isOpen, onClose, onFollow }) {
           </button>
 
           {loading ? (
-            <div className="text-center py-8">Loading...</div>
+            <div className="text-center py-8">
+              <ClipLoader size={25} color="#14B8A6" />
+            </div>
           ) : userDetails ? (
             <>
               {/* User Header */}
@@ -198,14 +239,20 @@ function UserProfileModal({ user, isOpen, onClose, onFollow }) {
 
               {/* Follow Button */}
               <button
-                onClick={() => onFollow(user.id)}
-                className={`w-full py-3 rounded-lg font-medium transition ${
+                onClick={handleFollowClick}
+                disabled={followLoading}
+                className={`w-full py-3 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed ${
                   userDetails.isFollowing
                     ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
                     : "bg-teal-600 text-white hover:bg-teal-700"
                 }`}
               >
-                {userDetails.isFollowing ? (
+                {followLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <ClipLoader size={16} color={userDetails.isFollowing ? "#374151" : "#ffffff"} />
+                    <span>Updating...</span>
+                  </span>
+                ) : userDetails.isFollowing ? (
                   <span className="flex items-center justify-center gap-2">
                     <UserCheck className="w-4 h-4" />
                     Following
@@ -258,40 +305,51 @@ function UserProfileModal({ user, isOpen, onClose, onFollow }) {
 }
 
 function PackageSocialFeed() {
+  const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [newPostOpen, setNewPostOpen] = useState(false);
   const [newPostText, setNewPostText] = useState("");
   const [newPostImage, setNewPostImage] = useState(null);
   const [topUsers, setTopUsers] = useState([]);
   const [following, setFollowing] = useState([]);
+  const [followedPosts, setFollowedPosts] = useState([]);
+  const [showAllFollowedPosts, setShowAllFollowedPosts] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [userModalOpen, setUserModalOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState(null);
+  const [editContent, setEditContent] = useState("");
+  const [editImage, setEditImage] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(null);
 
   useEffect(() => {
     fetchPosts();
     fetchTopUsers();
     fetchFollowing();
+    fetchFollowedPosts();
   }, []);
 
-  const fetchPosts = async () => {
+  const fetchPosts = async (silent = false) => {
     try {
-      setLoading(true); // start loading
+      if (!silent) setInitialLoading(true);
       const res = await api.get("/user/posts");
-      setPosts(res.data.data); // save posts
+      setPosts(res.data.data);
     } catch (error) {
-      toast.error("Failed to load posts");
+      if (!silent) toast.error("Failed to load posts");
     } finally {
-      setLoading(false); // stop loading in both success & error
+      if (!silent) setInitialLoading(false);
     }
   };
   
   const fetchTopUsers = async () => {
     try {
       const res = await api.get("/user/topusers");
-      setTopUsers(res.data.data);
+      console.log("Top Users Response:", res.data);
+      // Handle different response structures
+      setTopUsers(res.data.data || res.data || []);
     } catch (error) {
-      console.log("Failed to load top users");
+      console.log("Failed to load top users", error);
     }
   };
 
@@ -304,10 +362,19 @@ function PackageSocialFeed() {
     }
   };
 
+  const fetchFollowedPosts = async () => {
+    try {
+      const res = await api.get("/user/followed-posts");
+      setFollowedPosts(res.data.data);
+    } catch (error) {
+      console.log("Failed to load followed posts");
+    }
+  };
+
   const handleCreatePost = async () => {
     if (!newPostText.trim()) return;
 
-    setLoading(true);
+    const postingToast = toast.loading("Creating post...");
     try {
       const formData = new FormData();
       formData.append("content", newPostText);
@@ -319,23 +386,47 @@ function PackageSocialFeed() {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      toast.success("Post created successfully!");
+      toast.success("Post created successfully!", { id: postingToast });
       setNewPostOpen(false);
       setNewPostText("");
       setNewPostImage(null);
-      fetchPosts();
+      fetchPosts(true);
+      fetchTopUsers();
     } catch (error) {
-      toast.error("Failed to create post");
-    } finally {
-      setLoading(false);
+      toast.error("Failed to create post", { id: postingToast });
     }
   };
 
   const handleLike = async (postId) => {
+    // Optimistically update UI first
+    setPosts(prevPosts =>
+      prevPosts.map(post =>
+        post.id === postId
+          ? {
+              ...post,
+              isLiked: !post.isLiked,
+              likeCount: post.isLiked ? post.likeCount - 1 : post.likeCount + 1
+            }
+          : post
+      )
+    );
+
     try {
       await api.post(`/user/posts/${postId}/like`);
-      fetchPosts(); // Refresh to get updated like counts
+      fetchPosts(true);
     } catch (error) {
+      // Revert optimistic update on error
+      setPosts(prevPosts =>
+        prevPosts.map(post =>
+          post.id === postId
+            ? {
+                ...post,
+                isLiked: !post.isLiked,
+                likeCount: post.isLiked ? post.likeCount - 1 : post.likeCount + 1
+              }
+            : post
+        )
+      );
       toast.error("Failed to like post");
     }
   };
@@ -343,7 +434,7 @@ function PackageSocialFeed() {
   const handleComment = async (postId, commentText) => {
     try {
       await api.post(`/user/posts/${postId}/comment`, { content: commentText });
-      fetchPosts(); // Refresh to get updated comments
+      fetchPosts(true);
     } catch (error) {
       toast.error("Failed to add comment");
     }
@@ -357,21 +448,164 @@ function PackageSocialFeed() {
   const handleFollow = async (userId) => {
     try {
       await api.post(`/user/users/${userId}/follow`);
-      toast.success("Follow status updated!");
       fetchFollowing();
-      // Refresh user details if modal is open
-      if (userModalOpen && selectedUser?.id === userId) {
-        const res = await api.get(`/user/users/${userId}`);
-        setSelectedUser(res.data.data);
-      }
+      fetchFollowedPosts();
     } catch (error) {
       toast.error("Failed to update follow status");
     }
   };
-  
+
+  const handleEditPost = (post) => {
+    setEditingPost(post);
+    setEditContent(post.content);
+    setEditImage(null);
+    setEditModalOpen(true);
+  };
+
+  const handleUpdatePost = async () => {
+    if (!editContent.trim()) return;
+
+    try {
+      const formData = new FormData();
+      formData.append("content", editContent);
+      if (editImage) {
+        formData.append("image", editImage);
+      }
+
+      await api.put(`/user/posts/${editingPost.id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      toast.success("Post updated successfully!");
+      setEditModalOpen(false);
+      fetchPosts(true);
+    } catch (error) {
+      toast.error("Failed to update post");
+    }
+  };
+
+  const handleDeletePost = async (postId) => {
+    if (!window.confirm("Are you sure you want to delete this post? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      setDeleteLoading(postId);
+      await api.delete(`/user/posts/${postId}`);
+      toast.success("Post deleted successfully!");
+      fetchPosts(true);
+    } catch (error) {
+      toast.error("Failed to delete post");
+    } finally {
+      setDeleteLoading(null);
+    }
+  };
+
   return (
     <div className="px-4 md:px-10 py-10">
       <div className="max-w-7xl mx-auto flex gap-8">
+        {/* LEFT SIDEBAR - Followed Posts */}
+        <aside className="hidden lg:block w-80">
+          {/* FOLLOWED POSTS */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+            <h2 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <Heart className="w-4 h-4 text-pink-500" />
+              From People You Follow
+            </h2>
+            <p className="text-xs text-gray-500 mb-4">
+              Latest posts from your travel buddies
+            </p>
+
+            {followedPosts.length === 0 ? (
+              <div className="text-center py-6">
+                <Heart className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                <p className="text-xs text-gray-500">No posts from followed users yet</p>
+                <p className="text-[10px] text-gray-400 mt-1">Start following travelers!</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {(showAllFollowedPosts ? followedPosts : followedPosts.slice(0, 4)).map((post, idx) => (
+                  <div
+                    key={post.id}
+                    className="bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-100 rounded-xl p-4 hover:shadow-md transition-all duration-200 cursor-pointer group"
+                    onClick={() => handleUserClick(post.user)}
+                  >
+                    {/* User Info */}
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full flex items-center justify-center ring-2 ring-white shadow-sm">
+                        <User className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-pink-600 transition">
+                          {post.user.username}
+                        </p>
+                        <p className="text-[10px] text-gray-500">
+                          {new Date(post.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Post Content */}
+                    <div className="space-y-2">
+                      <p className="text-xs text-gray-700 line-clamp-3 leading-relaxed">
+                        {post.content}
+                      </p>
+
+                      {post.image && (
+                        <div className="relative w-full h-20 rounded-lg overflow-hidden bg-gray-100">
+                          <img
+                            src={`http://localhost:3000/${post.image}`}
+                            alt="Post"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                      )}
+
+                      {/* Engagement Stats */}
+                      <div className="flex items-center gap-3 text-[10px] text-gray-500 pt-1">
+                        <span className="flex items-center gap-1">
+                          <Heart className="w-3 h-3" />
+                          {post.likeCount}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MessageCircle className="w-3 h-3" />
+                          {post.commentCount}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {followedPosts.length > 4 && (
+                  <button
+                    onClick={() => setShowAllFollowedPosts(!showAllFollowedPosts)}
+                    className="w-full mt-3 py-2 px-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white text-xs font-medium rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      {showAllFollowedPosts ? (
+                        <>
+                          <span>Show Less</span>
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                          </svg>
+                        </>
+                      ) : (
+                        <>
+                          <span>View All ({followedPosts.length})</span>
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </>
+                      )}
+                    </div>
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </aside>
+
         {/* MAIN CONTENT - Centered Posts */}
         <div className="flex-1 max-w-2xl mx-auto">
           {/* HEADER */}
@@ -388,23 +622,27 @@ function PackageSocialFeed() {
             </p>
           </div>
 
-          {loading ? (
-  <div className="flex justify-center py-10">
-    <ClipLoader size={35} color="#14B8A6" />
-  </div>
-) : (
-  <div className="space-y-6">
-  {posts.map(post => (
-    <PostCard
-      key={post.id}
-      post={post}
-      onLike={handleLike}
-      onComment={handleComment}
-      onUserClick={handleUserClick}
-    />
-  ))}
-</div>
-)}
+          {initialLoading ? (
+            <div className="flex justify-center py-10">
+              <ClipLoader size={35} color="#14B8A6" />
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {posts.map(post => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  onLike={handleLike}
+                  onComment={handleComment}
+                  onUserClick={handleUserClick}
+                  onEdit={handleEditPost}
+                  onDelete={handleDeletePost}
+                  isOwnPost={user?.id === post.userId}
+                  deleteLoading={deleteLoading}
+                />
+              ))}
+            </div>
+          )}
     
         </div>
 
@@ -557,10 +795,72 @@ function PackageSocialFeed() {
               </button>
               <button
                 onClick={handleCreatePost}
-                disabled={loading || !newPostText.trim()}
+                disabled={!newPostText.trim()}
                 className="px-4 py-2 text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-lg transition disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                {loading ? "Posting..." : "Share Post"}
+                Share Post
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT POST MODAL */}
+      {editModalOpen && editingPost && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Edit Your Post
+            </h2>
+
+            <textarea
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 mb-4"
+              rows={4}
+              placeholder="Update your post content..."
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+            />
+
+            {/* Image Upload */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Update Image (Optional)
+              </label>
+              <div className="flex items-center gap-3">
+                <label className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-dashed border-teal-300 bg-teal-50/40 px-4 py-2 text-xs font-medium text-teal-700 hover:bg-teal-50">
+                  <Plus className="w-3.5 h-3.5 mr-2" />
+                  <span>Choose New Image</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => setEditImage(e.target.files[0])}
+                  />
+                </label>
+                {editImage && (
+                  <span className="text-xs text-gray-600 truncate max-w-[120px]">
+                    {editImage.name}
+                  </span>
+                )}
+              </div>
+              {editingPost.image && !editImage && (
+                <p className="text-xs text-gray-500 mt-1">Current image will be kept</p>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setEditModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdatePost}
+                disabled={!editContent.trim()}
+                className="px-4 py-2 text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-lg transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+              >
+                Update Post
               </button>
             </div>
           </div>

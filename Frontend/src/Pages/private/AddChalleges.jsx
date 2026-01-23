@@ -4,33 +4,17 @@ import api from "../../api/axios";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
-import { Edit2, Trash2, X, Sparkles } from "lucide-react";
 
 function AddChallenges() {
   const [loading, setLoading] = useState(false);
   const [listLoading, setListLoading] = useState(false);
   const [challenges, setChallenges] = useState([]);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [updatingChallenge, setUpdatingChallenge] = useState(null);
-  const [updateLoading, setUpdateLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
   } = useForm({
-    defaultValues: {
-      challengeName: "",
-      title: "",
-      submissionDeadline: "",
-      description: "",
-      award: "",
-      awardDetail: "",
-    },
-  });
-
-  const updateForm = useForm({
     defaultValues: {
       challengeName: "",
       title: "",
@@ -58,59 +42,13 @@ function AddChallenges() {
     fetchChallenges();
   }, []);
 
-  const handleUpdateChallenge = async (challengeItem) => {
-    try {
-      setUpdateLoading(true);
-      const res = await api.get(`/admin/getchallenges/${challengeItem.id}`);
-      const challengeData = res.data.data;
-
-      setUpdatingChallenge(challengeData);
-      updateForm.reset({
-        challengeName: challengeData.challengeName || "",
-        submissionDeadline: challengeData.submissionDeadline
-          ? new Date(challengeData.submissionDeadline).toISOString().split('T')[0]
-          : "",
-        description: challengeData.description || "",
-        award: challengeData.award || "",
-        awardDetail: challengeData.awardDetail || "",
-      });
-      setShowUpdateModal(true);
-    } catch (error) {
-      toast.error("Failed to load challenge details");
-    } finally {
-      setUpdateLoading(false);
-    }
+  // Empty funcs for now (per your request)
+  const handleUpdateChallenge = (challengeItem) => {
+    console.log("Update clicked:", challengeItem);
   };
 
-  const handleDeleteChallenge = async (challengeId) => {
-    if (!window.confirm("Are you sure you want to delete this challenge? This action cannot be undone.")) {
-      return;
-    }
-
-    try {
-      setDeleteLoading(challengeId);
-      await api.delete(`/admin/getchallenges/${challengeId}`);
-      toast.success("Challenge deleted successfully!");
-      fetchChallenges();
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to delete challenge");
-    } finally {
-      setDeleteLoading(null);
-    }
-  };
-
-  const onUpdateSubmit = async (data) => {
-    try {
-      setUpdateLoading(true);
-      await api.put(`/admin/getchallenges/${updatingChallenge.id}`, data);
-      toast.success("Challenge updated successfully!");
-      setShowUpdateModal(false);
-      fetchChallenges();
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to update challenge");
-    } finally {
-      setUpdateLoading(false);
-    }
+  const handleDeleteChallenge = (challengeId) => {
+    console.log("Delete clicked:", challengeId);
   };
 
   const onSubmit = async (data) => {
@@ -244,159 +182,6 @@ function AddChallenges() {
           </form>
         </div>
 
-        {/* Update Challenge Modal */}
-        {showUpdateModal && updatingChallenge && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-            <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
-              {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-teal-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">Update Challenge</h2>
-                    <p className="text-sm text-gray-500">Make changes to your challenge</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowUpdateModal(false)}
-                  className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition-colors"
-                >
-                  <X className="w-4 h-4 text-gray-500" />
-                </button>
-              </div>
-
-              {/* Form */}
-              <form onSubmit={updateForm.handleSubmit(onUpdateSubmit)} className="p-6 space-y-6">
-                {/* Challenge Name */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Challenge Name *
-                  </label>
-                  <input
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
-                    placeholder="Enter challenge name"
-                    {...updateForm.register("challengeName", {
-                      required: "Challenge name is required",
-                    })}
-                  />
-                  {updateForm.formState.errors.challengeName && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {updateForm.formState.errors.challengeName.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Submission Deadline */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Submission Deadline *
-                  </label>
-                  <input
-                    type="date"
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
-                    {...updateForm.register("submissionDeadline", {
-                      required: "Submission deadline is required",
-                    })}
-                  />
-                  {updateForm.formState.errors.submissionDeadline && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {updateForm.formState.errors.submissionDeadline.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Description */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Description *
-                  </label>
-                  <textarea
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all resize-none"
-                    rows={4}
-                    placeholder="Describe the challenge"
-                    {...updateForm.register("description", {
-                      required: "Description is required",
-                    })}
-                  />
-                  {updateForm.formState.errors.description && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {updateForm.formState.errors.description.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Award */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Award *
-                  </label>
-                  <input
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
-                    placeholder="What will participants receive?"
-                    {...updateForm.register("award", {
-                      required: "Award is required",
-                    })}
-                  />
-                  {updateForm.formState.errors.award && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {updateForm.formState.errors.award.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Award Detail */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Award Details *
-                  </label>
-                  <input
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
-                    placeholder="More details about the award"
-                    {...updateForm.register("awardDetail", {
-                      required: "Award detail is required",
-                    })}
-                  />
-                  {updateForm.formState.errors.awardDetail && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {updateForm.formState.errors.awardDetail.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Actions */}
-                <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                  <button
-                    type="button"
-                    onClick={() => setShowUpdateModal(false)}
-                    className="px-6 py-3 rounded-xl font-medium text-gray-700 hover:bg-gray-100 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={updateLoading}
-                    className="px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-teal-500 to-teal-600 text-white hover:from-teal-600 hover:to-teal-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                  >
-                    {updateLoading ? (
-                      <div className="flex items-center gap-2">
-                        <ClipLoader size={16} color="#ffffff" />
-                        <span>Updating...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4" />
-                        <span>Update Challenge</span>
-                      </div>
-                    )}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
         {/* Challenges List */}
         <div className="bg-white rounded-2xl shadow p-8 mt-8">
           <div className="flex items-center justify-between gap-4 mb-6">
@@ -454,32 +239,16 @@ function AddChallenges() {
                           <button
                             type="button"
                             onClick={() => handleUpdateChallenge(c)}
-                            disabled={updateLoading}
-                            className="group relative px-4 py-2 rounded-xl font-medium transition-all duration-200 bg-gradient-to-r from-teal-500 to-teal-600 text-white hover:from-teal-600 hover:to-teal-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-3 py-2 rounded-lg font-medium transition bg-teal-600 text-white hover:bg-teal-700"
                           >
-                            <div className="flex items-center gap-2">
-                              <Edit2 className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                              <span className="hidden sm:inline">Update</span>
-                            </div>
-                            <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-pulse opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            Update
                           </button>
                           <button
                             type="button"
                             onClick={() => handleDeleteChallenge(c.id)}
-                            disabled={deleteLoading === c.id}
-                            className="group relative px-4 py-2 rounded-xl font-medium transition-all duration-200 bg-gradient-to-r from-red-50 to-pink-50 text-red-600 hover:from-red-100 hover:to-pink-100 border border-red-200 hover:border-red-300 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-3 py-2 rounded-lg font-medium transition bg-red-50 text-red-600 hover:bg-red-100"
                           >
-                            <div className="flex items-center gap-2">
-                              {deleteLoading === c.id ? (
-                                <ClipLoader size={14} color="#dc2626" />
-                              ) : (
-                                <Trash2 className="w-4 h-4 group-hover:animate-bounce" />
-                              )}
-                              <span className="hidden sm:inline">
-                                {deleteLoading === c.id ? "Deleting..." : "Delete"}
-                              </span>
-                            </div>
-                            <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-400 rounded-full animate-pulse opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            Delete
                           </button>
                         </div>
                       </td>

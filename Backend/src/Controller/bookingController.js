@@ -125,3 +125,68 @@ export const getallbargains = async(req,res)=>{
         res.status(500).send({message:error.message})
     }
 }
+
+export const getUserBookings = async (req, res) => {
+    try {
+        const userId = req.user?.id;
+
+        if (!userId) {
+            return res.status(401).send({ message: "User not authenticated" });
+        }
+
+        const bookings = await Booking.findAll({
+            where: { userId },
+            include: [
+                {
+                    model: Package,
+                    attributes: [
+                        'id', 'title', 'description', 'price', 'duration',
+                        'locations', 'images', 'status', 'isActive'
+                    ]
+                }
+            ],
+            order: [['createdAt', 'DESC']]
+        });
+
+        res.status(200).send({
+            data: bookings,
+            message: "User bookings fetched successfully"
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: error.message });
+    }
+};
+
+export const updateBookingStatus = async (req, res) => {
+    try {
+        const { bookingId } = req.params;
+        const { status } = req.body;
+
+        if (!bookingId || !status) {
+            return res.status(400).send({ message: "Booking ID and status are required" });
+        }
+
+        // Validate status
+        const validStatuses = ["Not paid", "Paid", "Confirmed", "Cancelled"];
+        if (!validStatuses.includes(status)) {
+            return res.status(400).send({ message: "Invalid status" });
+        }
+
+        const booking = await Booking.findByPk(bookingId);
+        if (!booking) {
+            return res.status(404).send({ message: "Booking not found" });
+        }
+
+        booking.status = status;
+        await booking.save();
+
+        res.status(200).send({
+            data: booking,
+            message: "Booking status updated successfully"
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: error.message });
+    }
+};

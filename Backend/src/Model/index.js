@@ -8,6 +8,7 @@ import { Post } from "./postModel.js";
 import { Like } from "./Like.js";
 import { Comment } from "./Comments.js";
 import { Follow } from "./Follow.js";
+import { PackageRequest } from "./requestModel.js";
 
 Package.hasMany(Booking,{foreignKey:"packageId"}) 
 Package.hasMany(Bargain,{foreignKey:"packageId"})
@@ -49,3 +50,7 @@ User.belongsToMany(User, {
   foreignKey: "followerId",
   otherKey: "followingId"
 });
+
+// Package Request Associations
+User.hasMany(PackageRequest, { foreignKey: "userId" });
+PackageRequest.belongsTo(User, { foreignKey: "userId" });
