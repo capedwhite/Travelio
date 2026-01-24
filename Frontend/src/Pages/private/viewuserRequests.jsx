@@ -108,10 +108,21 @@ function ViewUserRequests() {
     setPackageModalOpen(true);
   };
 
-  const handlePackageSuccess = () => {
-    setPackageModalOpen(false);
-    fetchRequests(); // Refresh the requests list
-    toast.success("Package created successfully! The user will be notified.");
+  const handlePackageSuccess = async () => {
+    try {
+
+      if (selectedRequest?.id) {
+        await api.put(`/admin/packagerequests/${selectedRequest.id}/status`, { status: 'processed' });
+      }
+      setPackageModalOpen(false);
+      fetchRequests(); 
+      toast.success("Package created successfully! The request has been marked as processed.");
+    } catch (error) {
+      console.error("Failed to update request status:", error);
+      setPackageModalOpen(false);
+      fetchRequests();
+      toast.success("Package created successfully!");
+    }
   };
 
   // Calculate stats

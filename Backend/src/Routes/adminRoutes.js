@@ -1,14 +1,15 @@
 import express from "express"
 import upload from "../Config/multer.js";
 import { createPackage, deletePackage, getPackageByid, updatePackage } from "../Controller/packageController.js"
-import { getallbargains, getAllbookings, updateBookingStatus } from "../Controller/bookingController.js";
+import { getallbargains, getAllbookings, updateBookingStatus, updateBargainStatus } from "../Controller/bookingController.js";
 import { createChallenge, getAllChallenges, getChallengeById, updateChallenge, deleteChallenge, getAllChallengesWithSubmissions, setChallengeWinner } from "../Controller/ChallengeController.js";
-import { getAllPackageRequests } from "../Controller/packageController.js";
+import { getAllPackageRequests, updatePackageRequestStatus } from "../Controller/packageController.js";
 
 const router = express.Router()
 router.post("/addpackages",upload.any(),createPackage)
 router.get("/packagebooking",getAllbookings)
 router.get("/packagebargain",getallbargains)
+router.put("/bargain/:bargainId/status", updateBargainStatus)
 router.delete("/addpackages/:id",deletePackage)
 router.put("/addpackages/:id",upload.any(),updatePackage)
 router.get("/addpackages/:id",getPackageByid)
@@ -21,4 +22,5 @@ router.put("/booking/:bookingId/status", updateBookingStatus)
 router.get("/challenges/submissions", getAllChallengesWithSubmissions)
 router.put("/challenges/:challengeId/winner/:winnerId", setChallengeWinner)
 router.get("/packagerequests", getAllPackageRequests)
+router.put("/packagerequests/:requestId/status", updatePackageRequestStatus)
 export default router

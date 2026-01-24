@@ -105,7 +105,7 @@ const steps = [
   "Publish",
 ];
 
-function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,refetch,key, preFilledData = null}) {
+function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,refetch,key, preFilledData = null, visibility = 'public', specificUserId = null}) {
   const [loading, setLoading] = useState(false);
   const [initialData, setInitialData] = useState(null);
   const [formKey, setFormKey] = useState(0); 
@@ -243,7 +243,7 @@ function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,
       case "Media":
         return (
           (formData.media.coverImage || formData.media.existingCoverImage) &&
-          (formData.media.touristLocationImages.length > 0 ||
+          (formData.media.touristLocationImages?.length > 0 ||
             formData.media.existingTouristImages?.length > 0)
         );
       default:
@@ -280,6 +280,12 @@ function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,
       setLoading(true);
       console.log(data)
       const formData = buildPackageFormData(data, mode);
+
+      // Add visibility and specificUserId
+      formData.append('visibility', visibility);
+      if (specificUserId) {
+        formData.append('specificUserId', specificUserId);
+      }
 
       let res;
       if (mode === "edit") {

@@ -1,4 +1,5 @@
 
+import { Sequelize } from "sequelize";
 import { Package } from "../Model/packageModel.js";
 import { PackageRequest } from "../Model/requestModel.js";
 import { User } from "../Model/userModel.js";
@@ -76,6 +77,8 @@ req.files.forEach(file => {
       },
 
       createdBy: req.user.id,
+      visibility: req.body.visibility || 'public',
+      specificUserId: req.body.specificUserId || null,
     });
 
     res.status(201).json({
@@ -101,13 +104,29 @@ export const getPackage = async(req,res)=>{
 }
 export const getactivePackage = async(req,res)=>{
   try {
-      const packages = await Package.findAll({where:{status:"Active"}})
-      console.log(packages)
-      res.status(200).send({data:packages,message:"sucessfully fetched all packages"})
+      const userId = req.user?.id;
+      const whereCondition = { status: "Active" };
+
+      if (userId) {
+        whereCondition[Sequelize.Op.or] = [
+          { visibility: 'public' },
+          {
+            visibility: 'private',
+            specificUserId: userId
+          }
+        ];
+      } else {
+
+        whereCondition.visibility = 'public';
+      }
+
+      const packages = await Package.findAll({ where: whereCondition });
+      console.log(packages);
+      res.status(200).send({data:packages,message:"successfully fetched all packages"});
 
   } catch (error) {
-    console.log(error.message)
-    res.status(500).send({message:error.message})
+    console.log(error.message);
+    res.status(500).send({message:error.message});
   }
 }
 export const deletePackage = async (req, res) => {
@@ -265,7 +284,7 @@ export const createPackageRequest = async (req, res) => {
 
     const { destination, duration, travelers, budget, travelDate, specialRequests } = req.body;
 
-    // Validate required fields
+
     if (!destination || !duration || !travelers || !budget || !travelDate) {
       return res.status(400).send({ message: "All fields are required" });
     }
@@ -290,7 +309,7 @@ export const createPackageRequest = async (req, res) => {
   }
 };
 
-// Get all package requests with user details (for admin)
+
 export const getAllPackageRequests = async (req, res) => {
   try {
     const packageRequests = await PackageRequest.findAll({
@@ -306,6 +325,38 @@ export const getAllPackageRequests = async (req, res) => {
     res.status(200).send({
       data: packageRequests,
       message: "Package requests fetched successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: error.message });
+  }
+};
+
+
+export const updatePackageRequestStatus = async (req, res) => {
+  try {
+    const { requestId } = req.params;
+    const { status } = req.body;
+
+    if (!requestId || !status) {
+      return res.status(400).send({ message: "Request ID and status are required" });
+    }
+
+    if (!['pending', 'processed', 'completed', 'cancelled'].includes(status.toLowerCase())) {
+      return res.status(400).send({ message: "Invalid status. Must be 'pending', 'processed', 'completed', or 'cancelled'" });
+    }
+
+    const packageRequest = await PackageRequest.findByPk(requestId);
+    if (!packageRequest) {
+      return res.status(404).send({ message: "Package request not found" });
+    }
+
+    packageRequest.status = status.toLowerCase();
+    await packageRequest.save();
+
+    res.status(200).send({
+      data: packageRequest,
+      message: `Package request status updated to ${status} successfully`
     });
   } catch (error) {
     console.error(error);

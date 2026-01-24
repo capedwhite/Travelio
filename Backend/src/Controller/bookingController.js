@@ -126,6 +126,37 @@ export const getallbargains = async(req,res)=>{
     }
 }
 
+export const updateBargainStatus = async (req, res) => {
+    try {
+        const { bargainId } = req.params;
+        const { status } = req.body;
+
+        if (!bargainId || !status) {
+            return res.status(400).send({ message: "Bargain ID and status are required" });
+        }
+
+        if (!['accepted', 'declined', 'pending'].includes(status.toLowerCase())) {
+            return res.status(400).send({ message: "Invalid status. Must be 'accepted', 'declined', or 'pending'" });
+        }
+
+        const bargain = await Bargain.findByPk(bargainId);
+        if (!bargain) {
+            return res.status(404).send({ message: "Bargain not found" });
+        }
+
+        bargain.status = status.toLowerCase();
+        await bargain.save();
+
+        res.status(200).send({
+            data: bargain,
+            message: `Bargain status updated to ${status} successfully`
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: error.message });
+    }
+}
+
 export const getUserBookings = async (req, res) => {
     try {
         const userId = req.user?.id;

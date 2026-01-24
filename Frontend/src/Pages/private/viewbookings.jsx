@@ -165,23 +165,23 @@ function AdminBookingsPage() {
                   className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-white/50 overflow-hidden hover:shadow-2xl transition-all duration-300"
                 >
                   {/* Package Header */}
-                  <div className="bg-gradient-to-r from-[#2f9c8b]/80 via-[#3ab19d]/80 to-[#6ee7d8]
- p-6 text-white">
+                  <div className="bg-white
+ p-6 text-black">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                        <div className="w-16 h-16 bg-[#3ab19d]/40 rounded-2xl flex items-center justify-center backdrop-blur-sm">
                           <Package className="w-8 h-8" />
                         </div>
                         <div>
                           <h2 className="text-xl font-bold mb-1">{pkg.title}</h2>
-                          <div className="flex items-center gap-4 text-sm text-white/80">
+                          <div className="flex items-center gap-4 text-sm text-black/70">
                             <span className="flex items-center gap-1">
                               <Calendar className="w-4 h-4" />
                               {new Date(pkg.createdAt).toLocaleDateString()}
                             </span>
                             <span className="flex items-center gap-1">
                               <IndianRupee className="w-4 h-4" />
-                              ₹{Number(pkg.price.originalPrice).toLocaleString()}
+                              {Number(pkg.price.originalPrice).toLocaleString()}
                             </span>
                           </div>
                         </div>
@@ -189,23 +189,23 @@ function AdminBookingsPage() {
 
                       <div className="text-right">
                         <div className="text-2xl font-bold mb-1">{pkg.bookings.length}</div>
-                        <div className="text-sm text-white/80">Total Bookings</div>
+                        <div className="text-sm text-black/70">Total Bookings</div>
                       </div>
                     </div>
 
                     {/* Package Stats */}
                     <div className="grid grid-cols-3 gap-4 mt-6">
-                      <div className="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
+                      <div className="bg-[#3ab19d]/30 rounded-xl p-3 backdrop-blur-sm">
                         <div className="text-lg font-bold">{pkg.bookings.length}</div>
-                        <div className="text-xs text-white/70">Total</div>
+                        <div className="text-xs text-black/70">Total</div>
                       </div>
-                      <div className="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
-                        <div className="text-lg font-bold text-pink-300">{packageConfirmed}</div>
-                        <div className="text-xs text-white/70">Confirmed</div>
+                      <div className="bg-[#3ab19d]/30 rounded-xl p-3 backdrop-blur-sm">
+                        <div className="text-lg font-bold text-green-700">{packageConfirmed}</div>
+                        <div className="text-xs text-black/70">Confirmed</div>
                       </div>
-                      <div className="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
-                        <div className="text-lg font-bold text-yellow-300">₹{packageRevenue.toLocaleString()}</div>
-                        <div className="text-xs text-white/70">Revenue</div>
+                      <div className="bg-[#3ab19d]/30 rounded-xl p-3 backdrop-blur-sm">
+                        <div className="text-lg font-bold text-yellow-600">₹{packageRevenue.toLocaleString()}</div>
+                        <div className="text-xs text-black/70">Revenue</div>
                       </div>
                     </div>
                   </div>

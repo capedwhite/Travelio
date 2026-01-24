@@ -112,6 +112,21 @@ status:{
     defaultValue: true
   },
 
+  visibility: {
+    type: DataTypes.STRING,
+    defaultValue: 'public', 
+    allowNull: false
+  },
+
+  specificUserId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'users',
+      key: 'id'
+    }
+  },
+
   createdBy: {
     type: DataTypes.INTEGER,
     allowNull: false,

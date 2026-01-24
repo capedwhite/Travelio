@@ -2,6 +2,7 @@ import { Trophy, Users, Upload, Clock, Eye, Award } from "lucide-react";
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import toast from "react-hot-toast";
+import { useAuth } from "../../context/authContext";
 
 function TravelChallenges() {
   const [challenges, setChallenges] = useState([]);
@@ -15,28 +16,41 @@ function TravelChallenges() {
   const [challengeDetails, setChallengeDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [topusers, setTopusers] = useState(null);
-
+  const {user}=useAuth();
+  const userId=user.id
   const getallChallenges = async () => {
-    const res = await api.get("/user/getchallenges");
-    const data = res.data.data.map((challenge) => {
-      const submissions = challenge.submissions || [];
-      return {
-        ...challenge,
-        participantsCount: submissions.length,
-        hasSubmitted: challenge.hasSubmitted,
-      };
-    });
-    setChallenges(data);
+
+    try {
+      const res = await api.get("/user/getchallenges");
+      console.log(res.data.data)
+      const data = res.data.data.map((challenge) => {
+        const submissions = challenge.submissions || [];
+        return {
+          ...challenge,
+          participantsCount: submissions.length,
+          hasSubmitted: challenge.hasSubmitted,
+        };
+      });
+      setChallenges(data);
+    } catch (error) {
+      console.log(error.message)
+      console.log(error.response?.data?.message)
+    }
+
   };
 
-  // Calculate challenge stats
+
   const challengeStats = {
     totalCompleted: challenges.filter(ch => ch.hasSubmitted).length,
     remaining: challenges.filter(ch => !ch.hasSubmitted).length,
-    won: challenges.filter(ch => ch.result === "published" && ch.winnerId === challenges.find(c => c.hasSubmitted)?.userId).length,
+    won: challenges.filter(
+      ch =>
+        ch.result === "published" &&
+        ch.winnerId === userId
+    ).length,
   };
 
-  // Get completed challenges for the sidebar
+
   const completedChallenges = challenges.filter(ch => ch.hasSubmitted);
 
   const gettopusers = async () => {
