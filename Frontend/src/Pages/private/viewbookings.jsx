@@ -72,7 +72,7 @@ function AdminBookingsPage() {
     return (
       <>
         <AdminSidebar />
-        <div className="ml-64 min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center">
+        <div className="ml-64 min-h-screen bg-gradient-to-r from-teal-600 to-emerald-200 flex items-center justify-center">
           <div className="text-center">
             <Package className="w-24 h-24 text-gray-300 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-gray-600 mb-2">No Bookings Found</h3>
@@ -95,16 +95,15 @@ function AdminBookingsPage() {
   return (
     <>
       <AdminSidebar />
-      <div className="ml-64 min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+      <div className="ml-64 min-h-screen">
         <div className="p-8 space-y-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-3 bg-gradient-to-r from-indigo-100 via-purple-100 to-pink-100 px-6 py-3 rounded-full mb-4">
-              <Plane className="w-6 h-6 text-indigo-600" />
-              <span className="text-lg font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <div className="inline-flex items-center gap-3 bg-gradient-to-r from-teal-100 to-emerald-100 px-6 py-3 rounded-full mb-4">
+              <Plane className="w-6 h-6 text-teal-500" />
+              <span className="text-lg font-bold bg-gradient-to-r from-teal-600 to-emerald-400 bg-clip-text text-transparent">
                 Package Bookings Dashboard
               </span>
-              <Sparkles className="w-6 h-6 text-pink-600" />
             </div>
             <p className="text-gray-600 text-lg">Manage and track all travel package bookings</p>
           </div>
@@ -166,7 +165,8 @@ function AdminBookingsPage() {
                   className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-white/50 overflow-hidden hover:shadow-2xl transition-all duration-300"
                 >
                   {/* Package Header */}
-                  <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-6 text-white">
+                  <div className="bg-gradient-to-r from-[#2f9c8b]/80 via-[#3ab19d]/80 to-[#6ee7d8]
+ p-6 text-white">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
@@ -200,7 +200,7 @@ function AdminBookingsPage() {
                         <div className="text-xs text-white/70">Total</div>
                       </div>
                       <div className="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
-                        <div className="text-lg font-bold text-emerald-300">{packageConfirmed}</div>
+                        <div className="text-lg font-bold text-pink-300">{packageConfirmed}</div>
                         <div className="text-xs text-white/70">Confirmed</div>
                       </div>
                       <div className="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
@@ -218,7 +218,7 @@ function AdminBookingsPage() {
                           expandedPackage === pkg.id ? null : pkg.id
                         )
                       }
-                      className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 px-6 rounded-2xl font-semibold hover:shadow-lg hover:shadow-indigo-500/25 transition-all duration-300 flex items-center justify-center gap-2"
+                      className="w-full bg-teal-600 text-white py-3 px-6 rounded-2xl font-semibold hover:shadow-lg hover:shadow-indigo-500/25 transition-all duration-300 flex items-center justify-center gap-2"
                     >
                       {expandedPackage === pkg.id ? (
                         <>
@@ -322,7 +322,7 @@ function BookingsTable({ allBooking, packagePrice, onStatusChange, updatingStatu
                 <div className="flex items-center gap-2">
                   {booking.status === "Paid" && <CheckCircle className="w-4 h-4 text-emerald-600" />}
                   {booking.status === "Not paid" && <Clock className="w-4 h-4 text-yellow-600" />}
-                  {booking.status === "Confirmed" && <Award className="w-4 h-4 text-blue-600" />}
+                  {booking.status === "Confirmed" && <Award className="w-4 h-4 text-cyan-200" />}
                   {booking.status === "Cancelled" && <XCircle className="w-4 h-4 text-red-600" />}
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${

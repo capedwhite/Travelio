@@ -30,16 +30,17 @@ import { useAuth } from "../context/authContext";
         "
       >
         <ul className="py-2">
-          <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
+        <Link to="/profile">  <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <User size={18} />
             My Profile
         
-          </li>
-                 <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
+          </li></Link>
+                
+                <Link to = "/mybookings"><li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <BookOpen size={18} />
             My Bookings
         
-          </li>
+          </li></Link> 
                     <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <LucideClipboardPen size={18} />
             My Requests

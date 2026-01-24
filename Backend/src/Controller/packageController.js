@@ -1,6 +1,7 @@
 
 import { Package } from "../Model/packageModel.js";
 import { PackageRequest } from "../Model/requestModel.js";
+import { User } from "../Model/userModel.js";
 
 export const createPackage = async (req, res) => {
   console.log("api hit for create package")
@@ -282,6 +283,29 @@ export const createPackageRequest = async (req, res) => {
     res.status(201).send({
       message: "Package request submitted successfully! We'll get back to you soon.",
       data: packageRequest,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: error.message });
+  }
+};
+
+// Get all package requests with user details (for admin)
+export const getAllPackageRequests = async (req, res) => {
+  try {
+    const packageRequests = await PackageRequest.findAll({
+      include: [
+        {
+          model: User,
+          attributes: ["id", "username", "email", "name", "profileImage"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.status(200).send({
+      data: packageRequests,
+      message: "Package requests fetched successfully",
     });
   } catch (error) {
     console.error(error);

@@ -11,12 +11,13 @@ const PackageDetailsPage=React.lazy(()=>import("../Pages/private/packagedetails"
 const PackageSocialFeed=React.lazy(()=>import("../Pages/private/SocialFeed"))
 const TravelChallenges=React.lazy(()=>import("../Pages/private/ChallengesPage"))
 const MyProfile=React.lazy(()=>import("../Pages/private/Myprofile"))
-const MyBookingStatus=React.lazy(()=>import("../Pages/private/MyBookingStatus"))
+const MyBookingStatus=React.lazy(()=>import("../Pages/private/Mybookingstatus"))
 const AdminDashboard=React.lazy(()=>import("../Pages/private/admindashboard"))
 const AdminBookingsPage =React.lazy(()=>import("../Pages/private/viewbookings"))
 const BargainRequests = React.lazy(()=>import("../Pages/private/adminbargainpage"))
 const AddChallenges = React.lazy(()=>import("../Pages/private/AddChalleges"))
 const ViewChallenges = React.lazy(()=>import("../Pages/private/viewChallenges"))
+const ViewUserRequests = React.lazy(()=>import("../Pages/private/viewuserRequests"))
 const PrivateRoutes = () => {
   return (
     <Suspense fallback={<div>Loading</div>}>
@@ -137,6 +138,15 @@ const PrivateRoutes = () => {
             <ProtectedRoute allowedroles={["Admin"]}>
 
                <ViewChallenges></ViewChallenges>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/viewuserrequests"
+          element={
+            <ProtectedRoute allowedroles={["Admin"]}>
+
+               <ViewUserRequests></ViewUserRequests>
             </ProtectedRoute>
           }
         />

@@ -1,4 +1,4 @@
-import { Home, Package, ClipboardList, DollarSign, Award, LogOut } from "lucide-react";
+import { Home, Package, ClipboardList, DollarSign, Award, LogOut, Upload, HandHeart } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/authContext";
 
@@ -10,6 +10,8 @@ export default function AdminSidebar({children}) {
     { name: "Bookings", icon: <ClipboardList size={18} />, path: "/admin/bookings" },
     { name: "Bargain Requests", icon: <DollarSign size={18} />, path: "/admin/bargainrequest" },
     { name: "Challenges", icon: <Award size={18} />, path: "/admin/addchallenges" },
+    { name: "Submissions", icon: <Upload size={18} />, path: "/admin/viewchallenges" },
+    { name: "packageRequests", icon: <HandHeart size={18} />, path: "/admin/viewuserrequests" },
    
   ];
 

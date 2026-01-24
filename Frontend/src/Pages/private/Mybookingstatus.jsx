@@ -91,9 +91,6 @@ function MyBookingStatus() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* HEADER */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-            My Travel Bookings
-          </h1>
           <p className="text-gray-600 text-lg">
             Your journey begins here - track all your adventures
           </p>
@@ -164,7 +161,7 @@ function MyBookingStatus() {
               onClick={() => setFilter("all")}
               className={`px-6 py-2 rounded-full font-medium transition-all ${
                 filter === "all"
-                  ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg"
+                  ? "bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
@@ -223,7 +220,7 @@ function MyBookingStatus() {
                 className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 overflow-hidden hover:shadow-xl transition-all duration-300"
               >
                 {/* HEADER */}
-                <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-6 text-white">
+                <div className="bg-gradient-to-r from-teal-600 to-emerald-200 p-6 text-white">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
