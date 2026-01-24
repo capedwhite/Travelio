@@ -105,13 +105,13 @@ const steps = [
   "Publish",
 ];
 
-function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,refetch,key}) {
+function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,refetch,key, preFilledData = null}) {
   const [loading, setLoading] = useState(false);
   const [initialData, setInitialData] = useState(null);
   const [formKey, setFormKey] = useState(0); 
 
   const methods = useForm({
-    defaultValues: defaultValues,
+    defaultValues: preFilledData || defaultValues,
     mode: "onChange",
   });
 
@@ -1460,4 +1460,5 @@ function AdminPackagesTable({ packages, refetch }) {
   );
 }
 
+export { PackageForm };
 export default CreatePackage;
