@@ -126,7 +126,14 @@ status:{
       key: 'id'
     }
   },
-
+  privatePackageId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: "packages",
+      key: "id",
+    },
+  },
   createdBy: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -135,5 +142,6 @@ status:{
       key: 'id'
     }
   }
+
 
 })

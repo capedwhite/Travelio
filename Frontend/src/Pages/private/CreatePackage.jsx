@@ -105,7 +105,7 @@ const steps = [
   "Publish",
 ];
 
-function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,refetch,key, preFilledData = null, visibility = 'public', specificUserId = null}) {
+function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,refetch,key, preFilledData = null, visibility = 'public', specificUserId = null, bargainid = null}) {
   const [loading, setLoading] = useState(false);
   const [initialData, setInitialData] = useState(null);
   const [formKey, setFormKey] = useState(0); 
@@ -281,10 +281,13 @@ function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,
       console.log(data)
       const formData = buildPackageFormData(data, mode);
 
-      // Add visibility and specificUserId
+      // Add visibility and specificUserId and bargain id 
       formData.append('visibility', visibility);
       if (specificUserId) {
         formData.append('specificUserId', specificUserId);
+      }
+      if(bargainid){
+        formData.append("bargainId",bargainid);
       }
 
       let res;

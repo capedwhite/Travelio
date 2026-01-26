@@ -81,19 +81,19 @@ function PostCard({ post, onLike, onComment, onUserClick, onEdit, onDelete, isOw
             onClick={() => onLike(post.id)}
             className="flex items-center gap-2 text-sm font-medium hover:text-red-500 transition"
           >
-            <Heart
-              className={`w-5 h-5 ${
+          <Heart
+            className={`w-5 h-5 ${
                 post.isLiked ? "fill-red-500 text-red-500" : "text-gray-500"
-              }`}
-            />
+            }`}
+          />
             <span>{post.likeCount}</span>
-          </button>
+        </button>
 
           <button
             onClick={() => setShowComments(!showComments)}
             className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-teal-500 transition"
           >
-            <MessageCircle className="w-5 h-5" />
+        <MessageCircle className="w-5 h-5" />
             <span>{post.commentCount}</span>
           </button>
         </div>
@@ -125,24 +125,24 @@ function PostCard({ post, onLike, onComment, onUserClick, onEdit, onDelete, isOw
                 No comments yet
               </p>
             )}
-          </div>
+      </div>
 
           {/* Add Comment */}
           <div className="flex gap-2 p-3 border-t">
-            <input
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              placeholder="Add a comment..."
+        <input
+          value={commentText}
+          onChange={(e) => setCommentText(e.target.value)}
+          placeholder="Add a comment..."
               className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
               onKeyPress={(e) => e.key === 'Enter' && handleComment()}
-            />
-            <button
+        />
+        <button
               onClick={handleComment}
               className="bg-teal-600 text-white p-2 rounded-lg hover:bg-teal-700 transition"
-            >
+        >
               <Send className="w-4 h-4" />
-            </button>
-          </div>
+        </button>
+      </div>
         </div>
       )}
     </div>
@@ -304,7 +304,7 @@ function UserProfileModal({ user, isOpen, onClose, onFollow }) {
   );
 }
 
-function PackageSocialFeed() {
+ function PackageSocialFeed() {
   const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [newPostOpen, setNewPostOpen] = useState(false);
@@ -401,13 +401,13 @@ function PackageSocialFeed() {
     // Optimistically update UI first
     setPosts(prevPosts =>
       prevPosts.map(post =>
-        post.id === postId
-          ? {
-              ...post,
+      post.id === postId
+        ? {
+            ...post,
               isLiked: !post.isLiked,
               likeCount: post.isLiked ? post.likeCount - 1 : post.likeCount + 1
-            }
-          : post
+          }
+        : post
       )
     );
 
@@ -418,13 +418,13 @@ function PackageSocialFeed() {
       // Revert optimistic update on error
       setPosts(prevPosts =>
         prevPosts.map(post =>
-          post.id === postId
-            ? {
-                ...post,
+      post.id === postId
+        ? {
+            ...post,
                 isLiked: !post.isLiked,
                 likeCount: post.isLiked ? post.likeCount - 1 : post.likeCount + 1
-              }
-            : post
+          }
+        : post
         )
       );
       toast.error("Failed to like post");
@@ -628,10 +628,10 @@ function PackageSocialFeed() {
             </div>
           ) : (
             <div className="space-y-6">
-              {posts.map(post => (
-                <PostCard
-                  key={post.id}
-                  post={post}
+      {posts.map(post => (
+        <PostCard
+          key={post.id}
+          post={post}
                   onLike={handleLike}
                   onComment={handleComment}
                   onUserClick={handleUserClick}
@@ -639,8 +639,8 @@ function PackageSocialFeed() {
                   onDelete={handleDeletePost}
                   isOwnPost={user?.id === post.userId}
                   deleteLoading={deleteLoading}
-                />
-              ))}
+        />
+      ))}
             </div>
           )}
     

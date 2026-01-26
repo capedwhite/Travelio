@@ -1,6 +1,7 @@
 import express from "express"
 import { getactivePackage, getPackageByid, createPackageRequest } from "../Controller/packageController.js";
 import { bargain, bookpackage, getUserBookings } from "../Controller/bookingController.js";
+import { getUserPackageRequests, getUserBargainRequests } from "../Controller/packageController.js";
 import init from "../Controller/initController.js";
 import { getAllChallenges, getTopChallengeUsers, submitChallenge, getChallengeById } from "../Controller/ChallengeController.js";
 import {
@@ -28,6 +29,8 @@ router.get("/explorepackages/:id",getPackageByid)
 router.post("/explorepackages/bargain",bargain)
 router.post("/explorepackages/booking",bookpackage)
 router.post("/explorepackages/request", createPackageRequest)
+router.get("/mypackagerequests", getUserPackageRequests)
+router.get("/mybargainpackages", getUserBargainRequests)
 router.get("/mybookings", getUserBookings)
 router.get("/getchallenges",getAllChallenges)
 router.get("/getchallenges/:id",getChallengeById)

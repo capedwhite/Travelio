@@ -3,6 +3,7 @@ import { Sequelize } from "sequelize";
 import { Package } from "../Model/packageModel.js";
 import { PackageRequest } from "../Model/requestModel.js";
 import { User } from "../Model/userModel.js";
+import Bargain from "../Model/bargainModel.js";
 
 export const createPackage = async (req, res) => {
   console.log("api hit for create package")
@@ -14,6 +15,7 @@ export const createPackage = async (req, res) => {
     const touristSpots = JSON.parse(req.body.touristSpots);
     const itinerary = JSON.parse(req.body.itinerary);
     const availability = JSON.parse(req.body.availability);
+    const { bargainId } = req.body;
  let coverImage = null;
     let touristImages = [];
 req.files.forEach(file => {
@@ -31,6 +33,9 @@ req.files.forEach(file => {
         }
       }
     });
+ 
+
+
     const insertPackage = await Package.create({
       title: basicInfo.title,
       description: basicInfo.description,
@@ -80,7 +85,12 @@ req.files.forEach(file => {
       visibility: req.body.visibility || 'public',
       specificUserId: req.body.specificUserId || null,
     });
-
+    if (bargainId) {
+      await Bargain.update(
+        { privatePackageId: insertPackage.id },
+        { where: { bargainId } }
+      );
+    }
     res.status(201).json({
       message: "Successfully inserted vacation package",
       data: insertPackage,
@@ -332,6 +342,67 @@ export const getAllPackageRequests = async (req, res) => {
   }
 };
 
+
+export const getUserPackageRequests = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).send({ message: "User not authenticated" });
+    }
+
+    const packageRequests = await PackageRequest.findAll({
+      where: { userId },
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.status(200).send({
+      data: packageRequests,
+      message: "User package requests fetched successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: error.message });
+  }
+};
+
+
+export const getUserBargainRequests = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).send({ message: "User not authenticated" });
+    }
+
+    const bargains = await Bargain.findAll({
+      where: { userId },
+
+      include: [
+        {
+          model: Package,
+          required: false, 
+          where: {
+            visibility: "private",
+            specificUserId: userId,
+            status:"Active"
+          },
+        },
+      ],
+
+      order: [["createdAt", "DESC"]],
+      subQuery: false,
+    });
+console.log(bargains)
+    res.status(200).send({
+      data: bargains,
+      message: "User bargain requests fetched successfully",
+    });
+  } catch (error) {
+    console.error("Bargain fetch error:", error);
+    res.status(500).send({ message: error.message });
+  }
+};
 
 export const updatePackageRequestStatus = async (req, res) => {
   try {

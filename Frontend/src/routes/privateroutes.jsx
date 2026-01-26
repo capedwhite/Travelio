@@ -18,6 +18,7 @@ const BargainRequests = React.lazy(()=>import("../Pages/private/adminbargainpage
 const AddChallenges = React.lazy(()=>import("../Pages/private/AddChalleges"))
 const ViewChallenges = React.lazy(()=>import("../Pages/private/viewChallenges"))
 const ViewUserRequests = React.lazy(()=>import("../Pages/private/viewuserRequests"))
+const Mypackagerequests = React.lazy(()=>import("../Pages/private/Mypackagerequests"))
 const PrivateRoutes = () => {
   return (
     <Suspense fallback={<div>Loading</div>}>
@@ -71,6 +72,14 @@ const PrivateRoutes = () => {
           element={
             <NavBar>
               <MyBookingStatus></MyBookingStatus>
+            </NavBar>
+          }
+        ></Route>
+        <Route
+          path="/mypackagerequests"
+          element={
+            <NavBar>
+            <Mypackagerequests></Mypackagerequests>
             </NavBar>
           }
         ></Route>

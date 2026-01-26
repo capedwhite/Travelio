@@ -326,6 +326,19 @@ const BargainRequests = () => {
                                   </button>
                                 </>
                               )}
+                              {/* { bargainItem.status="accepted" &&(
+                                <>
+                                          <button
+                                    onClick={() => handleAcceptBargain(bargainItem.bargainId, bargainItem, pkg)}
+                                    disabled={processingBargain === bargainItem.bargainId}
+                                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    <Check size={16} />
+                                    recreate Package
+                                  </button>
+                                </>
+                          
+                              )} */}
 
                             </div>
                           </div>
@@ -432,6 +445,7 @@ const BargainRequests = () => {
                   </div>
                 </div>
 
+
                 {selectedBargain.bargain.notes && (
                   <div className="bg-white rounded-2xl p-4 shadow-md">
                     <div className="flex items-center gap-3 mb-3">
@@ -441,7 +455,6 @@ const BargainRequests = () => {
                     <p className="text-gray-700 leading-relaxed">{selectedBargain.bargain.notes}</p>
                   </div>
                 )}
-
 
                 <div className="bg-gradient-to-r from-teal-100 to-cyan-100 rounded-2xl p-4 mt-6">
                   <h4 className="font-semibold text-teal-800 mb-3">Package Details</h4>
@@ -476,6 +489,7 @@ const BargainRequests = () => {
                     preFilledData={selectedBargain.preFilled}
                     visibility="private"
                     specificUserId={selectedBargain.bargain.userId}
+                    bargainid={selectedBargain.bargain.bargainId}
                     onSuccess={handlePackageSuccess}
                     refetch={() => {}}
                   />

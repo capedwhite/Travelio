@@ -41,10 +41,10 @@ import { useAuth } from "../context/authContext";
             My Bookings
         
           </li></Link> 
-                    <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                   <Link to = "/mypackagerequests"> <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <LucideClipboardPen size={18} />
             My Requests
-          </li>
+          </li></Link>
                               <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <Award size={18} />
             Challenge badges
