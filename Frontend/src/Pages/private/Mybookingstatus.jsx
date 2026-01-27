@@ -30,6 +30,7 @@ function MyBookingStatus() {
     try {
       const res = await api.get("/user/mybookings");
       setBookings(res.data.data);
+      console.log(res.data.data);
     } catch (error) {
       toast.error("Failed to load bookings");
     } finally {
@@ -178,14 +179,14 @@ function MyBookingStatus() {
               Confirmed ({bookings.filter(b => b.status?.toLowerCase() === "confirmed" || b.status?.toLowerCase() === "paid").length})
             </button>
             <button
-              onClick={() => setFilter("pending")}
+              onClick={() => setFilter("not paid")}
               className={`px-6 py-2 rounded-full font-medium transition-all ${
                 filter === "pending"
                   ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              Pending ({bookings.filter(b => b.status?.toLowerCase() === "pending" || b.status?.toLowerCase() === "not paid").length})
+              Pending ({bookings.filter(b => b.status?.toLowerCase() === "not paid").length})
             </button>
             <button
               onClick={() => setFilter("cancelled")}

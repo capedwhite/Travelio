@@ -1,3 +1,4 @@
+import { sequelize } from "../Database/db.js";
 import Bargain from "../Model/bargainModel.js"
 import { Booking } from "../Model/bookingModel.js"
 import { Package } from "../Model/packageModel.js"
@@ -22,7 +23,7 @@ export const bookpackage = async (req, res) => {
       transaction,
       lock: transaction.LOCK.UPDATE,
     });
-
+console.log(pkg)
     if (!pkg) {
       await transaction.rollback();
       return res.status(404).send({ message: "Package not found" });
@@ -198,7 +199,6 @@ export const updateBookingStatus = async (req, res) => {
             return res.status(400).send({ message: "Booking ID and status are required" });
         }
 
-        // Validate status
         const validStatuses = ["Not paid", "Paid", "Confirmed", "Cancelled"];
         if (!validStatuses.includes(status)) {
             return res.status(400).send({ message: "Invalid status" });

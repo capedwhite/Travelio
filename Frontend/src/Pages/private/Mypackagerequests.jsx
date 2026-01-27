@@ -232,32 +232,94 @@ function Mypackagerequests() {
 
                       {/* Status Message */}
                       <div className="flex justify-end">
-                        {request.status === "processed" ? (
-                          <div className="text-center bg-emerald-50 rounded-xl p-4">
-                            <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-lg text-sm font-semibold mb-2">
-                              <CheckCircle className="w-4 h-4" />
-                              Package Created!
-                            </div>
-                            <p className="text-sm text-emerald-700">Our team has created a custom package tailored to your requirements.</p>
-                          </div>
-                        ) : request.status === "pending" ? (
-                          <div className="text-center bg-amber-50 rounded-xl p-4">
-                            <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-700 px-4 py-2 rounded-lg text-sm font-semibold mb-2">
-                              <Clock className="w-4 h-4" />
-                              Under Review
-                            </div>
-                            <p className="text-sm text-amber-700">We're carefully reviewing your request to create the perfect package for you.</p>
-                          </div>
-                        ) : (
-                          <div className="text-center bg-red-50 rounded-xl p-4">
-                            <div className="inline-flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2 rounded-lg text-sm font-semibold mb-2">
-                              <XCircle className="w-4 h-4" />
-                              Request Cancelled
-                            </div>
-                            <p className="text-sm text-red-700">This request has been cancelled. Please contact us if you need assistance.</p>
-                          </div>
-                        )}
-                      </div>
+  {request.status  === "processed" && request.package ? (
+    <>
+      <div className="text-center bg-emerald-50 rounded-xl p-4 w-full">
+        <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-lg text-sm font-semibold mb-2">
+          <CheckCircle className="w-4 h-4" />
+          Package Created!
+        </div>
+        <p className="text-sm text-emerald-700">
+          Our team has created a custom package tailored to your requirements.
+        </p>
+        <div className="bg-white border border-gray-200 rounded-xl p-4 pr-6 pl-6 ">
+            <div className="flex items-center justify-between mb-4 ">
+            <img
+        src={`http://localhost:3000/${request.package.images.coverImage}`}
+        alt={request.package.title}
+        className="w-12 h-12 rounded-full object-cover border border-gray-300"
+      />
+              <h4 className="text-lg font-bold text-gray-900">
+                {request.package.title}
+              </h4>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-teal-600">
+                  ${request.package.price?.discountedPrice}
+                </div>
+                <div className="text-xs text-gray-600">Your Special Price</div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="flex items-center gap-3">
+                <MapPin className="w-5 h-5 text-teal-600" />
+                <div>
+                  <div className="text-sm text-gray-600">Destination</div>
+                  <div className="font-semibold text-gray-900">
+                    {request.package.locations?.city ||
+                      request.package.locations?.country}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Clock className="w-6 h-6 text-cyan-600" />
+                <div>
+                  <div className="text-sm text-gray-600">Duration</div>
+                  <div className="font-semibold text-gray-900">
+                    {request.package.duration}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                onClick={() =>
+                  navigate(`/explorepackages/${request.package.id}`)
+                }
+                className="bg-teal-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-teal-700 transition flex items-center gap-2"
+              >
+                View Your Package
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+      </div>
+    </>
+  ) : request.status === "pending" ? (
+    <div className="text-center bg-amber-50 rounded-xl p-4">
+      <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-700 px-4 py-2 rounded-lg text-sm font-semibold mb-2">
+        <Clock className="w-4 h-4" />
+        Under Review
+      </div>
+      <p className="text-sm text-amber-700">
+        We're carefully reviewing your request to create the perfect package for you.
+      </p>
+    </div>
+  ) : (
+    <div className="text-center bg-red-50 rounded-xl p-4">
+      <div className="inline-flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2 rounded-lg text-sm font-semibold mb-2">
+        <XCircle className="w-4 h-4" />
+        Request Cancelled
+      </div>
+      <p className="text-sm text-red-700">
+        This request has been cancelled. Please contact us if you need assistance.
+      </p>
+    </div>
+  )}
+</div>
+
                     </div>
                   </div>
                 ))}
@@ -361,7 +423,7 @@ function Mypackagerequests() {
                       )}
 
                       {/* Package Details (if bargain was accepted) */}
-                      {bargain.Package && bargain.status === "accepted" && (
+                      {bargain.privatePackage && bargain.status === "accepted" && (
                         <div className="border-t border-gray-200 pt-6">
                           <div className="bg-emerald-50 rounded-xl p-4 mb-4">
                             <div className="flex items-center gap-2 mb-3">
@@ -375,9 +437,9 @@ function Mypackagerequests() {
 
                           <div className="bg-white border border-gray-200 rounded-xl p-4">
                             <div className="flex items-center justify-between mb-4">
-                              <h4 className="text-lg font-bold text-gray-900">{bargain.Package.title}</h4>
+                              <h4 className="text-lg font-bold text-gray-900">{bargain.privatePackage.title}</h4>
                               <div className="text-right">
-                                <div className="text-2xl font-bold text-teal-600">${bargain.Package.price?.discountedPrice}</div>
+                                <div className="text-2xl font-bold text-teal-600">${bargain.privatePackage.price?.discountedPrice}</div>
                                 <div className="text-xs text-gray-600">Your Special Price</div>
                               </div>
                             </div>
@@ -388,7 +450,7 @@ function Mypackagerequests() {
                                 <div>
                                   <div className="text-sm text-gray-600">Destination</div>
                                   <div className="font-semibold text-gray-900">
-                                    {bargain.Package.locations?.city || bargain.Package.locations?.country}
+                                    {bargain.privatePackage.locations?.city || bargain.privatePackage.locations?.country}
                                   </div>
                                 </div>
                               </div>
@@ -396,14 +458,14 @@ function Mypackagerequests() {
                                 <Clock className="w-6 h-6 text-cyan-600" />
                                 <div>
                                   <div className="text-sm text-gray-600">Duration</div>
-                                  <div className="font-semibold text-gray-900">{bargain.Package.duration}</div>
+                                  <div className="font-semibold text-gray-900">{bargain.privatePackage.duration}</div>
                                 </div>
                               </div>
                             </div>
 
                             <div className="flex justify-end">
                               <button
-                                onClick={() => navigate(`/package/${bargain.Package.id}`)}
+                                onClick={() => navigate(`/explorepackages/${bargain.privatePackage.id}`)}
                                 className="bg-teal-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-teal-700 transition flex items-center gap-2"
                               >
                                 View Your Package
@@ -415,7 +477,7 @@ function Mypackagerequests() {
                       )}
 
                       {/* No Package Message */}
-                      {!bargain.Package && (
+                      {!bargain.privatePackage && (
                         <div className="border-t border-gray-200 pt-6">
                           <div className="text-center py-8">
                             <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />

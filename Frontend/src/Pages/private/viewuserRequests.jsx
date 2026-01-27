@@ -662,6 +662,7 @@ function ViewUserRequests() {
                   <PackageForm
                     mode="create"
                     preFilledData={preFilledData}
+                    specificUserId={selectedRequest.userId}
                     onSuccess={handlePackageSuccess}
                     refetch={() => {}} // We'll handle refresh in handlePackageSuccess
                   />

@@ -12,10 +12,20 @@ import { PackageRequest } from "./requestModel.js";
 
 Package.hasMany(Booking,{foreignKey:"packageId"}) 
 Package.hasMany(Bargain,{foreignKey:"packageId"})
-Bargain.belongsTo(Package,{
-  foreignKey: "privatePackageId",
-  as: "privatePackage",
+Bargain.belongsTo(Package, { 
+  foreignKey: "packageId"
 });
+Bargain.hasOne(Package, {
+  foreignKey: "privatePackageId", 
+  as: "privatePackage"
+});
+
+Package.belongsTo(Bargain, {
+  foreignKey: "privatePackageId"
+});
+PackageRequest.belongsTo(Package, { foreignKey: "packageId", as: "package" });
+Package.hasMany(PackageRequest, { foreignKey: "packageId" });
+
 Bargain.belongsTo(User,{foreignKey:"userId"})
 User.hasMany(Bargain,{foreignKey:"userId"})
 Booking.belongsTo(Package,{foreignKey:"packageId"})

@@ -44,5 +44,6 @@ export const PackageRequest = sequelize.define("packageRequest", {
     type: DataTypes.STRING(50),
     allowNull: false,
     defaultValue: "pending"
-  }
+  },
+  
 });

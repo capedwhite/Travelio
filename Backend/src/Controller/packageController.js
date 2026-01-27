@@ -16,6 +16,7 @@ export const createPackage = async (req, res) => {
     const itinerary = JSON.parse(req.body.itinerary);
     const availability = JSON.parse(req.body.availability);
     const { bargainId } = req.body;
+    const {specificUserId} = req.body;
  let coverImage = null;
     let touristImages = [];
 req.files.forEach(file => {
@@ -87,9 +88,15 @@ req.files.forEach(file => {
     });
     if (bargainId) {
       await Bargain.update(
-        { privatePackageId: insertPackage.id },
+        { privatePackageId: bargainId },
         { where: { bargainId } }
       );
+    }
+    if(specificUserId){
+      await PackageRequest.update(
+        {packageId:insertPackage.id},
+        {where:{userId:specificUserId}}
+      )
     }
     res.status(201).json({
       message: "Successfully inserted vacation package",
@@ -353,8 +360,21 @@ export const getUserPackageRequests = async (req, res) => {
 
     const packageRequests = await PackageRequest.findAll({
       where: { userId },
+      include: [
+        {
+          model: Package,
+          as:"package",
+          required: false,
+          where: {
+            specificUserId: userId,
+            visibility: "public",
+            status: "Active",
+          },
+        },
+      ],
       order: [["createdAt", "DESC"]],
     });
+    
 
     res.status(200).send({
       data: packageRequests,
@@ -368,19 +388,19 @@ export const getUserPackageRequests = async (req, res) => {
 
 
 export const getUserBargainRequests = async (req, res) => {
+  console.log("api for bargain request of user hit ")
   try {
     const userId = req.user?.id;
 
     if (!userId) {
       return res.status(401).send({ message: "User not authenticated" });
     }
-
     const bargains = await Bargain.findAll({
       where: { userId },
-
       include: [
         {
           model: Package,
+          as:"privatePackage",
           required: false, 
           where: {
             visibility: "private",
