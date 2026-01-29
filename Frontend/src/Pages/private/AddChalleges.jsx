@@ -196,13 +196,20 @@ function AddChallenges() {
 
             {/* Award You'll Receive */}
             <div>
-              <input
+              <select
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                placeholder="Award You'll Receive *"
                 {...register("award", {
-                  required: "Award description is required",
+                  required: "Award is required",
                 })}
-              />
+              >
+                <option value="">Select Award *</option>
+                <option value="5 coupons">5 Coupons</option>
+                <option value="1 coupon">1 Coupon</option>
+                <option value="50% discount">50% Discount</option>
+                <option value="100% discount">100% Discount</option>
+                <option value="10% discount">10% Discount</option>
+                <option value="30% discount">30% Discount</option>
+              </select>
               {errors.award && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.award.message}
@@ -332,13 +339,20 @@ function AddChallenges() {
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Award *
                   </label>
-                  <input
+                  <select
                     className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
-                    placeholder="What will participants receive?"
                     {...updateForm.register("award", {
                       required: "Award is required",
                     })}
-                  />
+                  >
+                    <option value="">Select Award *</option>
+                    <option value="5 coupons">5 Coupons</option>
+                    <option value="1 coupon">1 Coupon</option>
+                    <option value="50% discount">50% Discount</option>
+                    <option value="100% discount">100% Discount</option>
+                    <option value="10% discount">10% Discount</option>
+                    <option value="30% discount">30% Discount</option>
+                  </select>
                   {updateForm.formState.errors.award && (
                     <p className="text-red-500 text-sm mt-1">
                       {updateForm.formState.errors.award.message}

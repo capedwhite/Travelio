@@ -2,7 +2,7 @@ import { Sequelize } from "sequelize";
 import { challenge } from "../Model/ChallengeModel.js";
 import { Submission } from "../Model/submissionModel.js";
 import { User } from "../Model/userModel.js";
-
+import Award from "../Model/awardModel.js";
 
 export const createChallenge = async (req, res) => {
   try {
@@ -347,7 +347,7 @@ export const setChallengeWinner = async (req, res) => {
     if (!challengeData) {
       return res.status(404).send({ message: "Challenge not found" });
     }
-
+console.log(challengeData)
     // Check if the winner has submitted to this challenge
     const winnerSubmission = await Submission.findOne({
       where: {
@@ -364,9 +364,21 @@ export const setChallengeWinner = async (req, res) => {
     challengeData.result = "published";
     await challengeData.save();
 
+    // Create award for the winner
+    const award = await Award.create({
+      userId: winnerId,
+      challengeId,
+      challengeTitle: challengeData.challengeName,
+      awardWon: challengeData.award,
+      awardDescription: challengeData.awardDetail,
+    });
+
     res.status(200).send({
-      data: challengeData,
-      message: "Challenge winner set successfully",
+      data: {
+        challenge: challengeData,
+        award,
+      },
+      message: "Challenge winner set successfully and award granted",
     });
   } catch (error) {
     console.log(error.message);

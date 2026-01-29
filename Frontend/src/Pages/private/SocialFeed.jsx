@@ -162,14 +162,14 @@ function UserProfileModal({ user, isOpen, onClose, onFollow }) {
 
   const fetchUserDetails = async () => {
     if (!user?.id) return;
-    
+    setLoading(true)
     try {
       const res = await api.get(`/user/users/${user.id}`);
       setUserDetails(res.data.data);
     } catch (error) {
       toast.error("Failed to load user profile");
     } finally {
-
+setLoading(false)
     }
   };
 

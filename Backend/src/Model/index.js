@@ -9,6 +9,7 @@ import { Like } from "./Like.js";
 import { Comment } from "./Comments.js";
 import { Follow } from "./Follow.js";
 import { PackageRequest } from "./requestModel.js";
+import Award from "./awardModel.js";
 
 Package.hasMany(Booking,{foreignKey:"packageId"}) 
 Package.hasMany(Bargain,{foreignKey:"packageId"})
@@ -67,3 +68,9 @@ User.belongsToMany(User, {
 
 User.hasMany(PackageRequest, { foreignKey: "userId" });
 PackageRequest.belongsTo(User, { foreignKey: "userId" });
+User.hasMany(Award, { foreignKey: "userId" });
+Award.belongsTo(User, { foreignKey: "userId" });
+
+
+challenge.hasMany(Award, { foreignKey: "challengeId" });
+Award.belongsTo(challenge, { foreignKey: "challengeId" });

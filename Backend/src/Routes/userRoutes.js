@@ -4,6 +4,7 @@ import { bargain, bookpackage, getUserBookings } from "../Controller/bookingCont
 import { getUserPackageRequests, getUserBargainRequests } from "../Controller/packageController.js";
 import init from "../Controller/initController.js";
 import { getAllChallenges, getTopChallengeUsers, submitChallenge, getChallengeById } from "../Controller/ChallengeController.js";
+import { getUserAwards, markAwardAsUsed } from "../Controller/awardController.js";
 import {
   createPost,
   getAllPosts,
@@ -53,5 +54,9 @@ router.get("/followed-posts", getFollowedPosts)
 // Profile Routes
 router.get("/profile", getProfile)
 router.put("/profile", upload.single("profileImage"), updateUserProfile)
+
+// Award Routes
+router.get("/awards", getUserAwards)
+router.put("/awards/:awardId/use", markAwardAsUsed)
 
 export default router

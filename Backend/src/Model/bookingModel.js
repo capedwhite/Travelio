@@ -67,5 +67,15 @@ export const Booking = sequelize.define("booking",{
       discountedPrice: null,
       currency: "INR",
     },
-}
+},
+    couponUsed: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null,
+    },
+    bookingCoupon: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null,
+    }
 })

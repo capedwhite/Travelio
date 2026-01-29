@@ -11,7 +11,7 @@ export const bookpackage = async (req, res) => {
 
   try {
     const userId = req.user.id;
-    const { fullname, email, phone, travelers, date, packageid } = req.body;
+    const { fullname, email, phone, travelers, date, packageid, selectedCoupon, finalPrice } = req.body;
 
     if (!fullname || !email || !phone || !travelers || !date || !packageid) {
       await transaction.rollback();
@@ -46,15 +46,30 @@ console.log(pkg)
 
     await pkg.save({ transaction });
 
+
+    const basePrice = pkg.price.discountedPrice ?? pkg.price.originalPrice;
+    const totalWithoutDiscount = basePrice * Number(travelers);
+    const totalWithDiscount = selectedCoupon ? finalPrice * Number(travelers) : totalWithoutDiscount;
+
     const priceSnapshot = {
       originalPrice: pkg.price.originalPrice,
       discountedPrice: pkg.price.discountedPrice,
       currency: pkg.price.currency,
       perPerson: true,
-      total:
-        (pkg.price.discountedPrice ?? pkg.price.originalPrice) *
-        Number(travelers),
+      total: totalWithoutDiscount,
+      finalTotal: totalWithDiscount,
+      couponApplied: selectedCoupon ? true : false,
+      couponDiscount: selectedCoupon ? (totalWithoutDiscount - totalWithDiscount) : 0,
     };
+
+    // Generate random booking coupon number
+    const generateCouponNumber = () => {
+      const prefix = 'TRAVEL';
+      const randomNum = Math.floor(100000 + Math.random() * 900000); // 6-digit random number
+      return `${prefix}${randomNum}`;
+    };
+
+    const bookingCouponNumber = generateCouponNumber();
 
     const booking = await Booking.create(
       {
@@ -66,16 +81,22 @@ console.log(pkg)
         Date: date,
         userId,
         price: priceSnapshot,
+        couponUsed: selectedCoupon || null,
+        bookingCoupon: bookingCouponNumber,
       },
       { transaction }
     );
 
-  
     await transaction.commit();
 
-    res.status(201).send({
+    res.status(200).send({
       message: "Booking created successfully",
-      data: booking,
+      success:true,
+      data: {
+        ...booking.toJSON(),
+        bookingCoupon: bookingCouponNumber
+      },
+      bookingCoupon: bookingCouponNumber,
     });
   } catch (error) {
     await transaction.rollback();

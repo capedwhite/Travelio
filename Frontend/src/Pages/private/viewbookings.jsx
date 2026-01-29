@@ -32,6 +32,7 @@ function AdminBookingsPage() {
       setLoading(true);
       const res = await api.get("/admin/packagebooking");
       setAllBookings(res.data.data);
+      console.log(res.data.data);
     } catch (error) {
       console.log(error.message);
       toast.error("Failed to load bookings");

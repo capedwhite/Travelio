@@ -1,4 +1,3 @@
-
 import { Sequelize } from "sequelize";
 import { Package } from "../Model/packageModel.js";
 import { PackageRequest } from "../Model/requestModel.js";

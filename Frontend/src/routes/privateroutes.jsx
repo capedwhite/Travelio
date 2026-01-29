@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom"
 import NavBar from "../components/Usernavbar"
 import AboutPage from "../Pages/public/aboutpage"
 import ProtectedRoute from "./protectedroute"
+import { ClipLoader } from "react-spinners"
 
 
 const ExplorePackages = React.lazy(()=>import("../Pages/private/ExplorePackages"))
@@ -21,7 +22,7 @@ const ViewUserRequests = React.lazy(()=>import("../Pages/private/viewuserRequest
 const Mypackagerequests = React.lazy(()=>import("../Pages/private/Mypackagerequests"))
 const PrivateRoutes = () => {
   return (
-    <Suspense fallback={<div>Loading</div>}>
+    <Suspense fallback={<ClipLoader></ClipLoader>}>
       <Routes>
         <Route
           path="/explorepackages"

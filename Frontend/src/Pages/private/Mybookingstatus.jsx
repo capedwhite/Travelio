@@ -292,15 +292,24 @@ function MyBookingStatus() {
                           <span className="text-sm text-gray-600">Total Amount:</span>
                           <span className="text-lg font-bold text-emerald-600 flex items-center">
                             <IndianRupee className="w-4 h-4" />
-                            {booking.price?.total?.toLocaleString() || "N/A"}
+                            {booking.price?.finalTotal?.toLocaleString() || booking.price?.total?.toLocaleString() || "N/A"}
                           </span>
                         </div>
-                        {booking.price?.discountedPrice && (
+                        {booking.price?.couponApplied && (
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">Original:</span>
+                            <span className="text-sm text-green-600">Coupon Discount:</span>
+                            <span className="text-sm font-medium text-green-600 flex items-center">
+                              -<IndianRupee className="w-3 h-3" />
+                              {booking.price?.couponDiscount?.toLocaleString()}
+                            </span>
+                          </div>
+                        )}
+                        {booking.price?.total && booking.price?.finalTotal && booking.price?.total !== booking.price?.finalTotal && (
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Original Total:</span>
                             <span className="text-sm text-gray-500 line-through flex items-center">
                               <IndianRupee className="w-3 h-3" />
-                              {booking.price?.originalPrice?.toLocaleString()}
+                              {booking.price?.total?.toLocaleString()}
                             </span>
                           </div>
                         )}
@@ -308,9 +317,25 @@ function MyBookingStatus() {
                           <span className="text-sm text-gray-600">Per Person:</span>
                           <span className="text-sm font-medium flex items-center">
                             <IndianRupee className="w-3 h-3" />
-                            {booking.price?.discountedPrice || booking.price?.originalPrice}
+                            {Math.round((booking.price?.finalTotal || booking.price?.total || 0) / booking.Travelers)}
                           </span>
                         </div>
+                        {booking.bookingCoupon && (
+                          <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+                            <span className="text-sm text-gray-600">Booking Coupon:</span>
+                            <span className="text-sm font-mono font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                              {booking.bookingCoupon}
+                            </span>
+                          </div>
+                        )}
+                        {booking.couponUsed && (
+                          <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded-lg">
+                            <div className="flex items-center gap-2 text-sm text-green-700">
+                              <CheckCircle className="w-4 h-4" />
+                              <span>Coupon applied: {booking.couponUsed}</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
