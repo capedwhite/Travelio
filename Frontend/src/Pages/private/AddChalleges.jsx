@@ -138,7 +138,7 @@ function AddChallenges() {
       <div className="pl-8 pr-8 pt-8 pb-6 bg-gray-50 min-h-screen ml-64">
         <h1 className="text-gray-500 mt-1 text-[20px] mb-6">Add New Challenge</h1>
 
-        <div className="bg-white rounded-2xl shadow p-8 max-w-3xl">
+        <div className="bg-white rounded-2xl shadow p-8 w-full">
           <h2 className="text-[16px] font-semibold mb-6">Challenge Details</h2>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

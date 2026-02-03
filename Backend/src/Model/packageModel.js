@@ -1,23 +1,22 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../Database/db.js";
 
-
-export const Package = sequelize.define('package', {
+export const Package = sequelize.define("package", {
   id: {
     type: DataTypes.INTEGER,
-       allowNull:false,
-        autoIncrement:true,
-    primaryKey: true
+    allowNull: false,
+    autoIncrement: true,
+    primaryKey: true,
   },
 
   title: {
     type: DataTypes.STRING(100),
-    allowNull: false
+    allowNull: false,
   },
 
   description: {
     type: DataTypes.TEXT,
-    allowNull: false
+    allowNull: false,
   },
 
   price: {
@@ -26,10 +25,10 @@ export const Package = sequelize.define('package', {
     defaultValue: {
       originalPrice: 0,
       discountedPrice: null,
-      currency: 'INR'
-    }
+      currency: "INR",
+    },
   },
-  
+
   duration: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -37,64 +36,59 @@ export const Package = sequelize.define('package', {
 
   locations: {
     type: DataTypes.JSONB,
-    defaultValue: []
+    defaultValue: [],
   },
 
   hotels: {
     type: DataTypes.JSONB,
     defaultValue: [],
-    hotels:[]
+    hotels: [],
   },
-status:{
-  type:DataTypes.STRING,
-  defaultValue:"Active"
-},
+  status: {
+    type: DataTypes.STRING,
+    defaultValue: "Active",
+  },
   touristSpots: {
     type: DataTypes.JSONB,
-    defaultValue: []
+    defaultValue: [],
   },
-
 
   itinerary: {
     type: DataTypes.JSONB,
-    defaultValue: []
+    defaultValue: [],
   },
-  
+
   inclusions: {
     type: DataTypes.ARRAY(DataTypes.TEXT),
-    defaultValue: []
+    defaultValue: [],
   },
 
   exclusions: {
     type: DataTypes.ARRAY(DataTypes.TEXT),
-    defaultValue: []
+    defaultValue: [],
   },
-
 
   images: {
     type: DataTypes.JSONB,
     allowNull: true,
     defaultValue: {
-      coverImage: '',
-      tourist:[],
-
-    }
+      coverImage: "",
+      tourist: [],
+    },
   },
-
 
   tags: {
     type: DataTypes.ARRAY(DataTypes.STRING),
-    defaultValue: []
+    defaultValue: [],
   },
-
 
   seasonalDiscount: {
     type: DataTypes.JSONB,
     defaultValue: {
       isActive: false,
       label: null,
-      percentage: 0
-    }
+      percentage: 0,
+    },
   },
 
   availability: {
@@ -103,45 +97,43 @@ status:{
       startDate: null,
       endDate: null,
       maxBookings: 50,
-      currentBookings: 0
-    }
+      currentBookings: 0,
+    },
   },
 
   isActive: {
     type: DataTypes.BOOLEAN,
-    defaultValue: true
+    defaultValue: true,
   },
 
   visibility: {
     type: DataTypes.STRING,
-    defaultValue: 'public', 
-    allowNull: false
+    defaultValue: "public",
+    allowNull: false,
   },
 
   specificUserId: {
     type: DataTypes.INTEGER,
     allowNull: true,
     references: {
-      model: 'users',
-      key: 'id'
-    }
+      model: "users",
+      key: "id",
+    },
   },
   privatePackageId: {
     type: DataTypes.INTEGER,
     allowNull: true,
     references: {
-      model: "packages",
-      key: "id",
+      model: "bargains",
+      key: "bargainId",
     },
   },
   createdBy: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'users',
-      key: 'id'
-    }
-  }
-
-
-})
+      model: "users",
+      key: "id",
+    },
+  },
+});

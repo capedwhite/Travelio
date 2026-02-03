@@ -5,6 +5,7 @@ import AboutPage from "../Pages/public/aboutpage"
 import ProtectedRoute from "./protectedroute"
 import { ClipLoader } from "react-spinners"
 import RoleRedirect from "./roleRedirect"
+import MyChallengeAwards from "../Pages/private/Mychallengebadges"
 
 
 const ExplorePackages = React.lazy(()=>import("../Pages/private/ExplorePackages"))
@@ -74,6 +75,14 @@ const PrivateRoutes = () => {
           element={
             <NavBar>
               <MyBookingStatus></MyBookingStatus>
+            </NavBar>
+          }
+        ></Route>
+             <Route
+          path="/myawards"
+          element={
+            <NavBar>
+             <MyChallengeAwards/>
             </NavBar>
           }
         ></Route>

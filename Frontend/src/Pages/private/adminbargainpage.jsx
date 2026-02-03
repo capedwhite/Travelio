@@ -262,7 +262,7 @@ const BargainRequests = () => {
                       <div className="text-sm text-slate-600">Bargain Offers</div>
                       <div className="flex gap-2 mt-2">
                         <div className="bg-amber-100 text-amber-700 px-2 py-1 rounded-lg text-xs font-medium">
-                          {pkg.bargains?.filter(b => b.status === "pending").length || 0} Pending
+                          {pkg.bargains?.filter(b => b.status === "Pending").length || 0} Pending
                         </div>
                         <div className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-lg text-xs font-medium">
                           {pkg.bargains?.filter(b => b.status === "accepted").length || 0} Accepted
@@ -353,13 +353,13 @@ const BargainRequests = () => {
                                   <div className="mt-4">
                                     <span className="text-sm font-semibold text-slate-700">Status:</span>
                                     <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-sm font-semibold ml-2 ${
-                                      bargainItem.status === "pending"
+                                      bargainItem.status === "Pending"
                                         ? "bg-amber-100 text-amber-700"
                                         : bargainItem.status === "accepted"
                                         ? "bg-emerald-100 text-emerald-700"
                                         : "bg-red-100 text-red-700"
                                     }`}>
-                                      {bargainItem.status === "pending" && <Clock className="w-4 h-4" />}
+                                      {bargainItem.status === "Pending" && <Clock className="w-4 h-4" />}
                                       {bargainItem.status === "accepted" && <Check className="w-4 h-4" />}
                                       {bargainItem.status === "declined" && <X className="w-4 h-4" />}
                                       {bargainItem.status?.toUpperCase() || "PENDING"}
@@ -403,7 +403,7 @@ const BargainRequests = () => {
                                         <ClipLoader size={16} color="#64748b" />
                                         <span>Processing...</span>
                                       </div>
-                                    ) : bargainItem.status === "pending" ? (
+                                    ) : bargainItem.status === "Pending" ? (
                                       <>
                                         <button
                                           onClick={() => handleAcceptBargain(bargainItem.bargainId, bargainItem, pkg)}

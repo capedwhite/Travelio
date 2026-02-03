@@ -218,10 +218,10 @@ function PackageDetailsPage() {
       };
       const res = await api.post("/user/explorepackages/bargain", payload);
       console.log(res.data.data);
-      alert(res.data.message);
+      toast.success(res.data.message);
     } catch (error) {
       console.log(error);
-      alert(error.res.data.message);
+      toast.error(error.response?.data?.message);
     }
   };
 

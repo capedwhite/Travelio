@@ -18,7 +18,7 @@ import {
   Award,
   Crown,
   Package,
-  Plus
+  Plus,
 } from "lucide-react";
 import api from "../../api/axios";
 import toast from "react-hot-toast";
@@ -64,8 +64,10 @@ function ViewUserRequests() {
         duration: request.duration,
       },
       pricing: {
-        originalPrice: request.budget.split(' - ')[1]?.replace(/[₹,]/g, '') || "50000",
-        discountedPrice: request.budget.split(' - ')[0]?.replace(/[₹,]/g, '') || "40000",
+        originalPrice:
+          request.budget.split(" - ")[1]?.replace(/[₹,]/g, "") || "50000",
+        discountedPrice:
+          request.budget.split(" - ")[0]?.replace(/[₹,]/g, "") || "40000",
         currency: "INR",
         label: "Custom Package Deal",
         discountpercentage: "20",
@@ -76,12 +78,18 @@ function ViewUserRequests() {
         pickup: "",
         notes: request.specialRequests || "",
       },
-      touristSpots: [{ spotname: request.destination, location: request.destination, description: `Explore the beautiful destination of ${request.destination}` }],
+      touristSpots: [
+        {
+          spotname: request.destination,
+          location: request.destination,
+          description: `Explore the beautiful destination of ${request.destination}`,
+        },
+      ],
       itinerary: [
         {
           title: `Day 1: Arrival in ${request.destination}`,
-          description: `Welcome to ${request.destination}! Start your amazing journey.`
-        }
+          description: `Welcome to ${request.destination}! Start your amazing journey.`,
+        },
       ],
       hotels: [
         {
@@ -89,8 +97,8 @@ function ViewUserRequests() {
           location: request.destination,
           rating: "4.5",
           amenities: "WiFi, Pool, Restaurant, Spa",
-          hotelImages: []
-        }
+          hotelImages: [],
+        },
       ],
       availability: {
         startDate: request.travelDate,
@@ -110,13 +118,16 @@ function ViewUserRequests() {
 
   const handlePackageSuccess = async () => {
     try {
-
       if (selectedRequest?.id) {
-        await api.put(`/admin/packagerequests/${selectedRequest.id}/status`, { status: 'processed' });
+        await api.put(`/admin/packagerequests/${selectedRequest.id}/status`, {
+          status: "processed",
+        });
       }
       setPackageModalOpen(false);
-      fetchRequests(); 
-      toast.success("Package created successfully! The request has been marked as processed.");
+      fetchRequests();
+      toast.success(
+        "Package created successfully! The request has been marked as processed.",
+      );
     } catch (error) {
       console.error("Failed to update request status:", error);
       setPackageModalOpen(false);
@@ -127,8 +138,9 @@ function ViewUserRequests() {
 
   // Calculate stats
   const totalRequests = requests.length;
-  const pendingRequests = requests.filter(r => r.status === "pending").length;
-  const uniqueDestinations = [...new Set(requests.map(r => r.destination))].length;
+  const pendingRequests = requests.filter((r) => r.status === "pending").length;
+  const uniqueDestinations = [...new Set(requests.map((r) => r.destination))]
+    .length;
   const totalTravelers = requests.reduce((sum, r) => sum + r.travelers, 0);
 
   if (loading) {
@@ -149,8 +161,12 @@ function ViewUserRequests() {
         <div className="ml-64 min-h-screen flex items-center justify-center">
           <div className="text-center">
             <Plane className="w-24 h-24 text-teal-200 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-gray-600 mb-2">No Requests Yet</h3>
-            <p className="text-gray-500">Package requests from users will appear here!</p>
+            <h3 className="text-2xl font-bold text-gray-600 mb-2">
+              No Requests Yet
+            </h3>
+            <p className="text-gray-500">
+              Package requests from users will appear here!
+            </p>
           </div>
         </div>
       </>
@@ -171,7 +187,9 @@ function ViewUserRequests() {
               </span>
               <Sparkles className="w-6 h-6 text-emerald-600" />
             </div>
-            <p className="text-gray-600 text-lg">Explore user dreams and create unforgettable experiences</p>
+            <p className="text-gray-600 text-lg">
+              Explore user dreams and create unforgettable experiences
+            </p>
           </div>
 
           {/* Stats Cards */}
@@ -180,8 +198,12 @@ function ViewUserRequests() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Total Requests</p>
-                  <p className="text-3xl font-bold text-teal-600 group-hover:scale-110 transition-transform">{totalRequests}</p>
-                  <p className="text-xs text-gray-500 mt-1">Dream destinations</p>
+                  <p className="text-3xl font-bold text-teal-600 group-hover:scale-110 transition-transform">
+                    {totalRequests}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Dream destinations
+                  </p>
                 </div>
                 <div className="w-14 h-14 bg-gradient-to-r from-teal-100 to-cyan-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                   <Target className="w-7 h-7 text-teal-600" />
@@ -193,7 +215,9 @@ function ViewUserRequests() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Pending</p>
-                  <p className="text-3xl font-bold text-cyan-600 group-hover:scale-110 transition-transform">{pendingRequests}</p>
+                  <p className="text-3xl font-bold text-cyan-600 group-hover:scale-110 transition-transform">
+                    {pendingRequests}
+                  </p>
                   <p className="text-xs text-gray-500 mt-1">Awaiting magic</p>
                 </div>
                 <div className="w-14 h-14 bg-gradient-to-r from-cyan-100 to-emerald-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -206,7 +230,9 @@ function ViewUserRequests() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Destinations</p>
-                  <p className="text-3xl font-bold text-emerald-600 group-hover:scale-110 transition-transform">{uniqueDestinations}</p>
+                  <p className="text-3xl font-bold text-emerald-600 group-hover:scale-110 transition-transform">
+                    {uniqueDestinations}
+                  </p>
                   <p className="text-xs text-gray-500 mt-1">Unique places</p>
                 </div>
                 <div className="w-14 h-14 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -219,7 +245,9 @@ function ViewUserRequests() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Travelers</p>
-                  <p className="text-3xl font-bold text-teal-600 group-hover:scale-110 transition-transform">{totalTravelers}</p>
+                  <p className="text-3xl font-bold text-teal-600 group-hover:scale-110 transition-transform">
+                    {totalTravelers}
+                  </p>
                   <p className="text-xs text-gray-500 mt-1">Dream seekers</p>
                 </div>
                 <div className="w-14 h-14 bg-gradient-to-r from-teal-100 to-cyan-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -238,14 +266,14 @@ function ViewUserRequests() {
               >
                 {/* Header with gradient */}
                 <div className="bg-[#3ab19d] p-6 text-white relative overflow-hidden">
-
-
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
                       <MapPin className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold">{request.destination}</h3>
+                      <h3 className="text-lg font-bold">
+                        {request.destination}
+                      </h3>
                       <div className="flex items-center gap-2 text-sm text-white/80">
                         <Calendar className="w-4 h-4" />
                         {new Date(request.travelDate).toLocaleDateString()}
@@ -255,11 +283,13 @@ function ViewUserRequests() {
 
                   {/* Status Badge */}
                   <div className="flex items-center justify-between">
-                    <div className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
-                      request.status === "pending"
-                        ? "bg-amber-500/20 text-amber-100 border border-amber-400/30"
-                        : "bg-emerald-500/20 text-emerald-100 border border-emerald-400/30"
-                    }`}>
+                    <div
+                      className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
+                        request.status === "pending"
+                          ? "bg-amber-500/20 text-amber-100 border border-amber-400/30"
+                          : "bg-emerald-500/20 text-emerald-100 border border-emerald-400/30"
+                      }`}
+                    >
                       {request.status === "pending" ? (
                         <>
                           <Clock className="w-3 h-3" />
@@ -294,8 +324,12 @@ function ViewUserRequests() {
                       )}
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-900">{request.user?.name || request.user?.username}</h4>
-                      <p className="text-sm text-gray-600">@{request.user?.username}</p>
+                      <h4 className="font-semibold text-gray-900">
+                        {request.user?.name || request.user?.username}
+                      </h4>
+                      <p className="text-sm text-gray-600">
+                        @{request.user?.username}
+                      </p>
                     </div>
                   </div>
 
@@ -303,12 +337,16 @@ function ViewUserRequests() {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="bg-teal-50 rounded-xl p-3 text-center">
                       <Clock className="w-5 h-5 text-teal-600 mx-auto mb-1" />
-                      <div className="text-sm font-semibold text-gray-900">{request.duration}</div>
+                      <div className="text-sm font-semibold text-gray-900">
+                        {request.duration}
+                      </div>
                       <div className="text-xs text-gray-600">Duration</div>
                     </div>
                     <div className="bg-cyan-50 rounded-xl p-3 text-center">
                       <Users className="w-5 h-5 text-cyan-600 mx-auto mb-1" />
-                      <div className="text-sm font-semibold text-gray-900">{request.travelers}</div>
+                      <div className="text-sm font-semibold text-gray-900">
+                        {request.travelers}
+                      </div>
                       <div className="text-xs text-gray-600">Travelers</div>
                     </div>
                   </div>
@@ -317,7 +355,9 @@ function ViewUserRequests() {
                   <div className="bg-emerald-50 rounded-xl p-3">
                     <div className="flex items-center gap-2 mb-1">
                       <IndianRupee className="w-4 h-4 text-emerald-600" />
-                      <span className="text-sm font-semibold text-gray-900">{request.budget}</span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {request.budget}
+                      </span>
                     </div>
                     <div className="text-xs text-gray-600">Budget Range</div>
                   </div>
@@ -327,7 +367,9 @@ function ViewUserRequests() {
                     <div className="bg-amber-50 rounded-xl p-3">
                       <div className="flex items-center gap-2 mb-1">
                         <Star className="w-4 h-4 text-amber-600" />
-                        <span className="text-sm font-semibold text-gray-900">Special Requests</span>
+                        <span className="text-sm font-semibold text-gray-900">
+                          Special Requests
+                        </span>
                       </div>
                       <div className="text-xs text-gray-700 line-clamp-2">
                         {request.specialRequests}
@@ -356,16 +398,19 @@ function ViewUserRequests() {
           <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="bg-[#3ab19d] p-6 text-white rounded-t-3xl relative overflow-hidden">
-           
-
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
                     <Plane className="w-8 h-8" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold">{selectedRequest.destination}</h2>
-                    <p className="text-white/80">{selectedRequest.user?.name || selectedRequest.user?.username}</p>
+                    <h2 className="text-2xl font-bold">
+                      {selectedRequest.destination}
+                    </h2>
+                    <p className="text-white/80">
+                      {selectedRequest.user?.name ||
+                        selectedRequest.user?.username}
+                    </p>
                   </div>
                 </div>
                 <button
@@ -379,19 +424,27 @@ function ViewUserRequests() {
               {/* Quick Stats */}
               <div className="grid grid-cols-4 gap-4">
                 <div className="text-center">
-                  <div className="text-lg font-bold">{selectedRequest.travelers}</div>
+                  <div className="text-lg font-bold">
+                    {selectedRequest.travelers}
+                  </div>
                   <div className="text-xs text-white/80">Travelers</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-lg font-bold">{selectedRequest.duration}</div>
+                  <div className="text-lg font-bold">
+                    {selectedRequest.duration}
+                  </div>
                   <div className="text-xs text-white/80">Duration</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-lg font-bold">{selectedRequest.budget}</div>
+                  <div className="text-lg font-bold">
+                    {selectedRequest.budget}
+                  </div>
                   <div className="text-xs text-white/80">Budget</div>
                 </div>
                 <div className="text-center">
-                  <div className={`text-lg font-bold ${selectedRequest.status === "pending" ? "text-amber-300" : "text-emerald-300"}`}>
+                  <div
+                    className={`text-lg font-bold ${selectedRequest.status === "pending" ? "text-amber-300" : "text-emerald-300"}`}
+                  >
                     {selectedRequest.status}
                   </div>
                   <div className="text-xs text-white/80">Status</div>
@@ -420,9 +473,16 @@ function ViewUserRequests() {
                     )}
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">{selectedRequest.user?.name || selectedRequest.user?.username}</h4>
-                    <p className="text-sm text-gray-600">{selectedRequest.user?.email}</p>
-                    <p className="text-xs text-gray-500">@{selectedRequest.user?.username}</p>
+                    <h4 className="font-semibold text-gray-900">
+                      {selectedRequest.user?.name ||
+                        selectedRequest.user?.username}
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      {selectedRequest.user?.email}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      @{selectedRequest.user?.username}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -432,20 +492,29 @@ function ViewUserRequests() {
                 <div className="bg-teal-50 rounded-2xl p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Calendar className="w-5 h-5 text-teal-600" />
-                    <span className="font-semibold text-gray-900">Travel Date</span>
+                    <span className="font-semibold text-gray-900">
+                      Travel Date
+                    </span>
                   </div>
-                  <p className="text-gray-700">{new Date(selectedRequest.travelDate).toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}</p>
+                  <p className="text-gray-700">
+                    {new Date(selectedRequest.travelDate).toLocaleDateString(
+                      "en-US",
+                      {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      },
+                    )}
+                  </p>
                 </div>
 
                 <div className="bg-cyan-50 rounded-2xl p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Clock className="w-5 h-5 text-cyan-600" />
-                    <span className="font-semibold text-gray-900">Duration</span>
+                    <span className="font-semibold text-gray-900">
+                      Duration
+                    </span>
                   </div>
                   <p className="text-gray-700">{selectedRequest.duration}</p>
                 </div>
@@ -453,9 +522,13 @@ function ViewUserRequests() {
                 <div className="bg-emerald-50 rounded-2xl p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Users className="w-5 h-5 text-emerald-600" />
-                    <span className="font-semibold text-gray-900">Travelers</span>
+                    <span className="font-semibold text-gray-900">
+                      Travelers
+                    </span>
                   </div>
-                  <p className="text-gray-700">{selectedRequest.travelers} people</p>
+                  <p className="text-gray-700">
+                    {selectedRequest.travelers} people
+                  </p>
                 </div>
 
                 <div className="bg-amber-50 rounded-2xl p-4">
@@ -472,30 +545,41 @@ function ViewUserRequests() {
                 <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <Star className="w-5 h-5 text-purple-600" />
-                    <span className="font-semibold text-gray-900">Special Requests & Dreams</span>
+                    <span className="font-semibold text-gray-900">
+                      Special Requests & Dreams
+                    </span>
                   </div>
-                  <p className="text-gray-700 leading-relaxed">{selectedRequest.specialRequests}</p>
+                  <p className="text-gray-700 leading-relaxed">
+                    {selectedRequest.specialRequests}
+                  </p>
                 </div>
               )}
 
               {/* Request Info */}
               <div className="bg-gray-50 rounded-2xl p-4">
-                <h3 className="font-semibold text-gray-900 mb-3">Request Details</h3>
+                <h3 className="font-semibold text-gray-900 mb-3">
+                  Request Details
+                </h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="text-gray-600">Submitted:</span>
                     <p className="font-medium text-gray-900">
-                      {new Date(selectedRequest.createdAt).toLocaleDateString('en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
+                      {new Date(selectedRequest.createdAt).toLocaleDateString(
+                        "en-US",
+                        {
+                          weekday: "long",
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        },
+                      )}
                     </p>
                   </div>
                   <div>
                     <span className="text-gray-600">Status:</span>
-                    <p className={`font-medium ${selectedRequest.status === "pending" ? "text-amber-600" : "text-emerald-600"}`}>
+                    <p
+                      className={`font-medium ${selectedRequest.status === "pending" ? "text-amber-600" : "text-emerald-600"}`}
+                    >
                       {selectedRequest.status}
                     </p>
                   </div>
@@ -507,7 +591,9 @@ function ViewUserRequests() {
                 <div className="text-center space-y-4">
                   <div className="inline-flex items-center gap-2 bg-gradient-to-r from-teal-100 to-cyan-100 px-4 py-2 rounded-full">
                     <Crown className="w-5 h-5 text-teal-600" />
-                    <span className="text-sm font-semibold text-teal-700">Ready to create their dream trip?</span>
+                    <span className="text-sm font-semibold text-teal-700">
+                      Ready to create their dream trip?
+                    </span>
                   </div>
                   <p className="text-gray-600 text-sm mb-4">
                     This request is waiting for your magical touch! ✨
@@ -528,14 +614,20 @@ function ViewUserRequests() {
 
       {/* Package Creation Modal */}
       {packageModalOpen && selectedRequest && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={()=>setPackageModalOpen(false)}>
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-7xl h-[95vh] overflow-hidden flex" onClick={e=>e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          onClick={() => setPackageModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-3xl shadow-2xl w-full max-w-7xl h-[95vh] overflow-hidden flex"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Left Side - User Request Details */}
             <div className="w-1/3 bg-gradient-to-br from-teal-50 via-cyan-50 to-emerald-50 p-6 overflow-y-auto">
               <div className="sticky top-0 bg-white/80 backdrop-blur-sm rounded-2xl p-6 mb-6 shadow-lg">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-teal-400 to-cyan-400 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-gradient-to-r from-teal-400 to-cyan-400 rounded-full flex items-center justify-center">
                       {selectedRequest.user?.profileImage ? (
                         <img
                           src={`http://localhost:3000/${selectedRequest.user?.profileImage}`}
@@ -547,7 +639,10 @@ function ViewUserRequests() {
                       )}
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-gray-900">{selectedRequest.user?.name || selectedRequest.user?.username}</h2>
+                      <h2 className="text-xl font-bold text-gray-900">
+                        {selectedRequest.user?.name ||
+                          selectedRequest.user?.username}
+                      </h2>
                       <p className="text-sm text-gray-600">Package Request</p>
                     </div>
                   </div>
@@ -562,7 +657,9 @@ function ViewUserRequests() {
                 <div className="bg-teal-500  text-white p-4 rounded-2xl">
                   <div className="flex items-center gap-3 mb-3">
                     <MapPin className="w-6 h-6" />
-                    <span className="text-lg font-bold">{selectedRequest.destination}</span>
+                    <span className="text-lg font-bold">
+                      {selectedRequest.destination}
+                    </span>
                   </div>
                   <p className="text-sm opacity-90">Dream Destination</p>
                 </div>
@@ -578,36 +675,53 @@ function ViewUserRequests() {
                 <div className="bg-white rounded-2xl p-4 shadow-md">
                   <div className="flex items-center gap-3 mb-3">
                     <Calendar className="w-5 h-5 text-teal-600" />
-                    <span className="font-semibold text-gray-900">Travel Date</span>
+                    <span className="font-semibold text-gray-900">
+                      Travel Date
+                    </span>
                   </div>
-                  <p className="text-gray-700 ml-8">{new Date(selectedRequest.travelDate).toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}</p>
+                  <p className="text-gray-700 ml-8">
+                    {new Date(selectedRequest.travelDate).toLocaleDateString(
+                      "en-US",
+                      {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      },
+                    )}
+                  </p>
                 </div>
 
                 <div className="bg-white rounded-2xl p-4 shadow-md">
                   <div className="flex items-center gap-3 mb-3">
                     <Clock className="w-5 h-5 text-cyan-600" />
-                    <span className="font-semibold text-gray-900">Duration</span>
+                    <span className="font-semibold text-gray-900">
+                      Duration
+                    </span>
                   </div>
-                  <p className="text-gray-700 ml-8">{selectedRequest.duration}</p>
+                  <p className="text-gray-700 ml-8">
+                    {selectedRequest.duration}
+                  </p>
                 </div>
 
                 <div className="bg-white rounded-2xl p-4 shadow-md">
                   <div className="flex items-center gap-3 mb-3">
                     <Users className="w-5 h-5 text-emerald-600" />
-                    <span className="font-semibold text-gray-900">Travelers</span>
+                    <span className="font-semibold text-gray-900">
+                      Travelers
+                    </span>
                   </div>
-                  <p className="text-gray-700 ml-8">{selectedRequest.travelers} people</p>
+                  <p className="text-gray-700 ml-8">
+                    {selectedRequest.travelers} people
+                  </p>
                 </div>
 
                 <div className="bg-white rounded-2xl p-4 shadow-md">
                   <div className="flex items-center gap-3 mb-3">
                     <IndianRupee className="w-5 h-5 text-amber-600" />
-                    <span className="font-semibold text-gray-900">Budget Range</span>
+                    <span className="font-semibold text-gray-900">
+                      Budget Range
+                    </span>
                   </div>
                   <p className="text-gray-700 ml-8">{selectedRequest.budget}</p>
                 </div>
@@ -616,30 +730,46 @@ function ViewUserRequests() {
                   <div className="bg-white rounded-2xl p-4 shadow-md">
                     <div className="flex items-center gap-3 mb-3">
                       <Heart className="w-5 h-5 text-purple-600" />
-                      <span className="font-semibold text-gray-900">Special Requests</span>
+                      <span className="font-semibold text-gray-900">
+                        Special Requests
+                      </span>
                     </div>
-                    <p className="text-gray-700 ml-8 leading-relaxed">{selectedRequest.specialRequests}</p>
+                    <p className="text-gray-700 ml-8 leading-relaxed">
+                      {selectedRequest.specialRequests}
+                    </p>
                   </div>
                 )}
 
                 {/* Quick Stats */}
                 <div className="bg-gradient-to-r from-teal-100 to-cyan-100 rounded-2xl p-4 mt-6">
-                  <h4 className="font-semibold text-teal-800 mb-3">Quick Reference</h4>
+                  <h4 className="font-semibold text-teal-800 mb-3">
+                    Quick Reference
+                  </h4>
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div className="bg-white/50 rounded-lg p-2 text-center">
-                      <div className="font-bold text-teal-700">{selectedRequest.travelers}</div>
+                      <div className="font-bold text-teal-700">
+                        {selectedRequest.travelers}
+                      </div>
                       <div className="text-teal-600">Travelers</div>
                     </div>
                     <div className="bg-white/50 rounded-lg p-2 text-center">
-                      <div className="font-bold text-teal-700">{selectedRequest.duration}</div>
+                      <div className="font-bold text-teal-700">
+                        {selectedRequest.duration}
+                      </div>
                       <div className="text-teal-600">Duration</div>
                     </div>
                     <div className="bg-white/50 rounded-lg p-2 text-center">
-                      <div className="font-bold text-teal-700">{selectedRequest.budget.split(' - ')[0]}</div>
+                      <div className="font-bold text-teal-700">
+                        {selectedRequest.budget.split(" - ")[0]}
+                      </div>
                       <div className="text-teal-600">Min Budget</div>
                     </div>
                     <div className="bg-white/50 rounded-lg p-2 text-center">
-                      <div className="font-bold text-teal-700">{new Date(selectedRequest.travelDate).toLocaleDateString()}</div>
+                      <div className="font-bold text-teal-700">
+                        {new Date(
+                          selectedRequest.travelDate,
+                        ).toLocaleDateString()}
+                      </div>
                       <div className="text-teal-600">Travel Date</div>
                     </div>
                   </div>
@@ -652,8 +782,15 @@ function ViewUserRequests() {
               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 z-10">
                 <div className="flex items-center gap-3">
                   <Package className="w-6 h-6 text-teal-600" />
-                  <h2 className="text-xl font-bold text-gray-900">Create Package</h2>
-                  <span className="text-sm text-gray-600">for {selectedRequest.user?.name || selectedRequest.user?.username}'s request</span>
+                  <h2 className="text-xl font-bold text-gray-900">
+                    Create Package
+                  </h2>
+                  <span className="text-sm text-gray-600">
+                    for{" "}
+                    {selectedRequest.user?.name ||
+                      selectedRequest.user?.username}
+                    's request
+                  </span>
                 </div>
               </div>
 
@@ -663,8 +800,9 @@ function ViewUserRequests() {
                     mode="create"
                     preFilledData={preFilledData}
                     specificUserId={selectedRequest.userId}
+                    requestId={selectedRequest.id}
                     onSuccess={handlePackageSuccess}
-                    refetch={() => {}} // We'll handle refresh in handlePackageSuccess
+                    refetch={() => {}} 
                   />
                 )}
               </div>

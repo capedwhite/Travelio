@@ -45,5 +45,12 @@ export const PackageRequest = sequelize.define("packageRequest", {
     allowNull: false,
     defaultValue: "pending"
   },
-  
+  packageId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: "packages",
+      key: "id"
+    }
+  }
 });

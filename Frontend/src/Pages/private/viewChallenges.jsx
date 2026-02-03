@@ -119,7 +119,7 @@ function SubmissionModal({
             <button
               onClick={() => onSetWinner(challengeId, submission.userId)}
               disabled={isSettingWinner}
-              className="bg-[#3ab19d] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#2d9b8a] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="bg-[#ebc173] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#2d9b8a] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {isSettingWinner ? (
                 <ClipLoader size={20} color="#ffffff" />
@@ -441,7 +441,7 @@ function ViewChallenges() {
 
                                 <div className="flex items-center gap-3">
                                   {challenge.winnerId === submission.userId && (
-                                    <div className="bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1.5">
+                                    <div className="bg-yellow-100 text-yellow-700 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1.5">
                                       <Crown className="w-4 h-4" />
                                       Winner
                                     </div>

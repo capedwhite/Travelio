@@ -51,10 +51,10 @@ import { useAuth } from "../context/authContext";
             <LucideClipboardPen size={18} />
             My Requests
           </li></Link>
-                              <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                            <Link to = "/myawards"> <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <Award size={18} />
             Challenge badges
-          </li>
+          </li></Link> 
       <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <Save size={18} />
           Saved Packages

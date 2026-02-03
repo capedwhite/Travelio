@@ -17,13 +17,12 @@ import Modal from "../../components/Modal";
 function buildPackageFormData(data, mode) {
   const formData = new FormData();
 
-
   formData.append("basicInfo", JSON.stringify(data.basicInfo));
   formData.append("pricing", JSON.stringify(data.pricing));
   formData.append("locations", JSON.stringify(data.locations));
   formData.append("touristSpots", JSON.stringify(data.touristSpots));
   formData.append("itinerary", JSON.stringify(data.itinerary));
-   console.log(data.availability)
+  console.log(data.availability);
   const hotelsData = data.hotels.map((hotel) => ({
     name: hotel.name,
     location: hotel.location,
@@ -44,7 +43,6 @@ function buildPackageFormData(data, mode) {
 
   formData.append("availability", JSON.stringify(data.availability));
 
-
   if (data.media.coverImage instanceof File) {
     formData.append("coverImage", data.media.coverImage);
   }
@@ -59,7 +57,7 @@ function buildPackageFormData(data, mode) {
       }
     });
   }
-console.log(formData)
+  console.log(formData);
   return formData;
 }
 
@@ -105,10 +103,22 @@ const steps = [
   "Publish",
 ];
 
-function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,refetch,key, preFilledData = null, visibility = 'public', specificUserId = null, bargainid = null}) {
+function PackageForm({
+  mode = "create",
+  packageId = null,
+  packageData,
+  onSuccess,
+  refetch,
+  key,
+  preFilledData = null,
+  visibility = "public",
+  specificUserId = null,
+  bargainid = null,
+  requestId = null,
+}) {
   const [loading, setLoading] = useState(false);
   const [initialData, setInitialData] = useState(null);
-  const [formKey, setFormKey] = useState(0); 
+  const [formKey, setFormKey] = useState(0);
 
   const methods = useForm({
     defaultValues: preFilledData || defaultValues,
@@ -118,7 +128,7 @@ function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,
   const { handleSubmit, watch, control, reset } = methods;
   const [activeIndex, setActiveIndex] = useState(0);
   const [completedSteps, setCompletedSteps] = useState(new Set());
-  const formData =watch()
+  const formData = watch();
 
   useEffect(() => {
     if (mode === "edit" && packageId) {
@@ -141,7 +151,6 @@ function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,
       setLoading(false);
     }
   };
-
 
   const transformPackageToForm = (data) => {
     return {
@@ -180,7 +189,7 @@ function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,
               rating: hotel.rating || "",
               amenities: hotel.amenities || "",
               hotelImages: hotel.hotelImages || [],
-              existingImages: hotel.hotelImages || [], 
+              existingImages: hotel.hotelImages || [],
             }))
           : [
               {
@@ -192,15 +201,19 @@ function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,
               },
             ],
       availability: {
-        startDate: data.availability.startDate ? formatDateForInput(data.availability.startDate) : "",
-        endDate: data.availability.endDate ? formatDateForInput(data.availability.endDate) : "",
+        startDate: data.availability.startDate
+          ? formatDateForInput(data.availability.startDate)
+          : "",
+        endDate: data.availability.endDate
+          ? formatDateForInput(data.availability.endDate)
+          : "",
         maxBookings: data.availability.maxBookings || "",
         inclusion: data.inclusions.join("\n") || "",
         exclusion: data.exclusions.join("\n") || "",
       },
       media: {
         coverImage: data.images.coverImage || null,
-        touristLocationImages: data.images.tourist|| [],
+        touristLocationImages: data.images.tourist || [],
         existingCoverImage: data.images.coverImage || null,
         existingTouristImages: data.images.tourist || [],
       },
@@ -228,7 +241,7 @@ function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,
         return formData.locations.country && formData.locations.city;
       case "Tourist Spots":
         return formData.touristSpots.every(
-          (spot) => spot.spotname && spot.location
+          (spot) => spot.spotname && spot.location,
         );
       case "Itinerary":
         return formData.itinerary.every((day) => day.title && day.description);
@@ -278,22 +291,25 @@ function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      console.log(data)
+      console.log(data);
       const formData = buildPackageFormData(data, mode);
 
-      // Add visibility and specificUserId and bargain id 
-      formData.append('visibility', visibility);
+      // Add visibility and specificUserId and bargain id
+      formData.append("visibility", visibility);
       if (specificUserId) {
-        formData.append('specificUserId', specificUserId);
+        formData.append("specificUserId", specificUserId);
       }
-      if(bargainid){
-        formData.append("bargainId",bargainid);
+      if (requestId) {
+        formData.append("requestId", requestId);
+      }
+      if (bargainid) {
+        formData.append("bargainId", bargainid);
       }
 
       let res;
       if (mode === "edit") {
-        console.log(packageId)
-        console.log(formData)
+        console.log(packageId);
+        console.log(formData);
         res = await api.put(`/admin/addpackages/${packageId}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
@@ -310,7 +326,7 @@ function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,
           await refetch();
         }
       }
-      onSuccess?.()
+      onSuccess?.();
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.message || `Failed to ${mode} package`);
@@ -373,10 +389,10 @@ function PackageForm({ mode = "create", packageId = null ,packageData,onSuccess,
                   isActive
                     ? "bg-teal-500 text-white"
                     : isCompleted
-                    ? "bg-teal-100 text-teal-700"
-                    : canAccess
-                    ? "hover:bg-gray-100"
-                    : "opacity-50 cursor-not-allowed"
+                      ? "bg-teal-100 text-teal-700"
+                      : canAccess
+                        ? "hover:bg-gray-100"
+                        : "opacity-50 cursor-not-allowed"
                 }`}
                 onClick={() => canAccess && setActiveIndex(index)}
                 disabled={!canAccess}
@@ -445,14 +461,14 @@ function CreatePackage() {
 
   useEffect(() => {
     getallpackages();
-  },[] );
+  }, []);
 
   return (
     <>
       <AdminSidebar />
 
       <div className="p-8 pt-2 bg-gray-50 min-h-screen ml-64">
-        <PackageForm refetch={getallpackages}/>
+        <PackageForm refetch={getallpackages} />
 
         <AdminPackagesTable packages={allpackages} refetch={getallpackages} />
       </div>
@@ -461,7 +477,7 @@ function CreatePackage() {
 }
 
 function BasicInfoSection() {
-  const { register, setValue, control,watch } = useFormContext();
+  const { register, setValue, control, watch } = useFormContext();
   const tags = [
     "Budget Friendly",
     "Adventure Package",
@@ -473,8 +489,8 @@ function BasicInfoSection() {
     control,
     name: "basicInfo.tag",
   });
-const titleValue = watch("basicInfo.title");
-console.log("Current title value:", titleValue);
+  const titleValue = watch("basicInfo.title");
+  console.log("Current title value:", titleValue);
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold">Basic Info</h2>
@@ -908,18 +924,20 @@ function MediaSection({ mode }) {
 
   useEffect(() => {
     if (mode === "edit") {
-    
       if (media.existingCoverImage && !coverPreview) {
-        const imageUrl = typeof media.existingCoverImage === 'string' 
-          ? `http://localhost:3000/${media.existingCoverImage}`
-          : URL.createObjectURL(media.existingCoverImage);
+        const imageUrl =
+          typeof media.existingCoverImage === "string"
+            ? `http://localhost:3000/${media.existingCoverImage}`
+            : URL.createObjectURL(media.existingCoverImage);
         setCoverPreview(imageUrl);
       }
 
- 
-      if (media.existingTouristImages?.length > 0 && touristPreviews.length === 0) {
-        const previews = media.existingTouristImages.map(img => {
-          if (typeof img === 'string') {
+      if (
+        media.existingTouristImages?.length > 0 &&
+        touristPreviews.length === 0
+      ) {
+        const previews = media.existingTouristImages.map((img) => {
+          if (typeof img === "string") {
             return `http://localhost:3000/${img}`;
           } else if (img instanceof File || img instanceof Blob) {
             return URL.createObjectURL(img);
@@ -941,12 +959,9 @@ function MediaSection({ mode }) {
   const handleTouristChange = (files) => {
     const newFiles = Array.from(files);
     const currentImages = media.touristLocationImages || [];
-    
-    setValue("media.touristLocationImages", [
-      ...currentImages,
-      ...newFiles,
-    ]);
-    
+
+    setValue("media.touristLocationImages", [...currentImages, ...newFiles]);
+
     setTouristPreviews([
       ...touristPreviews,
       ...newFiles.map((f) => URL.createObjectURL(f)),
@@ -955,7 +970,7 @@ function MediaSection({ mode }) {
 
   const removeTourist = (index) => {
     const existingCount = media.existingTouristImages?.length || 0;
-    
+
     if (index < existingCount) {
       // Removing an existing image
       const updatedExisting = [...(media.existingTouristImages || [])];
@@ -968,7 +983,7 @@ function MediaSection({ mode }) {
       updatedFiles.splice(newImageIndex, 1);
       setValue("media.touristLocationImages", updatedFiles);
     }
-    
+
     const updatedPreviews = [...touristPreviews];
     updatedPreviews.splice(index, 1);
     setTouristPreviews(updatedPreviews);
@@ -983,7 +998,7 @@ function MediaSection({ mode }) {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold">Media</h2>
-      
+
       {/* Cover Image */}
       <div className="space-y-2">
         <label className="block font-medium">Cover Image *</label>
@@ -1014,7 +1029,7 @@ function MediaSection({ mode }) {
       {/* Tourist Location Images */}
       <div className="space-y-2">
         <label className="block font-medium">
-          Tourist Location Images * 
+          Tourist Location Images *
           {mode === "edit" && touristPreviews.length > 0 && (
             <span className="text-sm text-gray-500 ml-2">
               ({touristPreviews.length} images)
@@ -1085,7 +1100,7 @@ function AdminPackagesTable({ packages, refetch }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterTag, setFilterTag] = useState("All");
   const [filterStatus, setFilterStatus] = useState("All");
-  const[selectedpackageId,setPackageid]=useState(null)
+  const [selectedpackageId, setPackageid] = useState(null);
   const [editPackage, setEditPackage] = useState(null);
 
   const tags = [
@@ -1098,19 +1113,17 @@ function AdminPackagesTable({ packages, refetch }) {
   ];
   const statuses = ["All", "Active", "Inactive"];
 
-  const handleEdit = async(id) => {
+  const handleEdit = async (id) => {
     try {
-       const res = await api.get(`/admin/addpackages/${id}`);
-    setEditPackage(res.data.data);
+      const res = await api.get(`/admin/addpackages/${id}`);
+      setEditPackage(res.data.data);
       console.log("Edit package:", id);
-      setPackageid(id)
+      setPackageid(id);
       setShowdialog(true);
     } catch (error) {
       console.log(error);
     }
-
   };
-       
 
   const handleDelete = async (id) => {
     try {
@@ -1122,8 +1135,6 @@ function AdminPackagesTable({ packages, refetch }) {
       toast.error(error.response?.data?.message || "something went wrong");
     }
   };
-
-
 
   const columns = [
     {
@@ -1169,12 +1180,12 @@ function AdminPackagesTable({ packages, refetch }) {
             row.tags?.[0] === "Luxury"
               ? "bg-purple-100 text-purple-700"
               : row.tags?.[0] === "Budget Friendly"
-              ? "bg-green-100 text-green-700"
-              : row.tags?.[0] === "Adventure Package"
-              ? "bg-orange-100 text-orange-700"
-              : row.tags?.[0] === "Family Friendly"
-              ? "bg-blue-100 text-blue-700"
-              : "bg-pink-100 text-pink-700"
+                ? "bg-green-100 text-green-700"
+                : row.tags?.[0] === "Adventure Package"
+                  ? "bg-orange-100 text-orange-700"
+                  : row.tags?.[0] === "Family Friendly"
+                    ? "bg-blue-100 text-blue-700"
+                    : "bg-pink-100 text-pink-700"
           }`}
         >
           {row.tags?.[0]}
@@ -1234,7 +1245,6 @@ function AdminPackagesTable({ packages, refetch }) {
       name: "Actions",
       cell: (row) => (
         <div className="flex items-center gap-2">
-         
           <button
             onClick={() => handleEdit(row.id)}
             className="p-2 hover:bg-teal-50 text-teal-600 rounded-lg transition"
@@ -1305,27 +1315,30 @@ function AdminPackagesTable({ packages, refetch }) {
   return (
     <div className="pr-8 pl-8 pt-6 pb-8 bg-gray-50 min-h-screen">
       {/* Header */}
-      
+
       <div className="flex justify-between items-center mb-8">
         <div>
-          <p className="text-gray-500 mt-1 text-lg">Manage all your travel packages</p>
+          <p className="text-gray-500 mt-1 text-lg">
+            Manage all your travel packages
+          </p>
         </div>
       </div>
- {
-        showdialog && editPackage && ( <Modal
-  isOpen={showdialog}
-  onClose={() => setShowdialog(false)}
-  title="Edit Package"
->
-  <PackageForm
-     key={selectedpackageId} 
-    mode="edit"
-    packageData={editPackage}
-    packageId={selectedpackageId}
-    onSuccess={() => setShowdialog(false)}
-    refetch={refetch}
-  />
-</Modal>)}
+      {showdialog && editPackage && (
+        <Modal
+          isOpen={showdialog}
+          onClose={() => setShowdialog(false)}
+          title="Edit Package"
+        >
+          <PackageForm
+            key={selectedpackageId}
+            mode="edit"
+            packageData={editPackage}
+            packageId={selectedpackageId}
+            onSuccess={() => setShowdialog(false)}
+            refetch={refetch}
+          />
+        </Modal>
+      )}
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
@@ -1369,7 +1382,7 @@ function AdminPackagesTable({ packages, refetch }) {
               <p className="text-3xl font-bold text-gray-900 mt-2">
                 {packages.reduce(
                   (sum, p) => sum + (p.bookings?.length || 0),
-                  0
+                  0,
                 )}
               </p>
             </div>
