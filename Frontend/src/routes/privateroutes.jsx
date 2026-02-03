@@ -1,27 +1,51 @@
-import React, { Suspense } from "react"
-import { Navigate, Route, Routes } from "react-router-dom"
-import NavBar from "../components/Usernavbar"
-import AboutPage from "../Pages/public/aboutpage"
-import ProtectedRoute from "./protectedroute"
-import { ClipLoader } from "react-spinners"
-import RoleRedirect from "./roleRedirect"
-import MyChallengeAwards from "../Pages/private/Mychallengebadges"
+import React, { Suspense } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
+import NavBar from "../components/Usernavbar";
+import AboutPage from "../Pages/public/aboutpage";
+import ProtectedRoute from "./protectedroute";
+import { ClipLoader } from "react-spinners";
+import RoleRedirect from "./roleRedirect";
+import MyChallengeAwards from "../Pages/private/Mychallengebadges";
 
-
-const ExplorePackages = React.lazy(()=>import("../Pages/private/ExplorePackages"))
-const CreatePackage=React.lazy(()=>import("../Pages/private/CreatePackage"))
-const PackageDetailsPage=React.lazy(()=>import("../Pages/private/packagedetails"))
-const PackageSocialFeed=React.lazy(()=>import("../Pages/private/SocialFeed"))
-const TravelChallenges=React.lazy(()=>import("../Pages/private/ChallengesPage"))
-const MyProfile=React.lazy(()=>import("../Pages/private/Myprofile"))
-const MyBookingStatus=React.lazy(()=>import("../Pages/private/Mybookingstatus"))
-const AdminDashboard=React.lazy(()=>import("../Pages/private/admindashboard"))
-const AdminBookingsPage =React.lazy(()=>import("../Pages/private/viewbookings"))
-const BargainRequests = React.lazy(()=>import("../Pages/private/adminbargainpage"))
-const AddChallenges = React.lazy(()=>import("../Pages/private/AddChalleges"))
-const ViewChallenges = React.lazy(()=>import("../Pages/private/viewChallenges"))
-const ViewUserRequests = React.lazy(()=>import("../Pages/private/viewuserRequests"))
-const Mypackagerequests = React.lazy(()=>import("../Pages/private/Mypackagerequests"))
+const ExplorePackages = React.lazy(
+  () => import("../Pages/private/ExplorePackages"),
+);
+const CreatePackage = React.lazy(
+  () => import("../Pages/private/CreatePackage"),
+);
+const PackageDetailsPage = React.lazy(
+  () => import("../Pages/private/packagedetails"),
+);
+const PackageSocialFeed = React.lazy(
+  () => import("../Pages/private/SocialFeed"),
+);
+const TravelChallenges = React.lazy(
+  () => import("../Pages/private/ChallengesPage"),
+);
+const MyProfile = React.lazy(() => import("../Pages/private/Myprofile"));
+const MyBookingStatus = React.lazy(
+  () => import("../Pages/private/Mybookingstatus"),
+);
+const AdminDashboard = React.lazy(
+  () => import("../Pages/private/admindashboard"),
+);
+const AdminBookingsPage = React.lazy(
+  () => import("../Pages/private/viewbookings"),
+);
+const BargainRequests = React.lazy(
+  () => import("../Pages/private/adminbargainpage"),
+);
+const AddChallenges = React.lazy(() => import("../Pages/private/AddChalleges"));
+const ViewChallenges = React.lazy(
+  () => import("../Pages/private/viewChallenges"),
+);
+const ViewUserRequests = React.lazy(
+  () => import("../Pages/private/viewuserRequests"),
+);
+const Mypackagerequests = React.lazy(
+  () => import("../Pages/private/Mypackagerequests"),
+);
+const MyFavourites = React.lazy(() => import("../Pages/private/myfavourties"));
 const PrivateRoutes = () => {
   return (
     <Suspense fallback={<ClipLoader></ClipLoader>}>
@@ -78,11 +102,11 @@ const PrivateRoutes = () => {
             </NavBar>
           }
         ></Route>
-             <Route
+        <Route
           path="/myawards"
           element={
             <NavBar>
-             <MyChallengeAwards/>
+              <MyChallengeAwards />
             </NavBar>
           }
         ></Route>
@@ -90,7 +114,15 @@ const PrivateRoutes = () => {
           path="/mypackagerequests"
           element={
             <NavBar>
-            <Mypackagerequests></Mypackagerequests>
+              <Mypackagerequests></Mypackagerequests>
+            </NavBar>
+          }
+        ></Route>
+        <Route
+          path="/myfavourites"
+          element={
+            <NavBar>
+              <MyFavourites></MyFavourites>
             </NavBar>
           }
         ></Route>
@@ -107,9 +139,7 @@ const PrivateRoutes = () => {
           path="/admin/dashboard"
           element={
             <ProtectedRoute allowedroles={["Admin"]}>
-
-                <AdminDashboard></AdminDashboard>
-
+              <AdminDashboard></AdminDashboard>
             </ProtectedRoute>
           }
         />
@@ -117,9 +147,7 @@ const PrivateRoutes = () => {
           path="/admin/createpackages"
           element={
             <ProtectedRoute allowedroles={["Admin"]}>
- 
-                <CreatePackage></CreatePackage>
-      
+              <CreatePackage></CreatePackage>
             </ProtectedRoute>
           }
         />
@@ -127,9 +155,7 @@ const PrivateRoutes = () => {
           path="/admin/bookings"
           element={
             <ProtectedRoute allowedroles={["Admin"]}>
- 
-                <AdminBookingsPage></AdminBookingsPage>
-
+              <AdminBookingsPage></AdminBookingsPage>
             </ProtectedRoute>
           }
         />
@@ -137,18 +163,15 @@ const PrivateRoutes = () => {
           path="/admin/bargainrequest"
           element={
             <ProtectedRoute allowedroles={["Admin"]}>
-
-                <BargainRequests></BargainRequests>
-
+              <BargainRequests></BargainRequests>
             </ProtectedRoute>
           }
         />
-                <Route
+        <Route
           path="/admin/addchallenges"
           element={
             <ProtectedRoute allowedroles={["Admin"]}>
-
-               <AddChallenges></AddChallenges>
+              <AddChallenges></AddChallenges>
             </ProtectedRoute>
           }
         />
@@ -156,8 +179,7 @@ const PrivateRoutes = () => {
           path="/admin/viewchallenges"
           element={
             <ProtectedRoute allowedroles={["Admin"]}>
-
-               <ViewChallenges></ViewChallenges>
+              <ViewChallenges></ViewChallenges>
             </ProtectedRoute>
           }
         />
@@ -165,20 +187,23 @@ const PrivateRoutes = () => {
           path="/admin/viewuserrequests"
           element={
             <ProtectedRoute allowedroles={["Admin"]}>
-
-               <ViewUserRequests></ViewUserRequests>
+              <ViewUserRequests></ViewUserRequests>
             </ProtectedRoute>
           }
         />
 
         <Route
           path="/unauthorized"
-          element={<p className="flex items-center justify-center text-4xl h-[100dvh] font-bold ">Unauthorized page</p>}
+          element={
+            <p className="flex items-center justify-center text-4xl h-[100dvh] font-bold ">
+              Unauthorized page
+            </p>
+          }
         ></Route>
 
-        <Route path="*" element={<RoleRedirect/>} />
+        <Route path="*" element={<RoleRedirect />} />
       </Routes>
     </Suspense>
-  )
-}
-export default PrivateRoutes
+  );
+};
+export default PrivateRoutes;

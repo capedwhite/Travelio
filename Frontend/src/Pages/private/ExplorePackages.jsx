@@ -37,6 +37,8 @@ function ExplorePackages() {
   const [packageid, setPackageid] = useState(null);
   const [activeFilter, setActiveFilter] = useState("All");
   const [loading, setLoading] = useState(false);
+  const [favoriteIds, setFavoriteIds] = useState([]);
+  const [togglingFavorite, setTogglingFavorite] = useState(null);
   const {
     register: bookingregister,
     handleSubmit: bookingsubmit,
@@ -101,6 +103,37 @@ function ExplorePackages() {
     };
     getallpackages();
   }, [activeFilter]);
+
+  // Fetch user's favorite IDs on mount
+  useEffect(() => {
+    const fetchFavoriteIds = async () => {
+      try {
+        const res = await api.get("/user/favorites/ids");
+        setFavoriteIds(res.data.data || []);
+      } catch (error) {
+        console.log("Error fetching favorites:", error);
+      }
+    };
+    fetchFavoriteIds();
+  }, []);
+
+  const handleToggleFavorite = async (packageId, e) => {
+    e.stopPropagation();
+    setTogglingFavorite(packageId);
+    try {
+      const res = await api.post("/user/favorites/toggle", { packageId });
+      if (res.data.isFavorited) {
+        setFavoriteIds((prev) => [...prev, packageId]);
+      } else {
+        setFavoriteIds((prev) => prev.filter((id) => id !== packageId));
+      }
+    } catch (error) {
+      console.log("Error toggling favorite:", error);
+      alert(error.response?.data?.message || "Failed to update favorite");
+    } finally {
+      setTogglingFavorite(null);
+    }
+  };
   const navigate = useNavigate();
   if (loading) {
     return (
@@ -224,8 +257,22 @@ function ExplorePackages() {
 
                       {/* Heart icon for favorites */}
                       <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                        <button className="p-1.5 bg-white/80 rounded-full hover:bg-white transition-all">
-                          <Heart className="w-4 h-4 text-gray-600" />
+                        <button
+                          className={`p-1.5 rounded-full transition-all ${
+                            favoriteIds.includes(pkg.id)
+                              ? "bg-red-500 hover:bg-red-600"
+                              : "bg-white/80 hover:bg-white"
+                          }`}
+                          onClick={(e) => handleToggleFavorite(pkg.id, e)}
+                          disabled={togglingFavorite === pkg.id}
+                        >
+                          <Heart
+                            className={`w-4 h-4 transition-colors ${
+                              favoriteIds.includes(pkg.id)
+                                ? "text-white fill-white"
+                                : "text-gray-600"
+                            }`}
+                          />
                         </button>
                       </div>
                     </div>

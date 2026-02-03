@@ -44,6 +44,11 @@ import {
   addReview,
   deleteReview,
 } from "../Controller/reviewController.js";
+import {
+  toggleFavorite,
+  getUserFavorites,
+  getUserFavoriteIds,
+} from "../Controller/favoriteController.js";
 import upload from "../Config/multer.js";
 
 const router = express.Router();
@@ -87,5 +92,10 @@ router.put("/awards/:awardId/use", markAwardAsUsed);
 router.get("/packages/:packageId/reviews", getPackageReviews);
 router.post("/packages/:packageId/reviews", addReview);
 router.delete("/reviews/:reviewId", deleteReview);
+
+// Favorite Routes
+router.post("/favorites/toggle", toggleFavorite);
+router.get("/favorites", getUserFavorites);
+router.get("/favorites/ids", getUserFavoriteIds);
 
 export default router;

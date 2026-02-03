@@ -79,3 +79,10 @@ Package.hasMany(Review, { foreignKey: "packageId" });
 Review.belongsTo(Package, { foreignKey: "packageId" });
 User.hasMany(Review, { foreignKey: "userId" });
 Review.belongsTo(User, { foreignKey: "userId" });
+
+// Favorite Associations
+import { Favorite } from "./favoriteModel.js";
+Package.hasMany(Favorite, { foreignKey: "packageId" });
+Favorite.belongsTo(Package, { foreignKey: "packageId" });
+User.hasMany(Favorite, { foreignKey: "userId" });
+Favorite.belongsTo(User, { foreignKey: "userId" });

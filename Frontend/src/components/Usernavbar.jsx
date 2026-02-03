@@ -55,10 +55,10 @@ import { useAuth } from "../context/authContext";
             <Award size={18} />
             Challenge badges
           </li></Link> 
-      <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
+      <Link to = "/myfavourites"><li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <Save size={18} />
           Saved Packages
-          </li>
+          </li></Link>
           <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-red-600 cursor-pointer" onClick={logout}>
             <LogOut size={18} />
             Logout
