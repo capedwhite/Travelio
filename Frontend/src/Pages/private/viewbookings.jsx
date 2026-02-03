@@ -4,7 +4,6 @@ import {
   Package,
   TrendingUp,
   Users,
-  IndianRupee,
   Calendar,
   MapPin,
   Eye,
@@ -13,9 +12,15 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  Sparkles,
   Award,
-  Plane
+  User,
+  Phone,
+  Mail,
+  Receipt,
+  DollarSign,
+  Crown,
+  Percent,
+  Ticket
 } from "lucide-react";
 import api from "../../api/axios";
 import toast from "react-hot-toast";
@@ -31,7 +36,7 @@ function AdminBookingsPage() {
     try {
       setLoading(true);
       const res = await api.get("/admin/packagebooking");
-      setAllBookings(res.data.data);
+      setAllBookings(res.data.data || []);
       console.log(res.data.data);
     } catch (error) {
       console.log(error.message);
@@ -62,8 +67,11 @@ function AdminBookingsPage() {
     return (
       <>
         <AdminSidebar />
-        <div className="ml-64 min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center">
-          <ClipLoader size={50} color="#8b5cf6" />
+        <div className="ml-64 min-h-screen bg-slate-50 flex items-center justify-center">
+          <div className="text-center">
+            <ClipLoader size={50} color="#64748b" />
+            <p className="text-slate-600 mt-4 font-medium">Loading premium bookings...</p>
+          </div>
         </div>
       </>
     );
@@ -73,11 +81,13 @@ function AdminBookingsPage() {
     return (
       <>
         <AdminSidebar />
-        <div className="ml-64 min-h-screen bg-gradient-to-r from-teal-600 to-emerald-200 flex items-center justify-center">
+        <div className="ml-64 min-h-screen bg-slate-50 flex items-center justify-center">
           <div className="text-center">
-            <Package className="w-24 h-24 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-gray-600 mb-2">No Bookings Found</h3>
-            <p className="text-gray-500">No bookings have been made yet.</p>
+            <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Receipt className="w-12 h-12 text-slate-400" />
+            </div>
+            <h3 className="text-2xl font-bold text-slate-600 mb-2">No Bookings Found</h3>
+            <p className="text-slate-500">No bookings have been made yet.</p>
           </div>
         </div>
       </>
@@ -85,302 +95,431 @@ function AdminBookingsPage() {
   }
 
   // Calculate total stats
-  const totalBookings = allBookings.reduce((sum, pkg) => sum + pkg.bookings.length, 0);
-  const totalRevenue = allBookings.reduce((sum, pkg) =>
-    sum + (pkg.bookings.length * Number(pkg.price.originalPrice)), 0
-  );
+  const totalBookings = allBookings.reduce((sum, pkg) => sum + (pkg.bookings?.length || 0), 0);
+  const totalRevenue = Math.round(allBookings.reduce((sum, pkg) => {
+    const packageRevenue = pkg.bookings
+      ?.filter(booking => true) // Include all bookings for now to debug
+      ?.reduce((pkgSum, booking) => {
+
+        let price = 0;
+        if (booking.price?.finalTotal) {
+          price = booking.price.finalTotal;
+        }
+        const parsedPrice = typeof price === 'string' ? parseFloat(price) || 0 : price;
+        return pkgSum + parsedPrice;
+      }, 0) || 0;
+    return sum + packageRevenue;
+  }, 0));
   const confirmedBookings = allBookings.reduce((sum, pkg) =>
-    sum + pkg.bookings.filter(b => b.status === "Confirmed").length, 0
+    sum + (pkg.bookings?.filter(b => b.status?.toLowerCase() === "confirmed" || b.status?.toLowerCase() === "paid")?.length || 0), 0
   );
 
   return (
     <>
       <AdminSidebar />
-      <div className="ml-64 min-h-screen">
+      <div className="ml-64 min-h-screen bg-slate-50">
         <div className="p-8 space-y-8">
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-3 bg-gradient-to-r from-teal-100 to-emerald-100 px-6 py-3 rounded-full mb-4">
-              <Plane className="w-6 h-6 text-teal-500" />
-              <span className="text-lg font-bold bg-gradient-to-r from-teal-600 to-emerald-400 bg-clip-text text-transparent">
-                Package Bookings Dashboard
-              </span>
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-4 bg-white px-8 py-4 rounded-2xl shadow-lg border border-slate-200 mb-6">
+              <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center">
+                <Crown className="w-6 h-6 text-slate-600" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-slate-800">Premium Bookings Dashboard</h1>
+                <p className="text-slate-600">Luxury travel management at your fingertips</p>
+              </div>
             </div>
-            <p className="text-gray-600 text-lg">Manage and track all travel package bookings</p>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50 hover:shadow-2xl transition-all duration-300">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Total Bookings</p>
-                  <p className="text-3xl font-bold text-indigo-600">{totalBookings}</p>
-                  <p className="text-xs text-gray-500 mt-1">Across all packages</p>
+                  <p className="text-sm font-medium text-slate-600 mb-2">Total Bookings</p>
+                  <p className="text-3xl font-bold text-slate-800">{totalBookings}</p>
+                  <p className="text-xs text-slate-500 mt-1">All time bookings</p>
                 </div>
-                <div className="w-14 h-14 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-full flex items-center justify-center">
-                  <Users className="w-7 h-7 text-indigo-600" />
+                <div className="w-14 h-14 bg-slate-100 rounded-xl flex items-center justify-center">
+                  <Receipt className="w-7 h-7 text-slate-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50 hover:shadow-2xl transition-all duration-300">
+            <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
-                  <p className="text-3xl font-bold text-emerald-600 flex items-center">
-                    <IndianRupee className="w-6 h-6" />
+                  <p className="text-sm font-medium text-slate-600 mb-2">Total Revenue</p>
+                  <p className="text-3xl font-bold text-emerald-700 flex items-center">
+                    <DollarSign className="w-6 h-6" />
                     {totalRevenue.toLocaleString()}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">Total earnings</p>
+                  <p className="text-xs text-slate-500 mt-1">Confirmed earnings</p>
                 </div>
-                <div className="w-14 h-14 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-full flex items-center justify-center">
+                <div className="w-14 h-14 bg-emerald-100 rounded-xl flex items-center justify-center">
                   <TrendingUp className="w-7 h-7 text-emerald-600" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50 hover:shadow-2xl transition-all duration-300">
+            <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Confirmed</p>
-                  <p className="text-3xl font-bold text-pink-600">{confirmedBookings}</p>
-                  <p className="text-xs text-gray-500 mt-1">Confirmed bookings</p>
+                  <p className="text-sm font-medium text-slate-600 mb-2">Confirmed</p>
+                  <p className="text-3xl font-bold text-blue-700">{confirmedBookings}</p>
+                  <p className="text-xs text-slate-500 mt-1">Active bookings</p>
                 </div>
-                <div className="w-14 h-14 bg-gradient-to-r from-pink-100 to-rose-100 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-7 h-7 text-pink-600" />
+                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <CheckCircle className="w-7 h-7 text-blue-600" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-600 mb-2">Conversion Rate</p>
+                  <p className="text-3xl font-bold text-purple-700">
+                    {totalBookings > 0 ? Math.round((confirmedBookings / totalBookings) * 100) : 0}%
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1">Booking success</p>
+                </div>
+                <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center">
+                  <Percent className="w-7 h-7 text-purple-600" />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Packages */}
-          <div className="space-y-6">
-            {allBookings.map((pkg) => {
-              const packageRevenue = pkg.bookings.length * Number(pkg.price.originalPrice);
-              const packageConfirmed = pkg.bookings.filter(b => b.status === "Confirmed").length;
 
-              return (
-                <div
-                  key={pkg.id}
-                  className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-white/50 overflow-hidden hover:shadow-2xl transition-all duration-300"
-                >
-                  {/* Package Header */}
-                  <div className="bg-white
- p-6 text-black">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 bg-[#3ab19d]/40 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                          <Package className="w-8 h-8" />
+          {/* Packages List */}
+          <div className="space-y-6">
+            {allBookings.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Package className="w-12 h-12 text-slate-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-slate-600 mb-2">No packages found</h3>
+                <p className="text-slate-500">No packages have been created yet.</p>
+              </div>
+            ) : (
+              allBookings.map((pkg) => {
+                const packageBookings = pkg.bookings || [];
+                const packageRevenue = packageBookings
+                  .filter(booking => true) // Include all bookings for now to debug
+                  .reduce((sum, booking) => {
+                    // Use finalTotal if available, otherwise calculate from discountedPrice * travelers or originalPrice * travelers
+                    let price = 0;
+                    if (booking.price?.finalTotal) {
+                      price = booking.price.finalTotal;
+                    } else if (booking.price?.total) {
+                      price = booking.price.total;
+                    } else if (booking.price?.discountedPrice) {
+                      price = (parseFloat(booking.price.discountedPrice) || 0) * (booking.Travelers || 1);
+                    } else if (booking.price?.originalPrice) {
+                      price = (parseFloat(booking.price.originalPrice) || 0) * (booking.Travelers || 1);
+                    }
+                    const parsedPrice = typeof price === 'string' ? parseFloat(price) || 0 : price;
+                    return sum + parsedPrice;
+                  }, 0);
+                const confirmedCount = packageBookings.filter(b => b.status?.toLowerCase() === "confirmed" || b.status?.toLowerCase() === "paid").length;
+
+                return (
+                  <div
+                    key={pkg.id}
+                    className="bg-white rounded-3xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-300"
+                  >
+                    {/* Package Header */}
+                    <div className="bg-slate-50 p-6 border-b border-slate-200">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="w-16 h-16 bg-[#3ab19d] rounded-2xl flex items-center justify-center">
+                            <Package className="w-8 h-8 text-white" />
+                          </div>
+                          <div>
+                            <h2 className="text-xl font-bold text-slate-800">{pkg.title}</h2>
+                            <div className="flex items-center gap-4 text-sm text-slate-600 mt-1">
+                              <span className="flex items-center gap-1">
+                                <Calendar className="w-4 h-4" />
+                                Created: {new Date(pkg.createdAt).toLocaleDateString()}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <DollarSign className="w-4 h-4" />
+                                {pkg.price?.currency} {Number(pkg.price?.originalPrice || 0).toLocaleString()}
+                              </span>
+                            </div>
+                            <p className="text-sm text-slate-600 mt-1 line-clamp-2">{pkg.description}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h2 className="text-xl font-bold mb-1">{pkg.title}</h2>
-                          <div className="flex items-center gap-4 text-sm text-black/70">
-                            <span className="flex items-center gap-1">
-                              <Calendar className="w-4 h-4" />
-                              {new Date(pkg.createdAt).toLocaleDateString()}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <IndianRupee className="w-4 h-4" />
-                              {Number(pkg.price.originalPrice).toLocaleString()}
-                            </span>
+
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-slate-800">{packageBookings.length}</div>
+                          <div className="text-sm text-slate-600">Total Bookings</div>
+                          <div className="flex gap-2 mt-2">
+                            <div className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-lg text-xs font-medium">
+                              {confirmedCount} Confirmed
+                            </div>
+                            <div className="bg-slate-100 text-slate-700 px-2 py-1 rounded-lg text-xs font-medium">
+                              Revenue: {pkg.price?.currency} {packageRevenue.toLocaleString()}
+                            </div>
                           </div>
                         </div>
                       </div>
-
-                      <div className="text-right">
-                        <div className="text-2xl font-bold mb-1">{pkg.bookings.length}</div>
-                        <div className="text-sm text-black/70">Total Bookings</div>
-                      </div>
                     </div>
 
-                    {/* Package Stats */}
-                    <div className="grid grid-cols-3 gap-4 mt-6">
-                      <div className="bg-[#3ab19d]/30 rounded-xl p-3 backdrop-blur-sm">
-                        <div className="text-lg font-bold">{pkg.bookings.length}</div>
-                        <div className="text-xs text-black/70">Total</div>
-                      </div>
-                      <div className="bg-[#3ab19d]/30 rounded-xl p-3 backdrop-blur-sm">
-                        <div className="text-lg font-bold text-green-700">{packageConfirmed}</div>
-                        <div className="text-xs text-black/70">Confirmed</div>
-                      </div>
-                      <div className="bg-[#3ab19d]/30 rounded-xl p-3 backdrop-blur-sm">
-                        <div className="text-lg font-bold text-yellow-600">₹{packageRevenue.toLocaleString()}</div>
-                        <div className="text-xs text-black/70">Revenue</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Toggle Button */}
-                  <div className="p-6 border-b border-gray-100">
-                    <button
-                      onClick={() =>
-                        setExpandedPackage(
-                          expandedPackage === pkg.id ? null : pkg.id
-                        )
-                      }
-                      className="w-full bg-teal-600 text-white py-3 px-6 rounded-2xl font-semibold hover:shadow-lg hover:shadow-indigo-500/25 transition-all duration-300 flex items-center justify-center gap-2"
-                    >
-                      {expandedPackage === pkg.id ? (
-                        <>
-                          <EyeOff className="w-5 h-5" />
-                          Hide Booking Details
-                        </>
-                      ) : (
-                        <>
-                          <Eye className="w-5 h-5" />
-                          View Booking Details
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  {/* Bookings Table */}
-                  {expandedPackage === pkg.id && (
+                    {/* Toggle Bookings Button */}
                     <div className="p-6">
-                      <BookingsTable
-                        allBooking={pkg.bookings}
-                        packagePrice={pkg.price.originalPrice}
-                        onStatusChange={handleStatusChange}
-                        updatingStatus={updatingStatus}
-                      />
+                      <button
+                        onClick={() =>
+                          setExpandedPackage(
+                            expandedPackage === pkg.id ? null : pkg.id
+                          )
+                        }
+                        className="w-full bg-[#3ab19d] text-white py-3 px-6 rounded-2xl font-semibold hover:bg-[#2d9b8a] transition-all duration-300 flex items-center justify-center gap-2"
+                      >
+                        {expandedPackage === pkg.id ? (
+                          <>
+                            <EyeOff className="w-5 h-5" />
+                            Hide Bookings
+                          </>
+                        ) : (
+                          <>
+                            <Eye className="w-5 h-5" />
+                            View Bookings ({packageBookings.length})
+                          </>
+                        )}
+                      </button>
                     </div>
-                  )}
-                </div>
-              );
-            })}
+
+                    {/* Bookings List */}
+                    {expandedPackage === pkg.id && (
+                      <div className="px-6 pb-6">
+                        {packageBookings.length === 0 ? (
+                          <div className="text-center py-8 bg-slate-50 rounded-2xl">
+                            <Receipt className="w-12 h-12 text-slate-400 mx-auto mb-2" />
+                            <p className="text-slate-600">No bookings for this package yet</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-4">
+                            {packageBookings.map((booking) => (
+                              <BookingDetailsCard
+                                key={booking.bookingId}
+                                booking={booking}
+                                onStatusChange={handleStatusChange}
+                                updatingStatus={updatingStatus}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
       </div>
     </>
   );
 }
-function BookingsTable({ allBooking, packagePrice, onStatusChange, updatingStatus }) {
+function BookingDetailsCard({ booking, onStatusChange, updatingStatus }) {
   return (
-    <div className="space-y-4">
-      {allBooking.map((booking) => (
-        <div
-          key={booking.bookingId}
-          className="bg-gradient-to-r from-white to-gray-50/50 rounded-2xl border border-gray-100 p-6 hover:shadow-lg transition-all duration-300"
-        >
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* User Info */}
-            <div className="space-y-2">
-              <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                <Users className="w-4 h-4 text-indigo-600" />
-                Customer Details
-              </h4>
-              <div className="space-y-1">
-                <p className="font-medium text-gray-900">{booking.Fullname}</p>
-                <p className="text-sm text-gray-600">{booking.Email}</p>
-                <p className="text-sm text-gray-600">{booking.Phone}</p>
-              </div>
+    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+      <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-0">
+        {/* Customer Information */}
+        <div className="p-6 border-r border-slate-200">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-[#3ab19d] rounded-xl flex items-center justify-center">
+              <User className="w-5 h-5 text-white" />
             </div>
-
-            {/* Booking Info */}
-            <div className="space-y-2">
-              <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-purple-600" />
-                Booking Details
-              </h4>
-              <div className="space-y-1">
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">Travelers:</span> {booking.Travelers}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">Date:</span> {new Date(booking.Date).toLocaleDateString()}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">ID:</span> #{booking.bookingId}
-                </p>
-              </div>
+            <h3 className="text-lg font-bold text-slate-800">Customer Details</h3>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <User className="w-4 h-4 text-slate-500" />
+              <span className="font-semibold text-slate-800">{booking.Fullname}</span>
             </div>
-
-            {/* Payment Info */}
-            <div className="space-y-2">
-              <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                <IndianRupee className="w-4 h-4 text-emerald-600" />
-                Payment Details
-              </h4>
-              <div className="space-y-1">
-                <p className="text-lg font-bold text-emerald-600">
-                  ₹{Number(packagePrice).toLocaleString()}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Per Person: ₹{Number(packagePrice).toLocaleString()}
-                </p>
-              </div>
+            <div className="flex items-center gap-3">
+              <Mail className="w-4 h-4 text-slate-500" />
+              <span className="text-slate-600">{booking.Email}</span>
             </div>
+            <div className="flex items-center gap-3">
+              <Phone className="w-4 h-4 text-slate-500" />
+              <span className="text-slate-600">{booking.Phone}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Calendar className="w-4 h-4 text-slate-500" />
+              <span className="text-slate-600">
+                Joined: {booking.user?.createdAt ? new Date(booking.user.createdAt).toLocaleDateString() : 'N/A'}
+              </span>
+            </div>
+          </div>
+        </div>
 
-            {/* Status & Actions */}
+
+        {/* Payment & Status */}
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+              <CreditCard className="w-5 h-5 text-white" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-800">Payment & Status</h3>
+          </div>
+
+          {/* Price Breakdown */}
+          <div className="bg-white rounded-xl p-4 mb-4 border border-slate-200">
+            <h4 className="font-semibold text-slate-800 mb-3">Price Breakdown</h4>
             <div className="space-y-2">
-              <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                <CreditCard className="w-4 h-4 text-pink-600" />
-                Payment Status
-              </h4>
-              <div className="space-y-3">
-                {/* Status Badge */}
-                <div className="flex items-center gap-2">
-                  {booking.status === "Paid" && <CheckCircle className="w-4 h-4 text-emerald-600" />}
-                  {booking.status === "Not paid" && <Clock className="w-4 h-4 text-yellow-600" />}
-                  {booking.status === "Confirmed" && <Award className="w-4 h-4 text-cyan-200" />}
-                  {booking.status === "Cancelled" && <XCircle className="w-4 h-4 text-red-600" />}
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      booking.status === "Paid"
-                        ? "bg-emerald-100 text-emerald-700"
-                        : booking.status === "Confirmed"
-                        ? "bg-blue-100 text-blue-700"
-                        : booking.status === "Not paid"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
-                  >
-                    {booking.status}
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-slate-600">Original Price:</span>
+                <span className="text-sm text-slate-800">
+                  {booking.price?.currency} {booking.price?.total?.toLocaleString() || booking.price?.originalPrice?.toLocaleString()}
+                </span>
+              </div>
+              {booking.price?.couponApplied && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-green-600">Coupon Discount:</span>
+                  <span className="text-sm text-green-600">
+                    -{booking.price?.currency} {booking.price?.couponDiscount?.toLocaleString()}
                   </span>
                 </div>
-
-                {/* Status Change Buttons */}
-                <div className="space-y-1">
-                  {updatingStatus === booking.bookingId ? (
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <ClipLoader size={16} color="#8b5cf6" />
-                      <span>Updating...</span>
-                    </div>
-                  ) : (
-                    <div className="flex flex-wrap gap-1">
-                      {booking.status !== "Paid" && (
-                        <button
-                          onClick={() => onStatusChange(booking.bookingId, "Paid")}
-                          className="px-3 py-1 bg-emerald-500 text-white text-xs rounded-lg hover:bg-emerald-600 transition-all duration-200 font-medium"
-                        >
-                          Mark Paid
-                        </button>
-                      )}
-                      {booking.status !== "Confirmed" && booking.status === "Paid" && (
-                        <button
-                          onClick={() => onStatusChange(booking.bookingId, "Confirmed")}
-                          className="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-all duration-200 font-medium"
-                        >
-                          Confirm
-                        </button>
-                      )}
-                      {booking.status !== "Cancelled" && (
-                        <button
-                          onClick={() => onStatusChange(booking.bookingId, "Cancelled")}
-                          className="px-3 py-1 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition-all duration-200 font-medium"
-                        >
-                          Cancel
-                        </button>
-                      )}
-                    </div>
-                  )}
+              )}
+              <div className="border-t border-slate-300 pt-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-slate-800">Final Total:</span>
+                  <span className="font-bold text-emerald-600">
+                    {booking.price?.currency} {booking.price?.finalTotal?.toLocaleString() || booking.price?.total?.toLocaleString()}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Booking Coupon */}
+          {booking.bookingCoupon && (
+            <div className="bg-yellow-50 rounded-xl p-4 mb-4 border border-yellow-200">
+              <div className="flex items-center gap-2 mb-2">
+                <Ticket className="w-4 h-4 text-yellow-600" />
+                <span className="font-semibold text-yellow-800">Booking Coupon</span>
+              </div>
+              <div className="bg-white border-2 border-yellow-300 rounded-lg p-2">
+                <p className="text-center font-mono font-bold text-yellow-700">{booking.bookingCoupon}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Status & Actions */}
+          <div className="space-y-3">
+            <div>
+              <span className="text-sm font-semibold text-slate-700">Current Status:</span>
+              <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-sm font-semibold ml-2 ${
+                booking.status?.toLowerCase() === "paid"
+                  ? "bg-emerald-100 text-emerald-700"
+                  : booking.status?.toLowerCase() === "confirmed"
+                  ? "bg-blue-100 text-blue-700"
+                  : booking.status?.toLowerCase() === "not paid"
+                  ? "bg-yellow-100 text-yellow-700"
+                  : "bg-red-100 text-red-700"
+              }`}>
+                {booking.status?.toLowerCase() === "paid" && <CheckCircle className="w-4 h-4" />}
+                {booking.status?.toLowerCase() === "confirmed" && <Award className="w-4 h-4" />}
+                {booking.status?.toLowerCase() === "not paid" && <Clock className="w-4 h-4" />}
+                {booking.status?.toLowerCase() === "cancelled" && <XCircle className="w-4 h-4" />}
+                {booking.status || "Unknown"}
+              </div>
+            </div>
+
+            {/* Status Change Buttons */}
+            <div className="flex flex-wrap gap-2">
+              {updatingStatus === booking.bookingId ? (
+                <div className="flex items-center gap-2 text-sm text-slate-500 bg-slate-100 px-3 py-2 rounded-lg">
+                  <ClipLoader size={16} color="#64748b" />
+                  <span>Updating...</span>
+                </div>
+              ) : booking.status?.toLowerCase() === "confirmed" ? (
+                <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+                  <CheckCircle className="w-4 h-4" />
+                  <span>Booking Confirmed - No further actions needed</span>
+                </div>
+              ) : (
+                <>
+                  {booking.status !== "Paid" && (
+                    <button
+                      onClick={() => onStatusChange(booking.bookingId, "Paid")}
+                      className="px-4 py-2 bg-emerald-600 text-white text-sm rounded-lg hover:bg-emerald-700 transition-all duration-200 font-medium"
+                    >
+                      Mark Paid
+                    </button>
+                  )}
+                  {booking.status !== "Confirmed" && booking.status === "Paid" && (
+                    <button
+                      onClick={() => onStatusChange(booking.bookingId, "Confirmed")}
+                      className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium"
+                    >
+                      Confirm
+                    </button>
+                  )}
+                  {booking.status !== "Cancelled" && (
+                    <button
+                      onClick={() => onStatusChange(booking.bookingId, "Cancelled")}
+                      className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-all duration-200 font-medium"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
         </div>
-      ))}
+      </div>
+
+      {/* Travel Dates */}
+      <div className="bg-white p-6 border-t border-slate-200">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center">
+            <Calendar className="w-5 h-5 text-white" />
+          </div>
+          <h3 className="text-lg font-bold text-slate-800">Travel Schedule</h3>
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="bg-slate-50 rounded-xl p-4">
+            <div className="text-sm text-slate-600 mb-1">Travel Date</div>
+            <div className="font-semibold text-slate-800">
+              {new Date(booking.Date).toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </div>
+          </div>
+          <div className="bg-slate-50 rounded-xl p-4">
+            <div className="text-sm text-slate-600 mb-1">Booking Created</div>
+            <div className="font-semibold text-slate-800">
+              {new Date(booking.createdAt).toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </div>
+          </div>
+          <div className="bg-slate-50 rounded-xl p-4">
+            <div className="text-sm text-slate-600 mb-1">Last Updated</div>
+            <div className="font-semibold text-slate-800">
+              {new Date(booking.updatedAt).toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

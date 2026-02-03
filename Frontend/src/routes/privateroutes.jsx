@@ -4,6 +4,7 @@ import NavBar from "../components/Usernavbar"
 import AboutPage from "../Pages/public/aboutpage"
 import ProtectedRoute from "./protectedroute"
 import { ClipLoader } from "react-spinners"
+import RoleRedirect from "./roleRedirect"
 
 
 const ExplorePackages = React.lazy(()=>import("../Pages/private/ExplorePackages"))
@@ -166,7 +167,7 @@ const PrivateRoutes = () => {
           element={<p className="flex items-center justify-center text-4xl h-[100dvh] font-bold ">Unauthorized page</p>}
         ></Route>
 
-        <Route path="*" element={<Navigate to="/explorepackages" replace></Navigate>} />
+        <Route path="*" element={<RoleRedirect/>} />
       </Routes>
     </Suspense>
   )

@@ -4,7 +4,6 @@ import { Comment } from "../Model/Comments.js";
 import { Follow } from "../Model/Follow.js";
 import { User } from "../Model/userModel.js";
 
-// User profile management functions
 export const getProfile = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -14,7 +13,15 @@ export const getProfile = async (req, res) => {
     }
 
     const user = await User.findByPk(userId, {
-      attributes: ["id", "username", "email", "name", "bio", "profileImage", "usertype"],
+      attributes: [
+        "id",
+        "username",
+        "email",
+        "name",
+        "bio",
+        "profileImage",
+        "usertype",
+      ],
     });
 
     if (!user) {
@@ -45,13 +52,11 @@ export const updateUserProfile = async (req, res) => {
       return res.status(404).send({ message: "User not found" });
     }
 
-    // Handle profile image upload
     let profileImagePath = user.profileImage; // Keep existing image by default
     if (req.file) {
       profileImagePath = req.file.path.replace(/\\/g, "/");
     }
 
-    // Update fields
     if (username) user.username = username;
     if (email) user.email = email;
     if (name) user.name = name;
@@ -124,7 +129,7 @@ export const getAllPosts = async (req, res) => {
       include: [
         {
           model: User,
-          attributes: ["id", "username", "email"],
+          attributes: ["id", "username", "email","profileImage"],
         },
         {
           model: Like,
@@ -132,7 +137,7 @@ export const getAllPosts = async (req, res) => {
           include: [
             {
               model: User,
-              attributes: ["id", "username"],
+              attributes: ["id", "username","profileImage"],
             },
           ],
         },
@@ -142,7 +147,7 @@ export const getAllPosts = async (req, res) => {
           include: [
             {
               model: User,
-              attributes: ["id", "username"],
+              attributes: ["id", "username","profileImage"],
             },
           ],
         },
@@ -265,14 +270,18 @@ export const toggleFollow = async (req, res) => {
     if (existingFollow) {
       // Unfollow
       await existingFollow.destroy();
-      res.status(200).send({ message: "User unfollowed successfully" });
+      res
+        .status(200)
+        .send({ isFollowing: false, message: "User unfollowed successfully" });
     } else {
       // Follow
       await Follow.create({
         followerId: currentUserId,
         followingId: targetUserId,
       });
-      res.status(201).send({ message: "User followed successfully" });
+      res
+        .status(200)
+        .send({ isFollowing: true, message: "User followed successfully" });
     }
   } catch (error) {
     console.log(error.message);
@@ -280,7 +289,6 @@ export const toggleFollow = async (req, res) => {
   }
 };
 
-// Get top users by post count
 export const getTopUsers = async (req, res) => {
   try {
     const topUsers = await User.findAll({
@@ -294,14 +302,16 @@ export const getTopUsers = async (req, res) => {
       attributes: [
         "id",
         "username",
+        "profileImage",
         [
           User.sequelize.fn("COUNT", User.sequelize.col("posts.id")),
           "postCount",
         ],
       ],
-      group: ["users.id"],
-      order: [[User.sequelize.literal("postCount"), "DESC"]],
+      group: ["users.id", "users.username", "users.profileImage"],
+      order: [[User.sequelize.literal('"postCount"'), "DESC"]],
       limit: 10,
+      subQuery: false,
     });
 
     res.status(200).send({
@@ -314,7 +324,6 @@ export const getTopUsers = async (req, res) => {
   }
 };
 
-// Get users that current user follows
 export const getFollowing = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -333,7 +342,7 @@ export const getFollowing = async (req, res) => {
           through: { attributes: [] },
         },
       ],
-      attributes: ["id", "username", "email"],
+      attributes: ["id", "username", "email", "profileImage"],
     });
 
     res.status(200).send({
@@ -363,7 +372,7 @@ export const getUserProfile = async (req, res) => {
               include: [
                 {
                   model: User,
-                  attributes: ["id", "username"],
+                  attributes: ["id", "username","profileImage"],
                 },
               ],
             },
@@ -373,7 +382,7 @@ export const getUserProfile = async (req, res) => {
               include: [
                 {
                   model: User,
-                  attributes: ["id", "username"],
+                  attributes: ["id", "username","profileImage"],
                 },
               ],
             },
@@ -383,13 +392,13 @@ export const getUserProfile = async (req, res) => {
         {
           model: User,
           as: "Followers",
-          attributes: ["id", "username"],
+          attributes: ["id", "username","profileImage"],
           through: { attributes: [] },
         },
         {
           model: User,
           as: "Following",
-          attributes: ["id", "username"],
+          attributes: ["id", "username","profileImage"],
           through: { attributes: [] },
         },
       ],
@@ -455,7 +464,7 @@ export const getFollowedPosts = async (req, res) => {
       attributes: ["id"],
     });
 
-    const followedUserIds = followedUsers.map(user => user.id);
+    const followedUserIds = followedUsers.map((user) => user.id);
 
     if (followedUserIds.length === 0) {
       return res.status(200).send({
@@ -472,42 +481,43 @@ export const getFollowedPosts = async (req, res) => {
       include: [
         {
           model: User,
-          attributes: ["id", "username", "email"],
+          attributes: ["id", "username", "email", "profileImage"],
         },
         {
           model: Like,
           required: false,
-          attributes: [],
+          include: [
+            {
+              model: User,
+              attributes: ["id", "username"],
+            },
+          ],
         },
         {
           model: Comment,
           required: false,
-          attributes: [],
+          include: [
+            {
+              model: User,
+              attributes: ["id", "username"],
+            },
+          ],
         },
       ],
-      attributes: [
-        "id",
-        "content",
-        "image",
-        "userId",
-        "createdAt",
-        [
-          User.sequelize.fn("COUNT", User.sequelize.fn("DISTINCT", User.sequelize.col("likes.id"))),
-          "likeCount",
-        ],
-        [
-          User.sequelize.fn("COUNT", User.sequelize.fn("DISTINCT", User.sequelize.col("comments.id"))),
-          "commentCount",
-        ],
-      ],
-      group: ["posts.id", "user.id"],
       order: [["createdAt", "DESC"]],
-      limit: 20, // Limit to prevent too many posts
-      subQuery: false,
+      limit: 20,
+    });
+
+    // Add like count and comment count
+    const postsWithCounts = posts.map((post) => {
+      const postData = post.toJSON();
+      postData.likeCount = postData.likes?.length || 0;
+      postData.commentCount = postData.comments?.length || 0;
+      return postData;
     });
 
     res.status(200).send({
-      data: posts,
+      data: postsWithCounts,
       message: "Followed posts found successfully",
     });
   } catch (error) {
@@ -516,7 +526,6 @@ export const getFollowedPosts = async (req, res) => {
   }
 };
 
-// Update a post (only by owner)
 export const updatePost = async (req, res) => {
   try {
     const { postId } = req.params;
@@ -532,11 +541,12 @@ export const updatePost = async (req, res) => {
     });
 
     if (!post) {
-      return res.status(404).send({ message: "Post not found or you don't have permission to edit it" });
+      return res.status(404).send({
+        message: "Post not found or you don't have permission to edit it",
+      });
     }
 
-    // Handle image update if provided
-    let imagePath = post.image; // Keep existing image by default
+    let imagePath = post.image;
     if (req.file) {
       imagePath = req.file.path.replace(/\\/g, "/");
     }
@@ -555,7 +565,6 @@ export const updatePost = async (req, res) => {
   }
 };
 
-// Delete a post (only by owner)
 export const deletePost = async (req, res) => {
   try {
     const { postId } = req.params;
@@ -570,10 +579,11 @@ export const deletePost = async (req, res) => {
     });
 
     if (!post) {
-      return res.status(404).send({ message: "Post not found or you don't have permission to delete it" });
+      return res.status(404).send({
+        message: "Post not found or you don't have permission to delete it",
+      });
     }
 
-    // Delete associated likes and comments first
     await Like.destroy({ where: { postId } });
     await Comment.destroy({ where: { postId } });
 

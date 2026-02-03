@@ -5,13 +5,19 @@ import { useAuth } from "../context/authContext";
 
  function ProfileHoverMenu() {
   const {logout,user}=useAuth()
+  console.log(user)
   return (
     <div className="relative group flex  justify-center items-center gap-2">
-      <img
-        src="/images/user.png"
-        alt="Profile"
-        className="w-10 h-10 rounded-full cursor-pointer border-white border-1"
-      />
+<img
+ src={
+    user?.profileImage
+      ? `http://localhost:3000/${user.profileImage}` 
+      : "/images/user.png" 
+  }
+  alt="Profile"
+  className="w-10 h-10 rounded-full cursor-pointer object-cover border-white border-1"
+/>
+
 
       <div
         className="

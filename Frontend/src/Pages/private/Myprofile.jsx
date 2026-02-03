@@ -102,14 +102,15 @@ function MyProfile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center">
-        <ClipLoader size={50} color="#8b5cf6" />
+      <div className="min-h-screen bg-teal-50 flex items-center justify-center">
+        <ClipLoader size={50} color="3ab19d" />
+        <p>Loading Profile</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+    <div className="min-h-screen bg-teal-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* HEADER */}
         <div className="text-center mb-8">

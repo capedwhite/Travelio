@@ -1,11 +1,30 @@
 import { useState, useEffect } from "react";
-import { Heart, MessageCircle, Plus, User, Send, UserPlus, UserCheck, Edit2, Trash2 } from "lucide-react";
+import {
+  Heart,
+  MessageCircle,
+  Plus,
+  User,
+  Send,
+  UserPlus,
+  UserCheck,
+  Edit2,
+  Trash2,
+} from "lucide-react";
 import api from "../../api/axios";
 import toast from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 import { useAuth } from "../../context/authContext";
 
-function PostCard({ post, onLike, onComment, onUserClick, onEdit, onDelete, isOwnPost, deleteLoading }) {
+function PostCard({
+  post,
+  onLike,
+  onComment,
+  onUserClick,
+  onEdit,
+  onDelete,
+  isOwnPost,
+  deleteLoading,
+}) {
   const [commentText, setCommentText] = useState("");
   const [showComments, setShowComments] = useState(false);
 
@@ -17,12 +36,19 @@ function PostCard({ post, onLike, onComment, onUserClick, onEdit, onDelete, isOw
 
   return (
     <div className="bg-white  rounded-2xl shadow-md overflow-hidden">
-
       {/* HEADER */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center">
-            <User className="w-5 h-5 text-teal-600" />
+            {post.user?.profileImage ? (
+              <img
+                src={`http://localhost:3000/${post.user.profileImage}`}
+                alt="Profile"
+                className="w-full h-full object-cover rounded-full"
+              />
+            ) : (
+              <User className="w-5 h-5 text-teal-600" />
+            )}
           </div>
           <button
             onClick={() => onUserClick(post.user)}
@@ -81,19 +107,19 @@ function PostCard({ post, onLike, onComment, onUserClick, onEdit, onDelete, isOw
             onClick={() => onLike(post.id)}
             className="flex items-center gap-2 text-sm font-medium hover:text-red-500 transition"
           >
-          <Heart
-            className={`w-5 h-5 ${
+            <Heart
+              className={`w-5 h-5 ${
                 post.isLiked ? "fill-red-500 text-red-500" : "text-gray-500"
-            }`}
-          />
+              }`}
+            />
             <span>{post.likeCount}</span>
-        </button>
+          </button>
 
           <button
             onClick={() => setShowComments(!showComments)}
             className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-teal-500 transition"
           >
-        <MessageCircle className="w-5 h-5" />
+            <MessageCircle className="w-5 h-5" />
             <span>{post.commentCount}</span>
           </button>
         </div>
@@ -105,17 +131,27 @@ function PostCard({ post, onLike, onComment, onUserClick, onEdit, onDelete, isOw
           {/* Existing Comments */}
           <div className="max-h-40 overflow-y-auto px-4 py-2 space-y-2">
             {post.comments && post.comments.length > 0 ? (
-              post.comments.map(comment => (
+              post.comments.map((comment) => (
                 <div key={comment.id} className="flex gap-2">
                   <div className="w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <User className="w-3 h-3 text-teal-600" />
+                     {post.user?.profileImage ? (
+              <img
+                src={`http://localhost:3000/${comment.user.profileImage}`}
+                alt="Profile"
+                className="w-full h-full object-cover rounded-full"
+              />
+            ) : (
+              <User className="w-3 h-3 text-teal-600" />
+            )}
                   </div>
                   <div className="flex-1">
                     <p className="text-xs">
                       <span className="font-semibold text-gray-900">
                         {comment.user.username}
                       </span>
-                      <span className="text-gray-700 ml-2">{comment.content}</span>
+                      <span className="text-gray-700 ml-2">
+                        {comment.content}
+                      </span>
                     </p>
                   </div>
                 </div>
@@ -125,31 +161,31 @@ function PostCard({ post, onLike, onComment, onUserClick, onEdit, onDelete, isOw
                 No comments yet
               </p>
             )}
-      </div>
+          </div>
 
           {/* Add Comment */}
           <div className="flex gap-2 p-3 border-t">
-        <input
-          value={commentText}
-          onChange={(e) => setCommentText(e.target.value)}
-          placeholder="Add a comment..."
+            <input
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              placeholder="Add a comment..."
               className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-              onKeyPress={(e) => e.key === 'Enter' && handleComment()}
-        />
-        <button
+              onKeyPress={(e) => e.key === "Enter" && handleComment()}
+            />
+            <button
               onClick={handleComment}
               className="bg-teal-600 text-white p-2 rounded-lg hover:bg-teal-700 transition"
-        >
+            >
               <Send className="w-4 h-4" />
-        </button>
-      </div>
+            </button>
+          </div>
         </div>
       )}
     </div>
   );
 }
 
-function UserProfileModal({ user, isOpen, onClose, onFollow }) {
+function UserProfileModal({ user, isOpen, onClose, onfollowChange }) {
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
@@ -162,24 +198,39 @@ function UserProfileModal({ user, isOpen, onClose, onFollow }) {
 
   const fetchUserDetails = async () => {
     if (!user?.id) return;
-    setLoading(true)
+    setLoading(true);
     try {
       const res = await api.get(`/user/users/${user.id}`);
       setUserDetails(res.data.data);
     } catch (error) {
+      console.log(error.message);
       toast.error("Failed to load user profile");
     } finally {
-setLoading(false)
+      setLoading(false);
     }
   };
 
   const handleFollowClick = async () => {
+    if (!userDetails) return;
+
+    const previousStatus = userDetails.isFollowing;
+    setUserDetails((prev) => ({ ...prev, isFollowing: !prev.isFollowing }));
     setFollowLoading(true);
+
     try {
-      await onFollow(user.id);
-      await fetchUserDetails();
+      const res = await api.post(`/user/users/${user.id}/follow`);
+
+      setUserDetails((prev) => ({
+        ...prev,
+        isFollowing: res.data.isFollowing,
+      }));
+      onfollowChange?.();
     } catch (error) {
-      // Error already handled in onFollow
+      console.error("Failed to follow/unfollow:", error);
+
+      // Step 4: Revert UI if API fails
+      setUserDetails((prev) => ({ ...prev, isFollowing: previousStatus }));
+      alert("Could not update follow status. Try again.");
     } finally {
       setFollowLoading(false);
     }
@@ -188,8 +239,14 @@ setLoading(false)
   if (!isOpen || !user) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto" onClick={e=>e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="p-6">
           <button
             onClick={onClose}
@@ -206,8 +263,16 @@ setLoading(false)
             <>
               {/* User Header */}
               <div className="text-center mb-6">
-                <div className="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <User className="w-10 h-10 text-teal-600" />
+                <div className="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
+                  {userDetails.profileImage ? (
+                    <img
+                      src={`http://localhost:3000/${userDetails.profileImage}`}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-10 h-10 text-teal-600" />
+                  )}
                 </div>
                 <h2 className="text-xl font-semibold text-gray-900">
                   {userDetails.username}
@@ -249,7 +314,10 @@ setLoading(false)
               >
                 {followLoading ? (
                   <span className="flex items-center justify-center gap-2">
-                    <ClipLoader size={16} color={userDetails.isFollowing ? "#374151" : "#ffffff"} />
+                    <ClipLoader
+                      size={16}
+                      color={userDetails.isFollowing ? "#374151" : "#ffffff"}
+                    />
                     <span>Updating...</span>
                   </span>
                 ) : userDetails.isFollowing ? (
@@ -273,7 +341,10 @@ setLoading(false)
                   </h3>
                   <div className="space-y-2">
                     {userDetails.posts.slice(0, 3).map((post) => (
-                      <div key={post.id} className="border rounded-lg p-3 bg-gray-50">
+                      <div
+                        key={post.id}
+                        className="border rounded-lg p-3 bg-gray-50"
+                      >
                         <p className="text-sm text-gray-800 line-clamp-2">
                           {post.content}
                         </p>
@@ -304,7 +375,7 @@ setLoading(false)
   );
 }
 
- function PackageSocialFeed() {
+function PackageSocialFeed() {
   const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [newPostOpen, setNewPostOpen] = useState(false);
@@ -336,12 +407,13 @@ setLoading(false)
       const res = await api.get("/user/posts");
       setPosts(res.data.data);
     } catch (error) {
-      if (!silent) toast.error("Failed to load posts");
+      if (!silent) console.log(error.message);
+      toast.error("Failed to load posts");
     } finally {
       if (!silent) setInitialLoading(false);
     }
   };
-  
+
   const fetchTopUsers = async () => {
     try {
       const res = await api.get("/user/topusers");
@@ -370,7 +442,10 @@ setLoading(false)
       console.log("Failed to load followed posts");
     }
   };
-
+  const refreshFollowingData = async () => {
+    await fetchFollowing();
+    await fetchFollowedPosts();
+  };
   const handleCreatePost = async () => {
     if (!newPostText.trim()) return;
 
@@ -398,34 +473,34 @@ setLoading(false)
   };
 
   const handleLike = async (postId) => {
-    // Optimistically update UI first
-    setPosts(prevPosts =>
-      prevPosts.map(post =>
-      post.id === postId
-        ? {
-            ...post,
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === postId
+          ? {
+              ...post,
               isLiked: !post.isLiked,
-              likeCount: post.isLiked ? post.likeCount - 1 : post.likeCount + 1
-          }
-        : post
-      )
+              likeCount: post.isLiked ? post.likeCount - 1 : post.likeCount + 1,
+            }
+          : post,
+      ),
     );
 
     try {
       await api.post(`/user/posts/${postId}/like`);
       fetchPosts(true);
     } catch (error) {
-      // Revert optimistic update on error
-      setPosts(prevPosts =>
-        prevPosts.map(post =>
-      post.id === postId
-        ? {
-            ...post,
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === postId
+            ? {
+                ...post,
                 isLiked: !post.isLiked,
-                likeCount: post.isLiked ? post.likeCount - 1 : post.likeCount + 1
-          }
-        : post
-        )
+                likeCount: post.isLiked
+                  ? post.likeCount - 1
+                  : post.likeCount + 1,
+              }
+            : post,
+        ),
       );
       toast.error("Failed to like post");
     }
@@ -443,16 +518,6 @@ setLoading(false)
   const handleUserClick = (user) => {
     setSelectedUser(user);
     setUserModalOpen(true);
-  };
-
-  const handleFollow = async (userId) => {
-    try {
-      await api.post(`/user/users/${userId}/follow`);
-      fetchFollowing();
-      fetchFollowedPosts();
-    } catch (error) {
-      toast.error("Failed to update follow status");
-    }
   };
 
   const handleEditPost = (post) => {
@@ -485,7 +550,11 @@ setLoading(false)
   };
 
   const handleDeletePost = async (postId) => {
-    if (!window.confirm("Are you sure you want to delete this post? This action cannot be undone.")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this post? This action cannot be undone.",
+      )
+    ) {
       return;
     }
 
@@ -519,12 +588,19 @@ setLoading(false)
             {followedPosts.length === 0 ? (
               <div className="text-center py-6">
                 <Heart className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-xs text-gray-500">No posts from followed users yet</p>
-                <p className="text-[10px] text-gray-400 mt-1">Start following travelers!</p>
+                <p className="text-xs text-gray-500">
+                  No posts from followed users yet
+                </p>
+                <p className="text-[10px] text-gray-400 mt-1">
+                  Start following travelers!
+                </p>
               </div>
             ) : (
               <div className="space-y-4">
-                {(showAllFollowedPosts ? followedPosts : followedPosts.slice(0, 4)).map((post, idx) => (
+                {(showAllFollowedPosts
+                  ? followedPosts
+                  : followedPosts.slice(0, 4)
+                ).map((post, idx) => (
                   <div
                     key={post.id}
                     className="bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-100 rounded-xl p-4 hover:shadow-md transition-all duration-200 cursor-pointer group"
@@ -532,8 +608,16 @@ setLoading(false)
                   >
                     {/* User Info */}
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full flex items-center justify-center ring-2 ring-white shadow-sm">
-                        <User className="w-5 h-5 text-white" />
+                      <div className="w-10 h-10 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full flex items-center justify-center ring-2 ring-white shadow-sm overflow-hidden">
+                        {post.user?.profileImage ? (
+                          <img
+                            src={`http://localhost:3000/${post.user.profileImage}`}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <User className="w-5 h-5 text-white" />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-pink-600 transition">
@@ -579,22 +663,44 @@ setLoading(false)
 
                 {followedPosts.length > 4 && (
                   <button
-                    onClick={() => setShowAllFollowedPosts(!showAllFollowedPosts)}
+                    onClick={() =>
+                      setShowAllFollowedPosts(!showAllFollowedPosts)
+                    }
                     className="w-full mt-3 py-2 px-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white text-xs font-medium rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
                   >
                     <div className="flex items-center justify-center gap-2">
                       {showAllFollowedPosts ? (
                         <>
                           <span>Show Less</span>
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                          <svg
+                            className="w-3 h-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 15l7-7 7 7"
+                            />
                           </svg>
                         </>
                       ) : (
                         <>
                           <span>View All ({followedPosts.length})</span>
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          <svg
+                            className="w-3 h-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7"
+                            />
                           </svg>
                         </>
                       )}
@@ -628,10 +734,10 @@ setLoading(false)
             </div>
           ) : (
             <div className="space-y-6">
-      {posts.map(post => (
-        <PostCard
-          key={post.id}
-          post={post}
+              {posts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
                   onLike={handleLike}
                   onComment={handleComment}
                   onUserClick={handleUserClick}
@@ -639,11 +745,10 @@ setLoading(false)
                   onDelete={handleDeletePost}
                   isOwnPost={user?.id === post.userId}
                   deleteLoading={deleteLoading}
-        />
-      ))}
+                />
+              ))}
             </div>
           )}
-    
         </div>
 
         {/* RIGHT SIDEBAR */}
@@ -664,17 +769,30 @@ setLoading(false)
               </div>
             ) : (
               <div className="space-y-3">
-                {topUsers.slice(0, 5).map((user, idx) => (
+                {topUsers.slice(0, 3).map((user, idx) => (
                   <div
                     key={user.id}
                     className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition"
                     onClick={() => handleUserClick(user)}
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center">
-                        <span className="text-xs font-bold text-teal-700">
-                          {idx + 1}
-                        </span>
+                      <div className="relative">
+                        <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center overflow-hidden">
+                          {user.profileImage ? (
+                            <img
+                              src={`http://localhost:3000/${user.profileImage}`}
+                              alt="Profile"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <User className="w-5 h-5 text-teal-600" />
+                          )}
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-teal-600 rounded-full flex items-center justify-center border-2 border-white">
+                          <span className="text-[10px] font-bold text-white">
+                            {idx + 1}
+                          </span>
+                        </div>
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-gray-900 truncate">
@@ -697,13 +815,13 @@ setLoading(false)
               <UserCheck className="w-4 h-4 text-green-600" />
               Following
             </h2>
-            <p className="text-xs text-gray-500 mb-4">
-              People you follow
-            </p>
+            <p className="text-xs text-gray-500 mb-4">People you follow</p>
             {!following || following.length === 0 ? (
               <div className="text-center py-4">
                 <UserCheck className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-xs text-gray-500">Not following anyone yet</p>
+                <p className="text-xs text-gray-500">
+                  Not following anyone yet
+                </p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -714,16 +832,22 @@ setLoading(false)
                     onClick={() => handleUserClick(user)}
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                        <User className="w-4 h-4 text-green-600" />
+                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center overflow-hidden">
+                        {user.profileImage ? (
+                          <img
+                            src={`http://localhost:3000/${user.profileImage}`}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <User className="w-5 h-5 text-green-600" />
+                        )}
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-gray-900 truncate">
                           {user.username}
                         </p>
-                        <p className="text-xs text-gray-500">
-                          Following
-                        </p>
+                        <p className="text-xs text-gray-500">Following</p>
                       </div>
                     </div>
                   </div>
@@ -844,7 +968,9 @@ setLoading(false)
                 )}
               </div>
               {editingPost.image && !editImage && (
-                <p className="text-xs text-gray-500 mt-1">Current image will be kept</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Current image will be kept
+                </p>
               )}
             </div>
 
@@ -872,7 +998,7 @@ setLoading(false)
         user={selectedUser}
         isOpen={userModalOpen}
         onClose={() => setUserModalOpen(false)}
-        onFollow={handleFollow}
+        onfollowChange={refreshFollowingData}
       />
     </div>
   );

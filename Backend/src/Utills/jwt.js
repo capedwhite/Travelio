@@ -9,7 +9,8 @@ export const generateToken = (user)=>{
             id:user.id,
             email:user.email,
             username:user.username,
-            usertype:user.usertype
+            usertype:user.usertype,
+            profileImage:user.profileImage
         },
         JWT_SECRET,
         {expiresIn:"7d"}

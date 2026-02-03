@@ -173,18 +173,28 @@ function LoginPage() {
   );
 }
 export const GoogleSuccess = () => {
+  const { login } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const token = params.get("token");
-    if (token) {
-      localStorage.setItem("authtoken", token);
-      navigate("/explorepackages");
-    } else {
-      navigate("/login");
-    }
-  }, [location, navigate]);
-  return <p>Logging in...</p>;
+    const handleGoogleLogin = async () => {
+      const params = new URLSearchParams(location.search);
+      const token = params.get("token");
+
+      if (!token) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      await login(token);   
+      navigate("/explorepackages", { replace: true });
+    };
+
+    handleGoogleLogin();
+  }, [location, navigate, login]);
+
+  return <div className="min-h-screen display-flex items-center justify-center"><p>Logging in...</p></div>;
 };
+
 export default LoginPage;
