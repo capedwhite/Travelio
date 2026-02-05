@@ -78,6 +78,14 @@ const PrivateRoutes = () => {
             </NavBar>
           }
         ></Route>
+                <Route
+                  path="/about"
+                  element={
+        <NavBar>
+                      <AboutPage></AboutPage>
+        </NavBar>
+                  }
+                ></Route>
         <Route
           path="/challenges"
           element={

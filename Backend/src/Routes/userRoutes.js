@@ -49,9 +49,13 @@ import {
   getUserFavorites,
   getUserFavoriteIds,
 } from "../Controller/favoriteController.js";
+import { userHeartbeat } from "../Controller/dashboardController.js";
 import upload from "../Config/multer.js";
 
 const router = express.Router();
+
+// Heartbeat for tracking active users
+router.post("/heartbeat", userHeartbeat);
 
 router.get("/init", init);
 router.get("/explorepackages", getactivePackage);

@@ -139,11 +139,12 @@ function ExplorePackages() {
     return (
       <div className="flex justify-center py-50">
         <ClipLoader size={35} color="#14B8A6" />
+        <p>Loading Explore packages</p>
       </div>
     );
   }
   return (
-    <div className="min-h-screen bg-[#e2e8f0]">
+    <div className="min-h-screen bg-slate-50">
       <div className="max-w-7xl mx-auto p-4 sm:p-6 pb-20">
         {/* Hero Section */}
         <div className="bg-[#3ab19d] rounded-2xl mb-8 p-8 text-center text-white">

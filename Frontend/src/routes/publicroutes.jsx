@@ -23,9 +23,9 @@ const Publicroutes = () => {
         <Route
           path="/about"
           element={
-            <NavBar>
+
               <AboutPage></AboutPage>
-            </NavBar>
+
           }
         ></Route>
         <Route

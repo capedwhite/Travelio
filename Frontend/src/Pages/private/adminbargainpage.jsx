@@ -123,7 +123,16 @@ const BargainRequests = () => {
     return (
       <>
         <AdminSidebar />
-        <div className="ml-64 min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="    min-h-screen
+    bg-slate-50
+    flex
+    items-center
+    justify-center
+    px-4
+    pt-20
+    md:pt-0
+    md:ml-64
+  ">
           <div className="text-center">
             <ClipLoader size={50} color="#64748b" />
             <p className="text-slate-600 mt-4 font-medium">Loading bargain requests...</p>
@@ -138,7 +147,15 @@ const BargainRequests = () => {
     return (
       <>
         <AdminSidebar />
-        <div className="ml-64 min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="min-h-screen
+    bg-slate-50
+    flex
+    items-center
+    justify-center
+    px-4
+    pt-20
+    md:pt-0
+    md:ml-64">
           <div className="text-center">
             <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Handshake className="w-12 h-12 text-slate-400" />
@@ -155,7 +172,9 @@ const BargainRequests = () => {
   return (
     <>
       <AdminSidebar />
-      <div className="ml-64 min-h-screen bg-slate-50">
+      <div className="md:ml-64 min-h-screen bg-slate-50    px-4
+    pt-20
+    md:pt-0">
         <div className="p-8 space-y-8">
           {/* Header */}
           <div className="text-center mb-12">
