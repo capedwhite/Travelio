@@ -73,17 +73,21 @@ const PrivateRoutes = () => {
         <Route
           path="/socialfeed"
           element={
+            <ProtectedRoute allowedroles={["User"]}>
             <NavBar>
               <PackageSocialFeed></PackageSocialFeed>
             </NavBar>
+            </ProtectedRoute>
           }
         ></Route>
                 <Route
                   path="/about"
                   element={
+        <ProtectedRoute allowedroles={["User"]}>
         <NavBar>
                       <AboutPage></AboutPage>
         </NavBar>
+        </ProtectedRoute>
                   }
                 ></Route>
         <Route

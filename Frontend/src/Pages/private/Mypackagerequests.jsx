@@ -223,7 +223,7 @@ function Mypackagerequests() {
                     {/* Request Details */}
                     <div className="p-6">
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                        <div className="bg-gray-50 rounded-xl p-4 text-center">
+                        <div className="bg-teal-100 rounded-xl p-4 text-center">
                           <Calendar className="w-6 h-6 text-teal-600 mx-auto mb-2" />
                           <div className="text-sm text-gray-600 mb-1">
                             Travel Date
@@ -232,7 +232,7 @@ function Mypackagerequests() {
                             {formatDate(request.travelDate)}
                           </div>
                         </div>
-                        <div className="bg-gray-50 rounded-xl p-4 text-center">
+                        <div className="bg-teal-100 rounded-xl p-4 text-center">
                           <Clock className="w-6 h-6 text-cyan-600 mx-auto mb-2" />
                           <div className="text-sm text-gray-600 mb-1">
                             Duration
@@ -241,7 +241,7 @@ function Mypackagerequests() {
                             {request.duration}
                           </div>
                         </div>
-                        <div className="bg-gray-50 rounded-xl p-4 text-center">
+                        <div className="bg-teal-100 rounded-xl p-4 text-center">
                           <Users className="w-6 h-6 text-emerald-600 mx-auto mb-2" />
                           <div className="text-sm text-gray-600 mb-1">
                             Travelers
@@ -250,7 +250,7 @@ function Mypackagerequests() {
                             {request.travelers}
                           </div>
                         </div>
-                        <div className="bg-gray-50 rounded-xl p-4 text-center">
+                        <div className="bg-teal-100 rounded-xl p-4 text-center">
                           <IndianRupee className="w-6 h-6 text-amber-600 mx-auto mb-2" />
                           <div className="text-sm text-gray-600 mb-1">
                             Budget
@@ -263,7 +263,7 @@ function Mypackagerequests() {
 
                       {/* Special Requests */}
                       {request.specialRequests && (
-                        <div className="bg-blue-50 rounded-xl p-4 mb-6">
+                        <div className="bg-green-100 rounded-xl p-4 mb-6">
                           <div className="flex items-center gap-2 mb-2">
                             <Heart className="w-5 h-5 text-blue-600" />
                             <span className="font-semibold text-gray-900">

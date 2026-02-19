@@ -16,9 +16,9 @@ import {
   CheckCircle,
   Sparkles,
 } from "lucide-react";
-import LandingNavbar from "../../components/LandingNavbar";
 
-// Floating animation component
+
+
 function FloatingElement({ children, delay = 0, y = 15 }) {
   return (
     <motion.div
@@ -79,12 +79,19 @@ export default function AboutPage() {
 
   return (
     <div className="bg-white overflow-hidden">
-      <LandingNavbar />
+
 
       {/* Hero Section */}
       <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden pt-20">
         {/* Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#e8fff9] via-white to-[#f2fffd]" />
+
+          <div
+    className="absolute inset-0 bg-cover bg-center z-1"
+    style={{
+      backgroundImage: "url('/images/aboutbg.png')",
+    }}
+  />
+
 
         {/* Decorative elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -118,17 +125,6 @@ export default function AboutPage() {
             </FloatingElement>
           </div>
 
-          {/* Dotted pattern */}
-          <div className="absolute inset-0 opacity-20">
-            <div
-              className="w-full h-full"
-              style={{
-                backgroundImage:
-                  "radial-gradient(circle, #3ab19d 1px, transparent 1px)",
-                backgroundSize: "40px 40px",
-              }}
-            />
-          </div>
         </div>
 
         {/* Content */}
@@ -154,11 +150,11 @@ export default function AboutPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-6"
+              className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-[#51b3a1] leading-tight mb-6"
             >
               Turning Trips Into
               <motion.span
-                className="block text-[#3ab19d]"
+                className="block text-white "
                 animate={{ scale: [1, 1.02, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
@@ -170,7 +166,7 @@ export default function AboutPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto"
+              className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto"
             >
               We don't just plan trips — we create unforgettable memories, one
               destination at a time. Join thousands of adventurers who trust us.

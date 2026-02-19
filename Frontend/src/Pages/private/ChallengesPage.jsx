@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/authContext";
+import { ClipLoader } from "react-spinners";
 
 function TravelChallenges() {
   const [challenges, setChallenges] = useState([]);
@@ -16,11 +17,13 @@ function TravelChallenges() {
   const [challengeDetails, setChallengeDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [topusers, setTopusers] = useState(null);
+  const [ loading,setLoading]=useState(false);
   const {user}=useAuth();
   const userId=user.id
   const getallChallenges = async () => {
 
     try {
+      setLoading(true);
       const res = await api.get("/user/getchallenges");
       console.log(res.data.data)
       const data = res.data.data.map((challenge) => {
@@ -31,7 +34,9 @@ function TravelChallenges() {
           hasSubmitted: challenge.hasSubmitted,
         };
       });
+          setLoading(false);
       setChallenges(data);
+  
     } catch (error) {
       console.log(error.message)
       console.log(error.response?.data?.message)
@@ -132,7 +137,14 @@ function TravelChallenges() {
       toast.error(error.response?.data?.message || "Failed to submit entry");
     }
   };
-
+if(loading){
+  return(
+    <div className="flex items-center justify-center h-[60vh]">
+          <ClipLoader size={35} color="#14B8A6" />
+      <p className="text-gray-500 mx-3 ">Loading challenges...</p>
+    </div>
+  )
+}
   return (
     <div className="px-4 md:px-10 py-10">
       <div className="max-w-7xl mx-auto flex gap-8">

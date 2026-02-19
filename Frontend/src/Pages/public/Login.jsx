@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+
+} from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -10,8 +16,8 @@ import toast from "react-hot-toast";
 import { useLoading } from "../../context/loadingContext.jsx";
 
 function LoginPage() {
-  const {setLoading} = useLoading();
-  const { login} = useAuth();
+  const { setLoading } = useLoading();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [useparams] = useSearchParams();
 
@@ -34,18 +40,16 @@ function LoginPage() {
 
   const onSubmit = async (data) => {
     try {
-      setLoading(true)
+      setLoading(true);
       const res = await api.post("/auth/login", data);
 
       await login(res.data.token);
-      toast.success(res.data.message)
-     
+      toast.success(res.data.message);
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data?.message)
-    }
-    finally{
-      setLoading(false)
+      toast.error(error.response?.data?.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,16 +59,16 @@ function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <div className="relative min-h-[calc(100vh-64px)] flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 bg-[url(/images/SignupBg.png)] md:bg-contain md:bg-no-repeat md:bg-bottom opacity-30 md:opacity-100 lg-bg-cover"></div>
 
-      <div className="relative z-10 bg-white w-[90%] md:w-[80%] lg:w-[60%] max-w-5xl rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden">
-        <div className="w-full p-6 sm:p-10">
-          <h1 className="text-[#3ab19d] font-semibold text-3xl sm:text-4xl lg:text-5xl mb-3">
+      <div className="relative z-10 bg-white w-[90%] md:w-[75%] lg:w-[55%] max-w-4xl rounded-xl shadow-xl flex flex-col md:flex-row overflow-hidden animate-[slideUp_0.4s_ease-out]">
+        <div className="w-full p-5 sm:p-8">
+          <h1 className="text-[#3ab19d] font-semibold text-2xl sm:text-3xl lg:text-4xl mb-2">
             Welcome to Travelio
           </h1>
 
-          <p className="text-gray-500 mb-8">
+          <p className="text-gray-500 text-sm mb-6">
             The best stories begin with a passport and a plan
           </p>
 
@@ -72,35 +76,37 @@ function LoginPage() {
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col md:w-[50%]"
           >
-            <label className="text-gray-900 mb-2">Username</label>
+            <label className="text-gray-900 text-sm mb-1">Username</label>
             <input
               placeholder="Enter your username"
-              className="h-[50px] border border-gray-400 rounded-md px-4 focus:outline-none focus:ring-1 focus:ring-[#3ab19d]"
+              className="h-[42px] text-sm border border-gray-400 rounded-md px-3 focus:outline-none focus:ring-1 focus:ring-[#3ab19d]"
               {...register("username", { required: true })}
             />
- {errors.username &&(
+            {errors.username && (
               <p className="text-[red] text-xs">{errors.username.message}</p>
             )}
             <div className="flex flex-col relative">
-              <label className="text-gray-900 mb-2 mt-4">Password</label>
+              <label className="text-gray-900 text-sm mb-1 mt-3">
+                Password
+              </label>
               <input
                 placeholder="Enter your Password"
-                className="h-[50px] border border-gray-400 rounded-md px-4 focus:outline-none focus:ring-1 focus:ring-[#3ab19d]"
+                className="h-[42px] text-sm border border-gray-400 rounded-md px-3 focus:outline-none focus:ring-1 focus:ring-[#3ab19d]"
                 type={eye ? "text" : "password"}
                 {...register("password", { required: true })}
               />
- {errors.password &&(
-              <p className="text-[red] text-xs">{errors.password.message}</p>
-            )}
-              {Error && <p className="text-red-500 mt-2">{Error}</p>}
+              {errors.password && (
+                <p className="text-[red] text-xs">{errors.password.message}</p>
+              )}
+              {Error && <p className="text-red-500 mt-2 text-sm">{Error}</p>}
 
-              <p className="self-end mt-2 text-sm text-gray-500 font-medium cursor-pointer hover:underline">
+              <p className="self-end mt-2 text-xs text-gray-500 font-medium cursor-pointer hover:underline">
                 <Link to="/forgetpassword">Forgot Password?</Link>
               </p>
 
               <button
                 type="button"
-                className="absolute right-2 bottom-10"
+                className="absolute right-2 bottom-8"
                 onClick={() => setEye(!eye)}
               >
                 {!eye ? (
@@ -132,21 +138,19 @@ function LoginPage() {
               </button>
             </div>
 
-            <button 
+            <button
               type="submit"
-              className={`w-full h-[50px] rounded-lg  mt-5 hover:opacity-70 transition ${setLoading===true?"bg-[#3ab19d]/70 text-gray-400 cursor-not-allowed":"bg-[#3ab19d] text-white"}`}
+              className={`w-full h-[42px] rounded-lg text-sm mt-4 hover:opacity-70 transition ${setLoading === true ? "bg-[#3ab19d]/70 text-gray-400 cursor-not-allowed" : "bg-[#3ab19d] text-white"}`}
             >
-
-      Login
-
-
+              Login
             </button>
 
             <button
               type="button"
-              className="w-full h-[50px] rounded-lg border-2 border-[#3ab19d] text-[#3ab19d] mt-3 hover:bg-[#3ab19d] hover:text-white transition"
+              className="w-full h-[42px] rounded-lg border-2 border-[#3ab19d] text-[#3ab19d] text-sm mt-3 hover:bg-[#3ab19d] hover:text-white transition"
               onClick={handleGoogleSignIn}
             >
+              <img src="/images/google.png" alt="Google Logo" className="inline w-5 h-5 mr-2" />
               Continue with Google
             </button>
 
@@ -187,14 +191,18 @@ export const GoogleSuccess = () => {
         return;
       }
 
-      await login(token);   
+      await login(token);
       navigate("/explorepackages", { replace: true });
     };
 
     handleGoogleLogin();
   }, [location, navigate, login]);
 
-  return <div className="min-h-screen display-flex items-center justify-center"><p>Logging in...</p></div>;
+  return (
+    <div className="min-h-screen display-flex items-center justify-center">
+      <p>Logging in...</p>
+    </div>
+  );
 };
 
 export default LoginPage;

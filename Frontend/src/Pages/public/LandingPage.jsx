@@ -197,10 +197,9 @@ export default function Landing() {
 
   return (
     <div className="w-full overflow-hidden bg-white">
-      <LandingNavbar />
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden ">
         {/* Animated Background */}
            <div
     className="absolute inset-0 bg-cover bg-center z-1"

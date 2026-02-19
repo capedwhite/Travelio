@@ -139,7 +139,7 @@ function ExplorePackages() {
     return (
       <div className="flex justify-center py-50">
         <ClipLoader size={35} color="#14B8A6" />
-        <p>Loading Explore packages</p>
+        <p className="mx-3 ">Loading Explore packages</p>
       </div>
     );
   }
@@ -147,7 +147,13 @@ function ExplorePackages() {
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-7xl mx-auto p-4 sm:p-6 pb-20">
         {/* Hero Section */}
-        <div className="bg-[#3ab19d] rounded-2xl mb-8 p-8 text-center text-white">
+        <div className=" rounded-2xl mb-8 p-8 text-center text-white"     style={{
+      backgroundImage: "url('/images/image.png')",
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    }}>
+          
           <div className="flex justify-center mb-4">
             <div className="p-3 bg-white/10 rounded-full">
               <Globe className="w-10 h-10" />
@@ -156,7 +162,7 @@ function ExplorePackages() {
           <h1 className="text-3xl sm:text-4xl font-bold mb-3">
             Explore Packages
           </h1>
-          <p className="text-lg text-white/90 mb-6 max-w-2xl mx-auto">
+          <p className="text-lg text-[#fffffff2] mb-6 max-w-2xl mx-auto">
             Discover extraordinary destinations and create unforgettable
             memories with our curated travel experiences
           </p>
@@ -340,23 +346,7 @@ function ExplorePackages() {
                         </button>
                       </div>
 
-                      {/* Rating indicator */}
-                      <div className="flex items-center justify-between pt-3 border-t border-gray-200">
-                        <div className="flex items-center gap-1">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`w-3 h-3 ${i < 4 ? "text-yellow-500 fill-current" : "text-gray-300"}`}
-                            />
-                          ))}
-                          <span className="text-xs text-gray-600 ml-1">
-                            4.8
-                          </span>
-                        </div>
-                        <span className="text-xs text-gray-500">
-                          120 reviews
-                        </span>
-                      </div>
+          
                     </div>
                   </div>
 

@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Plane } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function LandingNavbar() {
+export default function LandingNavbar({children}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -76,7 +76,7 @@ export default function LandingNavbar() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-5 py-2.5 text-sm font-semibold text-[#3ab19d] hover:text-[#2c9c8c] transition-colors"
+                  className="px-5 py-2.5 text-sm font-semibold text-white hover:text-[#002e27] transition-colors"
                 >
                   Log in
                 </motion.button>
@@ -169,7 +169,7 @@ export default function LandingNavbar() {
                   <Link
                     to="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block w-full text-center px-4 py-3 border-2 border-[#3ab19d] text-[#3ab19d] rounded-xl font-semibold hover:bg-[#3ab19d]/5 transition-colors"
+                    className="block w-full text-center px-4 py-3 border-2 border-[#171d1c] text-[#2c9c8c] rounded-xl font-semibold hover:bg-[#3ab19d]/5 transition-colors"
                   >
                     Log in
                   </Link>
@@ -186,6 +186,9 @@ export default function LandingNavbar() {
           </>
         )}
       </AnimatePresence>
+            <main className="mt-14 sm:mt-16 md:mt-20">
+        {children}
+      </main>
     </>
   );
 }
