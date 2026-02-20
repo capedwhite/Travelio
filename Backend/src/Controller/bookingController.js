@@ -49,7 +49,10 @@ export const bookpackage = async (req, res) => {
       });
     }
 
-    pkg.availability.currentBookings += Number(travelers);
+pkg.availability = {
+  ...pkg.availability,
+  currentBookings: pkg.availability.currentBookings + Number(travelers),
+};
 
     await pkg.save({ transaction });
 
