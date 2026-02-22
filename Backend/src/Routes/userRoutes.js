@@ -66,12 +66,14 @@ router.post("/explorepackages/request", createPackageRequest);
 router.get("/mypackagerequests", getUserPackageRequests);
 router.get("/mybargainpackages", getUserBargainRequests);
 router.get("/mybookings", getUserBookings);
+
+// ChallengesRoutes 
 router.get("/getchallenges", getAllChallenges);
 router.get("/getchallenges/:id", getChallengeById);
 router.post("/getchallenges/:id", upload.any(), submitChallenge);
 router.get("/gettopusers", getTopChallengeUsers);
 
-// Social Feed Routes
+// SocialFeedRoutes
 router.post("/posts", upload.single("image"), createPost);
 router.get("/posts", getAllPosts);
 router.put("/posts/:postId", upload.single("image"), updatePost);
@@ -84,7 +86,7 @@ router.get("/following", getFollowing);
 router.get("/users/:userId", getUserProfile);
 router.get("/followed-posts", getFollowedPosts);
 
-// Profile Routes
+// ProfileRoutes
 router.get("/profile", getProfile);
 router.put("/profile", upload.single("profileImage"), updateUserProfile);
 
