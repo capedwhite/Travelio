@@ -89,9 +89,8 @@ jest.unstable_mockModule("../Config/multer.js", () => ({
 }));
 
 // Import after mocking
-const { createPost, toggleLike, addComment, toggleFollow } = await import(
-  "../Controller/postController.js"
-);
+const { createPost, toggleLike, addComment, toggleFollow } =
+  await import("../Controller/postController.js");
 
 // Create a test app
 const createTestApp = () => {
@@ -217,7 +216,9 @@ describe("Post Routes", () => {
     });
 
     it("should return 400 if comment content is missing", async () => {
-      const response = await request(app).post("/user/posts/1/comment").send({});
+      const response = await request(app)
+        .post("/user/posts/1/comment")
+        .send({});
 
       expect(response.status).toBe(400);
       expect(response.body.message).toBe("Comment content is required");

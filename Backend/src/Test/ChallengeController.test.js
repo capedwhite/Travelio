@@ -51,8 +51,12 @@ jest.unstable_mockModule("../Model/awardModel.js", () => ({
 }));
 
 // Import controller after mocking
-const { getAllChallenges, getChallengeById, submitChallenge, getTopChallengeUsers } =
-  await import("../Controller/ChallengeController.js");
+const {
+  getAllChallenges,
+  getChallengeById,
+  submitChallenge,
+  getTopChallengeUsers,
+} = await import("../Controller/ChallengeController.js");
 
 describe("Challenge Controller", () => {
   const mockResponse = () => {
@@ -113,7 +117,7 @@ describe("Challenge Controller", () => {
       expect(res.send).toHaveBeenCalledWith(
         expect.objectContaining({
           message: "Successfully fetched challenges",
-        })
+        }),
       );
     });
 
@@ -221,7 +225,7 @@ describe("Challenge Controller", () => {
       expect(res.send).toHaveBeenCalledWith(
         expect.objectContaining({
           message: "Challenge fetched successfully",
-        })
+        }),
       );
     });
 
@@ -313,7 +317,7 @@ describe("Challenge Controller", () => {
       expect(res.send).toHaveBeenCalledWith(
         expect.objectContaining({
           message: "Challenge submitted successfully",
-        })
+        }),
       );
     });
 
@@ -418,7 +422,7 @@ describe("Challenge Controller", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           message: "Global leaderboard fetched successfully",
-        })
+        }),
       );
     });
 
@@ -434,7 +438,7 @@ describe("Challenge Controller", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           data: [],
-        })
+        }),
       );
     });
   });

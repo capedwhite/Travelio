@@ -9,7 +9,8 @@ const ChallengeMock = dbMock.define("Challenge", {
   submissionDeadline: new Date("2026-03-15"),
   description: "Share your best travel photo from your adventures!",
   award: "Free Trip Package",
-  awardDetail: "Win a free 5-day trip to Bali including flights and accommodation",
+  awardDetail:
+    "Win a free 5-day trip to Bali including flights and accommodation",
   result: "pending",
   winnerId: null,
 });
@@ -33,14 +34,19 @@ describe("Challenge Model", () => {
       submissionDeadline: new Date("2026-03-15"),
       description: "Share your best travel photo from your adventures!",
       award: "Free Trip Package",
-      awardDetail: "Win a free 5-day trip to Bali including flights and accommodation",
+      awardDetail:
+        "Win a free 5-day trip to Bali including flights and accommodation",
     });
 
     expect(challenge.id).toBe(1);
     expect(challenge.challengeName).toBe("Best Travel Photo 2026");
-    expect(challenge.description).toBe("Share your best travel photo from your adventures!");
+    expect(challenge.description).toBe(
+      "Share your best travel photo from your adventures!",
+    );
     expect(challenge.award).toBe("Free Trip Package");
-    expect(challenge.awardDetail).toBe("Win a free 5-day trip to Bali including flights and accommodation");
+    expect(challenge.awardDetail).toBe(
+      "Win a free 5-day trip to Bali including flights and accommodation",
+    );
   });
 
   it("should have default result as pending", async () => {

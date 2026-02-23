@@ -76,8 +76,12 @@ jest.unstable_mockModule("../Config/multer.js", () => ({
 }));
 
 // Import after mocking
-const { getAllChallenges, getChallengeById, submitChallenge, getTopChallengeUsers } =
-  await import("../Controller/ChallengeController.js");
+const {
+  getAllChallenges,
+  getChallengeById,
+  submitChallenge,
+  getTopChallengeUsers,
+} = await import("../Controller/ChallengeController.js");
 
 // Create a test app
 const createTestApp = () => {
@@ -238,7 +242,9 @@ describe("Challenge Routes", () => {
         .send({ caption: "Test" });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toBe("You have already submitted your challenge");
+      expect(response.body.message).toBe(
+        "You have already submitted your challenge",
+      );
     });
   });
 
@@ -254,7 +260,9 @@ describe("Challenge Routes", () => {
       const response = await request(app).get("/user/gettopusers");
 
       expect(response.status).toBe(200);
-      expect(response.body.message).toBe("Global leaderboard fetched successfully");
+      expect(response.body.message).toBe(
+        "Global leaderboard fetched successfully",
+      );
       expect(response.body.data).toBeDefined();
     });
 

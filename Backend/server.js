@@ -8,15 +8,15 @@ import { protect } from "./src/Middleware/authmiddleware.js";
 import "./src/Model/index.js"
 import adminRoutes from "./src/Routes/adminRoutes.js"
 import userRoutes from "./src/Routes/userRoutes.js"
-
-
+import dotenv from "dotenv"
+dotenv.config()
 
 const app = express();
-const port="3000"
+const port=process.env.PORT || 3000
 
 connection()
 app.use(cors({
-  origin:"http://localhost:5173",
+  origin:process.env.FRONTEND_URL,
   credentials: true,
 }))
 

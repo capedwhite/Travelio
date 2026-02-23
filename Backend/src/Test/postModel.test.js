@@ -48,7 +48,9 @@ describe("Post Model", () => {
     });
 
     expect(post.id).toBe(1);
-    expect(post.content).toBe("This is a sample post about my travel experience!");
+    expect(post.content).toBe(
+      "This is a sample post about my travel experience!",
+    );
     expect(post.image).toBe("uploads/posts/image1.jpg");
     expect(post.userId).toBe(1);
   });

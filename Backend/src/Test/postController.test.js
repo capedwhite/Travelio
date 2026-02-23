@@ -62,9 +62,8 @@ jest.unstable_mockModule("../Model/userModel.js", () => ({
 }));
 
 // Import controller after mocking
-const { createPost, toggleLike, addComment, toggleFollow } = await import(
-  "../Controller/postController.js"
-);
+const { createPost, toggleLike, addComment, toggleFollow } =
+  await import("../Controller/postController.js");
 
 describe("Post Controller", () => {
   const mockResponse = () => {
@@ -116,7 +115,7 @@ describe("Post Controller", () => {
       expect(res.send).toHaveBeenCalledWith(
         expect.objectContaining({
           message: "Post created successfully",
-        })
+        }),
       );
     });
 
@@ -177,7 +176,7 @@ describe("Post Controller", () => {
         expect.objectContaining({
           content: "Text only post",
           image: null,
-        })
+        }),
       );
     });
   });
@@ -275,7 +274,7 @@ describe("Post Controller", () => {
       expect(res.send).toHaveBeenCalledWith(
         expect.objectContaining({
           message: "Comment added successfully",
-        })
+        }),
       );
     });
 
@@ -334,7 +333,7 @@ describe("Post Controller", () => {
         expect.objectContaining({
           isFollowing: true,
           message: "User followed successfully",
-        })
+        }),
       );
     });
 
@@ -362,7 +361,7 @@ describe("Post Controller", () => {
         expect.objectContaining({
           isFollowing: false,
           message: "User unfollowed successfully",
-        })
+        }),
       );
     });
 
