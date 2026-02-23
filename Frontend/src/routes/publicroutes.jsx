@@ -12,7 +12,7 @@ const SignupPage = React.lazy(() => import("../Pages/public/Signup"));
 const AboutPage = React.lazy(() => import("../Pages/public/aboutpage"));
 const Publicroutes = () => {
   return (
-    <Suspense fallback={<div>Loading</div>}>
+       <Suspense fallback={<div className="flex justify-center items-center h-screen"><ClipLoader size={50}  /></div>}>
       <Routes>
         <Route path="/landing" element={<LandingNavbar><Landing /></LandingNavbar>}></Route>
         <Route path="/login" element={<LandingNavbar><LoginPage></LoginPage></LandingNavbar>}></Route>

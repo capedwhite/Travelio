@@ -48,7 +48,7 @@ const Mypackagerequests = React.lazy(
 const MyFavourites = React.lazy(() => import("../Pages/private/myfavourties"));
 const PrivateRoutes = () => {
   return (
-    <Suspense fallback={<ClipLoader></ClipLoader>}>
+    <Suspense fallback={<div className="flex justify-center items-center h-screen"><ClipLoader size={50} /></div>}>
       <Routes>
         <Route
           path="/explorepackages"
