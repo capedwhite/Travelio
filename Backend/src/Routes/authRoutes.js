@@ -5,7 +5,7 @@ import {
   signUp,
   forgotPassword,
   resetPassword,
-} from "../Controller/Authcontroller.js";
+} from "../Controller/authcontroller.js";
 import passport from "passport";
 const router = express.Router();
 router.post("/login", login);
