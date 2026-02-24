@@ -42,6 +42,7 @@ function PackageDetailsPage() {
   const [totalReviews, setTotalReviews] = useState(0);
   const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
   const [reviewLoading, setReviewLoading] = useState(false);
+  const [bookingDetails, setBookingDetails] = useState(null);
   const {
     register: bookingregister,
     handleSubmit: bookingsubmit,
@@ -191,6 +192,7 @@ function PackageDetailsPage() {
       // Show booking ticket popup with coupon number
       if (res.data.success) {
         setBookingCoupon(res.data.bookingCoupon);
+        setBookingDetails(data);
         setShowBookingTicket(true);
 
         // If booking successful and coupon was used, mark it as used
@@ -535,9 +537,206 @@ function PackageDetailsPage() {
               ))}
             </div>
           </section>
+          
+        <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                What's Included
+              </h2>
+              <div className="space-y-2">
+                {pkg.inclusions?.length > 0 ? (
+                  pkg.inclusions.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-start gap-3 p-2 bg-green-50 rounded-lg border border-green-100"
+                    >
+                      <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-gray-700">{item}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <XCircle className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-500">
+                      Details not provided
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <XCircle className="w-4 h-4 text-red-600" />
+                What's Excluded
+              </h2>
+              <div className="space-y-2">
+                {pkg.exclusions?.length > 0 ? (
+                  pkg.exclusions.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-start gap-3 p-2 bg-red-50 rounded-lg border border-red-100"
+                    >
+                      <XCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-gray-700">{item}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <CheckCircle className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-500">
+                      Details not provided
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Reviews Section */}
+        <section className=" bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-[#3ab19d]" />
+                Reviews & Ratings
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                See what other travelers are saying
+              </p>
+            </div>
+            <div className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-lg">
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={`w-4 h-4 ${star <= Math.round(averageRating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                  />
+                ))}
+              </div>
+              <span className="font-bold text-gray-900">
+                {averageRating.toFixed(1)}
+              </span>
+              <span className="text-sm text-gray-500">
+                ({totalReviews} reviews)
+              </span>
+            </div>
+          </div>
+
+          {/* Add Review Form */}
+          <div className="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-100">
+            <h3 className="font-semibold text-gray-900 mb-3">Write a Review</h3>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-sm text-gray-600">Your Rating:</span>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setNewReview({ ...newReview, rating: star })}
+                    className="focus:outline-none"
+                  >
+                    <Star
+                      className={`w-6 h-6 transition ${star <= newReview.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300 hover:text-yellow-300"}`}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <textarea
+                value={newReview.comment}
+                onChange={(e) =>
+                  setNewReview({ ...newReview, comment: e.target.value })
+                }
+                placeholder="Share your experience with this package..."
+                className="flex-1 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#3ab19d] resize-none"
+                rows={3}
+              />
+            </div>
+            <div className="flex justify-end mt-3">
+              <button
+                onClick={handleSubmitReview}
+                disabled={reviewLoading || !newReview.comment.trim()}
+                className="flex items-center gap-2 bg-[#3ab19d] hover:bg-[#329b89] text-white px-5 py-2.5 rounded-lg font-medium text-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Send className="w-4 h-4" />
+                {reviewLoading ? "Submitting..." : "Submit Review"}
+              </button>
+            </div>
+          </div>
+
+          {/* Reviews List */}
+          <div className="space-y-4">
+            {reviews.length === 0 ? (
+              <div className="text-center py-8">
+                <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500">
+                  No reviews yet. Be the first to review!
+                </p>
+              </div>
+            ) : (
+              reviews.map((review) => (
+                <div
+                  key={review.id}
+                  className="border border-gray-100 rounded-xl p-4 hover:shadow-sm transition"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[#3ab19d]/10 rounded-full flex items-center justify-center overflow-hidden">
+                        {review.user?.profileImage ? (
+                          <img
+                            src={`http://localhost:3000/${review.user.profileImage}`}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <User className="w-5 h-5 text-[#3ab19d]" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900">
+                          {review.user?.username || "Anonymous"}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <div className="flex">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`w-3 h-3 ${star <= review.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-xs text-gray-500">
+                            {new Date(review.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    {user?.id === review.userId && (
+                      <button
+                        onClick={() => handleDeleteReview(review.id)}
+                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
+                        title="Delete review"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-gray-700 text-sm mt-3 leading-relaxed">
+                    {review.comment}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
         </div>
 
-        <div className="space-y-5 sticky top-24 h-fit">
+        <div className="space-y-5 sticky top-24 h-fit ">
           <form onSubmit={bookingsubmit(handleBooking)}>
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
               <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -862,202 +1061,6 @@ function PackageDetailsPage() {
           )}
         </div>
 
-        <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                What's Included
-              </h2>
-              <div className="space-y-2">
-                {pkg.inclusions?.length > 0 ? (
-                  pkg.inclusions.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-start gap-3 p-2 bg-green-50 rounded-lg border border-green-100"
-                    >
-                      <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-gray-700">{item}</span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <XCircle className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-500">
-                      Details not provided
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <XCircle className="w-4 h-4 text-red-600" />
-                What's Excluded
-              </h2>
-              <div className="space-y-2">
-                {pkg.exclusions?.length > 0 ? (
-                  pkg.exclusions.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-start gap-3 p-2 bg-red-50 rounded-lg border border-red-100"
-                    >
-                      <XCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-gray-700">{item}</span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <CheckCircle className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-500">
-                      Details not provided
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Reviews Section */}
-        <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <MessageSquare className="w-5 h-5 text-[#3ab19d]" />
-                Reviews & Ratings
-              </h2>
-              <p className="text-sm text-gray-500 mt-1">
-                See what other travelers are saying
-              </p>
-            </div>
-            <div className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-lg">
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    className={`w-4 h-4 ${star <= Math.round(averageRating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
-                  />
-                ))}
-              </div>
-              <span className="font-bold text-gray-900">
-                {averageRating.toFixed(1)}
-              </span>
-              <span className="text-sm text-gray-500">
-                ({totalReviews} reviews)
-              </span>
-            </div>
-          </div>
-
-          {/* Add Review Form */}
-          <div className="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-100">
-            <h3 className="font-semibold text-gray-900 mb-3">Write a Review</h3>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-sm text-gray-600">Your Rating:</span>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => setNewReview({ ...newReview, rating: star })}
-                    className="focus:outline-none"
-                  >
-                    <Star
-                      className={`w-6 h-6 transition ${star <= newReview.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300 hover:text-yellow-300"}`}
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <textarea
-                value={newReview.comment}
-                onChange={(e) =>
-                  setNewReview({ ...newReview, comment: e.target.value })
-                }
-                placeholder="Share your experience with this package..."
-                className="flex-1 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#3ab19d] resize-none"
-                rows={3}
-              />
-            </div>
-            <div className="flex justify-end mt-3">
-              <button
-                onClick={handleSubmitReview}
-                disabled={reviewLoading || !newReview.comment.trim()}
-                className="flex items-center gap-2 bg-[#3ab19d] hover:bg-[#329b89] text-white px-5 py-2.5 rounded-lg font-medium text-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Send className="w-4 h-4" />
-                {reviewLoading ? "Submitting..." : "Submit Review"}
-              </button>
-            </div>
-          </div>
-
-          {/* Reviews List */}
-          <div className="space-y-4">
-            {reviews.length === 0 ? (
-              <div className="text-center py-8">
-                <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500">
-                  No reviews yet. Be the first to review!
-                </p>
-              </div>
-            ) : (
-              reviews.map((review) => (
-                <div
-                  key={review.id}
-                  className="border border-gray-100 rounded-xl p-4 hover:shadow-sm transition"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#3ab19d]/10 rounded-full flex items-center justify-center overflow-hidden">
-                        {review.user?.profileImage ? (
-                          <img
-                            src={`http://localhost:3000/${review.user.profileImage}`}
-                            alt="Profile"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <User className="w-5 h-5 text-[#3ab19d]" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-900">
-                          {review.user?.username || "Anonymous"}
-                        </p>
-                        <div className="flex items-center gap-2">
-                          <div className="flex">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Star
-                                key={star}
-                                className={`w-3 h-3 ${star <= review.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
-                              />
-                            ))}
-                          </div>
-                          <span className="text-xs text-gray-500">
-                            {new Date(review.createdAt).toLocaleDateString()}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    {user?.id === review.userId && (
-                      <button
-                        onClick={() => handleDeleteReview(review.id)}
-                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
-                        title="Delete review"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                  <p className="text-gray-700 text-sm mt-3 leading-relaxed">
-                    {review.comment}
-                  </p>
-                </div>
-              ))
-            )}
-          </div>
-        </section>
       </div>
 
       {/* Booking Ticket Popup */}
@@ -1118,14 +1121,14 @@ function PackageDetailsPage() {
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
                   <span className="text-sm text-gray-600">Travelers</span>
                   <span className="text-sm font-semibold text-gray-900">
-                    2 Adults
+                    {bookingDetails?.travelers || 1} person(s)
                   </span>
                 </div>
                 <div className="flex justify-between items-center py-2">
                   <span className="text-sm text-gray-600">Total Paid</span>
                   <span className="text-lg font-bold text-emerald-600">
                     {pkg.price.currency}{" "}
-                    {(pkg.price.discountedPrice || pkg.price.originalPrice) * 2}
+                    {calculateFinalPrice() * (bookingDetails?.travelers || 1)}
                   </span>
                 </div>
               </div>
