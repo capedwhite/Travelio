@@ -25,6 +25,7 @@ import { bargainSchema } from "./schema/bargainSchema";
 import { bookingSchema } from "./schema/bookingSchema";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/authContext";
+import { ClipLoader } from "react-spinners";
 
 function PackageDetailsPage() {
   const { user } = useAuth();
@@ -43,6 +44,8 @@ function PackageDetailsPage() {
   const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
   const [reviewLoading, setReviewLoading] = useState(false);
   const [bookingDetails, setBookingDetails] = useState(null);
+  const [isBooking, setIsBooking] = useState(false);
+  const [isBargaining, setIsBargaining] = useState(false);
   const {
     register: bookingregister,
     handleSubmit: bookingsubmit,
@@ -179,6 +182,7 @@ function PackageDetailsPage() {
   }
   const handleBooking = async (data) => {
     console.log("handling booking submission ", data);
+    setIsBooking(true);
     try {
       const payload = {
         ...data,
@@ -211,8 +215,12 @@ function PackageDetailsPage() {
       console.log(error.message);
       toast.error(error.response?.data?.message);
     }
+    finally {
+    setIsBooking(false);
   };
+}
   const handleBargain = async (data) => {
+    setIsBargaining(true)
     try {
       const payload = {
         ...data,
@@ -224,6 +232,9 @@ function PackageDetailsPage() {
     } catch (error) {
       console.log(error);
       toast.error(error.response?.data?.message);
+    }
+    finally{
+      setIsBargaining(false);
     }
   };
 
@@ -754,9 +765,9 @@ function PackageDetailsPage() {
                     {...bookingregister("fullname")}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#3ab19d] focus:border-[#3ab19d] focus:outline-none"
                   />
-                  {bookingerror.name && (
+                  {bookingerror.fullname && (
                     <p className="text-red-500 text-xs mt-1">
-                      {bookingerror.name.message}
+                      {bookingerror.fullname.message}
                     </p>
                   )}
                 </div>
@@ -897,8 +908,10 @@ function PackageDetailsPage() {
               <button
                 className="w-full bg-[#3ab19d] mt-6 text-white px-4 py-3 rounded-lg font-semibold text-sm hover:bg-[#2d9b8a] transition duration-200 shadow-sm hover:shadow-md"
                 type="submit"
+                disabled={isBooking}
               >
-                Confirm Booking
+                {isBooking ? <p className="gap-2"><ClipLoader/>Booking....</p> : "Confirm Booking" }
+                
               </button>
             </div>
           </form>
@@ -976,8 +989,9 @@ function PackageDetailsPage() {
               <button
                 className="w-full bg-[#dda169] text-white px-4 py-3 rounded-lg font-semibold text-sm hover:bg-[#c48b4d] transition duration-200 shadow-sm hover:shadow-md mt-4"
                 type="submit"
+                disabled={isBargaining}
               >
-                Submit Negotiation
+               {isBargaining?<p className="gap-2"><ClipLoader/>Submitting....</p>:"Send Bargain"}
               </button>
             </div>
           </form>
@@ -1167,4 +1181,5 @@ function PackageDetailsPage() {
     </div>
   );
 }
+
 export default PackageDetailsPage;
