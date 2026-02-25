@@ -68,6 +68,22 @@ PostgreSQL ensures relational data consistency
 
 OAuth enables secure authentication flow
 
+⚙️ Local Development Setup
+Clone Repository
+git clone https://github.com/capedwhite/Travelio.git
+cd Travelio
+
+Backend Setup
+cd backend
+npm install
+npm start
+
+Frontend Setup
+cd frontend
+npm install
+npm run dev
+
+
 💡 Core Features
 ✈️ Travel Services
 
@@ -114,21 +130,6 @@ Photo sharing and travel posts
 Reviews, tips, and itinerary sharing
 
 Community-driven travel discovery
-
-⚙️ Local Development Setup
-Clone Repository
-git clone https://github.com/capedwhite/Travelio.git
-cd Travelio
-
-Backend Setup
-cd backend
-npm install
-npm start
-
-Frontend Setup
-cd frontend
-npm install
-npm run dev
 
 
 The .env file is excluded for security.
