@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import LandingNavbar from "../../components/LandingNavbar";
 import api from "../../api/axios";
+import toast from "react-hot-toast";
 
 // Floating animation component
 function FloatingElement({ children, delay = 0, duration = 3, y = 20 }) {
@@ -69,16 +70,15 @@ function FlyingPlane() {
   );
 }
 
-// Package Card Component
+// Package Card Component - Matches ExplorePackages UI
 function PackageCard({ pkg, index }) {
   const handleClick = () => {
-    alert("Please login to view package details and make bookings!");
+    toast.error("Please login to view package details and make bookings!");
   };
 
-  const mainImage =
-    pkg.images && pkg.images.length > 0
-      ? `http://localhost:3000/${pkg.images[0]}`
-      : "/images/placeholder-travel.jpg";
+  const coverImage = pkg.images?.coverImage
+    ? `http://localhost:3000/${pkg.images.coverImage}`
+    : "/images/placeholder-travel.jpg";
 
   return (
     <motion.div
@@ -86,75 +86,85 @@ function PackageCard({ pkg, index }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      whileHover={{ y: -8 }}
-      className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer"
+      className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200 cursor-pointer"
       onClick={handleClick}
     >
-      {/* Image */}
-      <div className="relative h-48 overflow-hidden">
-        <img
-          src={mainImage}
-          alt={pkg.title}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+      <div className="relative overflow-hidden">
+        <div className="aspect-[3/2] relative">
+          <img
+            src={coverImage}
+            alt={pkg.title}
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-        {/* Lock overlay */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            whileHover={{ scale: 1, opacity: 1 }}
-            className="bg-white/90 backdrop-blur-sm rounded-full p-4"
-          >
-            <Lock className="w-6 h-6 text-[#3ab19d]" />
-          </motion.div>
-        </div>
-
-        {/* Duration badge */}
-        <div className="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold text-gray-800 flex items-center gap-1">
-          <Clock className="w-3 h-3" />
-          {pkg.duration}
-        </div>
-
-        {/* Price */}
-        <div className="absolute bottom-3 right-3">
-          <div className="bg-[#3ab19d] text-white px-3 py-1 rounded-lg font-bold text-sm">
-            ₹{pkg.price?.discountedPrice || pkg.price?.originalPrice || "N/A"}
+          {/* Hover View Display */}
+          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+            <div className="text-white text-center">
+              <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 flex items-center gap-2">
+                <Lock className="w-5 h-5" />
+                <span className="font-semibold">Login to View</span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="p-4">
-        <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-1">
-          {pkg.title}
-        </h3>
-
-        <div className="flex items-center gap-1 text-gray-500 text-sm mb-3">
-          <MapPin className="w-4 h-4 text-[#3ab19d]" />
-          <span className="line-clamp-1">
-            {pkg.locations?.slice(0, 2).join(", ") || "Multiple Destinations"}
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          <div className="flex items-center gap-4 text-xs text-gray-500">
-            <span className="flex items-center gap-1">
-              <Users className="w-3.5 h-3.5" />
-              {pkg.availability?.maxBookings || 10} spots
-            </span>
+        {/* Seasonal Discount Badge */}
+        {pkg.seasonalDiscount?.label && (
+          <div className="absolute bottom-3 right-3 bg-red-500 text-white text-xs px-2 py-1 rounded-lg font-semibold flex items-center gap-1">
+            <Star className="w-3 h-3" />
+            {pkg.seasonalDiscount.label} {pkg.seasonalDiscount.percentage}%
           </div>
-          <span className="text-[#3ab19d] text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
-            View <ChevronRight className="w-4 h-4" />
-          </span>
-        </div>
+        )}
+
+        {/* Tags Badge */}
+        {pkg.tags && pkg.tags.length > 0 && (
+          <div className="absolute top-3 left-3 bg-yellow-400 text-black text-xs px-2 py-1 rounded-lg font-semibold flex items-center gap-1">
+            <Star className="w-3 h-3" />
+            {pkg.tags.slice(0, 2).join(", ")}
+          </div>
+        )}
       </div>
 
-      {/* Login to view overlay on hover */}
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#3ab19d] to-transparent h-0 group-hover:h-16 transition-all duration-300 flex items-end justify-center pb-3 opacity-0 group-hover:opacity-100">
-        <span className="text-white text-sm font-semibold">
-          Login to explore →
-        </span>
+      <div className="p-5">
+        <div className="mb-3">
+          <h3 className="text-lg font-semibold text-gray-900 leading-tight mb-1 group-hover:text-[#3ab19d] transition-colors duration-300">
+            {pkg.title}
+          </h3>
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <MapPin className="w-4 h-4 text-[#3ab19d]" />
+            <span>{pkg.locations?.city || "Multiple Destinations"}</span>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Clock className="w-4 h-4 text-[#3ab19d]" />
+            <span>{pkg.duration}</span>
+          </div>
+          <div className="text-right">
+            <div className="flex items-center gap-1">
+              <span className="text-sm font-semibold text-[#3ab19d]">
+                {pkg.price?.currency || "₹"}
+              </span>
+              <span className="text-sm font-bold text-gray-900">
+                {Number(pkg.price?.discountedPrice) === 0 ? (
+                  <span className="text-green-600">Free</span>
+                ) : (
+                  pkg.price?.discountedPrice ||
+                  pkg.price?.originalPrice ||
+                  "N/A"
+                )}
+              </span>
+            </div>
+            {Number(pkg.price?.discountedPrice) !== 0 &&
+              pkg.price?.originalPrice && (
+                <p className="text-xs text-gray-400 line-through">
+                  {pkg.price?.currency || "₹"} {pkg.price.originalPrice}
+                </p>
+              )}
+          </div>
+        </div>
       </div>
     </motion.div>
   );
@@ -169,7 +179,7 @@ export default function Landing() {
   useEffect(() => {
     const fetchPackages = async () => {
       try {
-        const res = await api.get("/user/explorepackages");
+        const res = await api.get("/auth/explorepackages");
         setPackages(res.data.data?.slice(0, 6) || []);
       } catch {
         setPackages([]);
@@ -197,16 +207,16 @@ export default function Landing() {
 
   return (
     <div className="w-full overflow-hidden bg-white">
-
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden ">
         {/* Animated Background */}
-           <div
-    className="absolute inset-0 bg-cover bg-center z-1"
-    style={{
-      backgroundImage: "url('/images/landing.jpg')",
-    }}
-  /><div className="absolute inset-0 bg-black/50 z-5" />
+        <div
+          className="absolute inset-0 bg-cover bg-center z-1"
+          style={{
+            backgroundImage: "url('/images/landing.jpg')",
+          }}
+        />
+        <div className="absolute inset-0 bg-black/50 z-5" />
         <motion.div
           style={{ y: backgroundY }}
           className="absolute inset-0 bg-gradient-to-br from-[#e8fff9] via-white to-[#f2fffd]"
@@ -281,8 +291,6 @@ export default function Landing() {
 
         {/* Hero Content */}
         <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
-
-
           <motion.div
             initial="hidden"
             animate="visible"
@@ -517,122 +525,14 @@ export default function Landing() {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                {
-                  title: "Explore Bali Paradise",
-                  location: "Bali, Indonesia",
-                  duration: "5 Days",
-                  price: "₹45,000",
-                  image:
-                    "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800",
-                },
-                {
-                  title: "Swiss Alps Adventure",
-                  location: "Switzerland",
-                  duration: "7 Days",
-                  price: "₹1,20,000",
-                  image:
-                    "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800",
-                },
-                {
-                  title: "Dubai Luxury Experience",
-                  location: "Dubai, UAE",
-                  duration: "4 Days",
-                  price: "₹85,000",
-                  image:
-                    "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800",
-                },
-                {
-                  title: "Maldives Beach Escape",
-                  location: "Maldives",
-                  duration: "6 Days",
-                  price: "₹95,000",
-                  image:
-                    "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800",
-                },
-                {
-                  title: "Japanese Culture Tour",
-                  location: "Tokyo, Japan",
-                  duration: "8 Days",
-                  price: "₹1,10,000",
-                  image:
-                    "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800",
-                },
-                {
-                  title: "Kerala Backwaters",
-                  location: "Kerala, India",
-                  duration: "4 Days",
-                  price: "₹25,000",
-                  image:
-                    "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800",
-                },
-              ].map((pkg, index) => (
-                <motion.div
-                  key={pkg.title}
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  whileHover={{ y: -8 }}
-                  onClick={() =>
-                    alert(
-                      "Please login to view package details and make bookings!",
-                    )
-                  }
-                  className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer"
-                >
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={pkg.image}
-                      alt={pkg.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-                      <motion.div
-                        initial={{ scale: 0, opacity: 0 }}
-                        whileHover={{ scale: 1, opacity: 1 }}
-                        className="bg-white/90 backdrop-blur-sm rounded-full p-4"
-                      >
-                        <Lock className="w-6 h-6 text-[#3ab19d]" />
-                      </motion.div>
-                    </div>
-                    <div className="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold text-gray-800 flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {pkg.duration}
-                    </div>
-                    <div className="absolute bottom-3 right-3">
-                      <div className="bg-[#3ab19d] text-white px-3 py-1 rounded-lg font-bold text-sm">
-                        {pkg.price}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-lg text-gray-900 mb-2">
-                      {pkg.title}
-                    </h3>
-                    <div className="flex items-center gap-1 text-gray-500 text-sm mb-3">
-                      <MapPin className="w-4 h-4 text-[#3ab19d]" />
-                      <span>{pkg.location}</span>
-                    </div>
-                    <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-[#ffd166] fill-[#ffd166]" />
-                        <span className="text-sm font-medium">4.8</span>
-                      </div>
-                      <span className="text-[#3ab19d] text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
-                        View <ChevronRight className="w-4 h-4" />
-                      </span>
-                    </div>
-                  </div>
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#3ab19d] to-transparent h-0 group-hover:h-16 transition-all duration-300 flex items-end justify-center pb-3 opacity-0 group-hover:opacity-100">
-                    <span className="text-white text-sm font-semibold">
-                      Login to explore →
-                    </span>
-                  </div>
-                </motion.div>
-              ))}
+            <div className="text-center py-16">
+              <Compass className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                No packages available yet
+              </h3>
+              <p className="text-gray-500">
+                Check back soon for amazing travel experiences!
+              </p>
             </div>
           )}
 

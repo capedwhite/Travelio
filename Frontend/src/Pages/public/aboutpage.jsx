@@ -91,7 +91,7 @@ export default function AboutPage() {
       backgroundImage: "url('/images/aboutbg.png')",
     }}
   />
-
+ <div className="absolute inset-0 bg-black/50 z-5" />
 
         {/* Decorative elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">

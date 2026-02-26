@@ -5,7 +5,7 @@ import ForgetPassword from "../Pages/public/Forgetpassword";
 import ResetPassword from "../Pages/public/ResetPassword";
 import { GoogleSuccess } from "../Pages/public/Login";
 import LandingNavbar from "../components/LandingNavbar";
-
+import { ClipLoader } from "react-spinners"
 const Landing = React.lazy(() => import("../Pages/public/LandingPage"));
 const LoginPage = React.lazy(() => import("../Pages/public/Login"));
 const SignupPage = React.lazy(() => import("../Pages/public/Signup"));

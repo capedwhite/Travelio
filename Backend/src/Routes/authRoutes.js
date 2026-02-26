@@ -7,6 +7,7 @@ import {
   resetPassword,
 } from "../Controller/authcontroller.js";
 import passport from "passport";
+import { getactivePackage } from "../Controller/packageController.js";
 const router = express.Router();
 router.post("/login", login);
 router.post("/signup", signUp);
@@ -29,5 +30,5 @@ router.get(
   }),
   googleCallback,
 );
-
+router.get("/explorepackages", getactivePackage);
 export default router;
