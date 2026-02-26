@@ -9,6 +9,7 @@ import {
 import {
   getallbargains,
   getAllbookings,
+  getAllPackagesAdmin,
   updateBookingStatus,
   updateBargainStatus,
 } from "../Controller/bookingController.js";
@@ -40,6 +41,7 @@ router.get("/dashboard/trends", getBookingTrends);
 router.get("/dashboard/activity", getRecentActivity);
 router.get("/dashboard/active-users", getActiveUsers);
 router.post("/addpackages", upload.any(), createPackage);
+router.get("/packages", getAllPackagesAdmin);
 router.get("/packagebooking", getAllbookings);
 router.get("/packagebargain", getallbargains);
 router.put("/bargain/:bargainId/status", updateBargainStatus);

@@ -449,7 +449,7 @@ function CreatePackage() {
 
   const getallpackages = async () => {
     try {
-      const res = await api.get("/admin/packagebooking");
+      const res = await api.get("/admin/packages");
       setAllpackages(res.data.data);
       console.log(res.data.data);
       console.log(res.data.message);
@@ -1269,9 +1269,9 @@ function AdminPackagesTable({ packages, refetch }) {
   const filteredPackages = useMemo(() => {
     return packages.filter((pkg) => {
       const matchesSearch =
-        pkg.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        pkg.destination.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesTag = filterTag === "All" || pkg.tag === filterTag;
+        pkg.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        pkg.locations?.city?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesTag = filterTag === "All" || pkg.tags?.[0] === filterTag;
       const matchesStatus =
         filterStatus === "All" || pkg.status === filterStatus;
       return matchesSearch && matchesTag && matchesStatus;
@@ -1459,7 +1459,7 @@ function AdminPackagesTable({ packages, refetch }) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <DataTable
           columns={columns}
-          data={packages}
+          data={filteredPackages}
           pagination
           paginationPerPage={10}
           paginationRowsPerPageOptions={[5, 10, 15, 20]}

@@ -5,19 +5,24 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useAuth } from "../../context/authContext.jsx";
 import { signupSchema } from "./schema/signupschema.jsx";
+import toast from "react-hot-toast";
+import { LoadingProvider } from "../../context/loadingContext.jsx";
 
 export default function SignupPage() {
+const[loading,setLoading]=useState(false)
   const {
     register,
     handleSubmit,
     formState: { errors },
     getValues,
+      formState: { isSubmitting },
   } = useForm({ resolver: zodResolver(signupSchema) });
   const { login } = useAuth();
   const navigate = useNavigate();
   const [eyepass, setEyepass] = useState("");
   const [eyeretype, setEyeretype] = useState("");
   const onsubmit = async (data) => {
+    setLoading(true);
     try {
       const res = await api.post("/auth/signup", data);
       await login(res.data.token);
@@ -25,7 +30,10 @@ export default function SignupPage() {
       navigate("/explorepackages");
     } catch (err) {
       console.log(err);
-      alert(err.response?.data?.message || "Signup failed");
+      toast.error(err.response?.data?.message || "Signup failed");
+    }
+    finally{
+      setLoading(false);
     }
   };
   console.log(errors);
@@ -168,8 +176,8 @@ export default function SignupPage() {
               {errors.retype && (
                 <p className="text-[red] text-xs">{errors.retype.message}</p>
               )}
-              <button className="w-full h-[40px] rounded-lg bg-[#3ab19d] text-white text-sm mt-4 hover:opacity-70 transition">
-                Sign-In
+              <button className="w-full h-[40px] rounded-lg bg-[#3ab19d] text-white text-sm mt-4 hover:opacity-70 transition" type="submit" disabled={isSubmitting}>
+               {loading ? "Signing in...." : "Sign-In"}
               </button>
 
               <div className="flex gap-2 mt-3 text-sm">

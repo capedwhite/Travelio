@@ -17,46 +17,47 @@ function TravelChallenges() {
   const [challengeDetails, setChallengeDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [topusers, setTopusers] = useState(null);
-  const [ loading,setLoading]=useState(false);
-  const {user}=useAuth();
-  const userId=user.id
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const { user } = useAuth();
+  const userId = user.id;
   const getallChallenges = async () => {
-
     try {
       setLoading(true);
       const res = await api.get("/user/getchallenges");
-      console.log(res.data.data)
-      const data = res.data.data.map((challenge) => {
-        const submissions = challenge.submissions || [];
-        return {
-          ...challenge,
-          participantsCount: submissions.length,
-          hasSubmitted: challenge.hasSubmitted,
-        };
-      });
-          setLoading(false);
+      console.log(res.data.data);
+      const now = new Date();
+      const data = res.data.data
+        .filter((challenge) => {
+          // Filter out challenges that have passed their deadline
+          if (!challenge.submissionDeadline) return true;
+          return new Date(challenge.submissionDeadline) >= now;
+        })
+        .map((challenge) => {
+          const submissions = challenge.submissions || [];
+          return {
+            ...challenge,
+            participantsCount: submissions.length,
+            hasSubmitted: challenge.hasSubmitted,
+          };
+        });
+      setLoading(false);
       setChallenges(data);
-  
     } catch (error) {
-      console.log(error.message)
-      console.log(error.response?.data?.message)
+      console.log(error.message);
+      console.log(error.response?.data?.message);
     }
-
   };
 
-
   const challengeStats = {
-    totalCompleted: challenges.filter(ch => ch.hasSubmitted).length,
-    remaining: challenges.filter(ch => !ch.hasSubmitted).length,
+    totalCompleted: challenges.filter((ch) => ch.hasSubmitted).length,
+    remaining: challenges.filter((ch) => !ch.hasSubmitted).length,
     won: challenges.filter(
-      ch =>
-        ch.result === "published" &&
-        ch.winnerId === userId
+      (ch) => ch.result === "published" && ch.winnerId === userId,
     ).length,
   };
 
-
-  const completedChallenges = challenges.filter(ch => ch.hasSubmitted);
+  const completedChallenges = challenges.filter((ch) => ch.hasSubmitted);
 
   const gettopusers = async () => {
     try {
@@ -94,7 +95,9 @@ function TravelChallenges() {
       const res = await api.get(`/user/getchallenges/${challenge.id}`);
       setChallengeDetails(res.data.data);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to load challenge details");
+      toast.error(
+        error.response?.data?.message || "Failed to load challenge details",
+      );
     } finally {
       setLoadingDetails(false);
     }
@@ -119,6 +122,7 @@ function TravelChallenges() {
 
   const handleSubmitEntry = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
 
     try {
       const formData = new FormData();
@@ -135,16 +139,18 @@ function TravelChallenges() {
     } catch (error) {
       console.log(error.message);
       toast.error(error.response?.data?.message || "Failed to submit entry");
+    } finally {
+      setSubmitting(false);
     }
   };
-if(loading){
-  return(
-    <div className="flex items-center justify-center h-[60vh]">
-          <ClipLoader size={35} color="#14B8A6" />
-      <p className="text-gray-500 mx-3 ">Loading challenges...</p>
-    </div>
-  )
-}
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <ClipLoader size={35} color="#14B8A6" />
+        <p className="text-gray-500 mx-3 ">Loading challenges...</p>
+      </div>
+    );
+  }
   return (
     <div className="px-4 md:px-10 py-10">
       <div className="max-w-7xl mx-auto flex gap-8">
@@ -160,8 +166,8 @@ if(loading){
               Compete, explore, and win rewards
             </h1>
             <p className="text-sm text-gray-600 max-w-2xl">
-              Join curated travel challenges, share your experiences, and stand a
-              chance to earn exciting awards for your journeys.
+              Join curated travel challenges, share your experiences, and stand
+              a chance to earn exciting awards for your journeys.
             </p>
           </div>
 
@@ -173,7 +179,9 @@ if(loading){
                   <Upload className="w-5 h-5 text-teal-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">{challengeStats.totalCompleted}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {challengeStats.totalCompleted}
+                  </p>
                   <p className="text-xs text-gray-500">Completed</p>
                 </div>
               </div>
@@ -185,7 +193,9 @@ if(loading){
                   <Clock className="w-5 h-5 text-amber-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">{challengeStats.remaining}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {challengeStats.remaining}
+                  </p>
                   <p className="text-xs text-gray-500">Remaining</p>
                 </div>
               </div>
@@ -197,7 +207,9 @@ if(loading){
                   <Award className="w-5 h-5 text-yellow-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">{challengeStats.won}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {challengeStats.won}
+                  </p>
                   <p className="text-xs text-gray-500">Won</p>
                 </div>
               </div>
@@ -225,8 +237,7 @@ if(loading){
               Top Participants
             </h2>
             <p className="text-xs text-gray-500 mb-4">
-           Top 3 travelers who participated 
-  
+              Top 3 travelers who participated
             </p>
             {!topusers || topusers.length === 0 ? (
               <div className="space-y-3 text-xs text-gray-600">
@@ -274,8 +285,12 @@ if(loading){
                   <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-2">
                     <Trophy className="w-6 h-6 text-gray-400" />
                   </div>
-                  <p className="text-xs text-gray-500">No challenges completed yet</p>
-                  <p className="text-[10px] text-gray-400 mt-1">Start participating to see your progress!</p>
+                  <p className="text-xs text-gray-500">
+                    No challenges completed yet
+                  </p>
+                  <p className="text-[10px] text-gray-400 mt-1">
+                    Start participating to see your progress!
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -289,7 +304,9 @@ if(loading){
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
-                              <span className="text-[10px] font-bold text-green-700">✓</span>
+                              <span className="text-[10px] font-bold text-green-700">
+                                ✓
+                              </span>
                             </div>
                             <p className="text-xs font-medium text-gray-900 truncate">
                               {challenge.challengeName}
@@ -297,13 +314,18 @@ if(loading){
                           </div>
                           <div className="flex items-center gap-2 text-[10px] text-gray-500">
                             <Users className="w-3 h-3" />
-                            <span>{challenge.participantsCount} participants</span>
-                            {challenge.result === "published" && challenge.winnerId && (
-                              <>
-                                <span>•</span>
-                                <span className="text-amber-600 font-medium">Winner announced!</span>
-                              </>
-                            )}
+                            <span>
+                              {challenge.participantsCount} participants
+                            </span>
+                            {challenge.result === "published" &&
+                              challenge.winnerId && (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-amber-600 font-medium">
+                                    Winner announced!
+                                  </span>
+                                </>
+                              )}
                           </div>
                         </div>
                       </div>
@@ -313,7 +335,8 @@ if(loading){
                   {completedChallenges.length > 5 && (
                     <div className="text-center py-2">
                       <p className="text-xs text-gray-500">
-                        +{completedChallenges.length - 5} more completed challenges
+                        +{completedChallenges.length - 5} more completed
+                        challenges
                       </p>
                     </div>
                   )}
@@ -399,9 +422,11 @@ if(loading){
                 </button>
                 <button
                   type="submit"
-                  className="rounded-lg bg-teal-600 px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-1"
+                  disabled={submitting}
+                  className="rounded-lg bg-teal-600 px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
-                  Submit entry
+                  {submitting && <ClipLoader size={14} color="#ffffff" />}
+                  {submitting ? "Submitting..." : "Submit entry"}
                 </button>
               </div>
             </form>
@@ -411,8 +436,14 @@ if(loading){
 
       {/* Challenge Details Modal */}
       {showDetailsModal && challengeDetails && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={closeDetailsModal}>
-          <div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 relative" onClick={(e)=>e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+          onClick={closeDetailsModal}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 relative"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               onClick={closeDetailsModal}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
@@ -457,7 +488,8 @@ if(loading){
                       </p>
                     )}
                     {challengeDetails.currentUserSubmission.images &&
-                      challengeDetails.currentUserSubmission.images.length > 0 && (
+                      challengeDetails.currentUserSubmission.images.length >
+                        0 && (
                         <div className="grid grid-cols-2 gap-3">
                           {challengeDetails.currentUserSubmission.images.map(
                             (img, idx) => (
@@ -471,7 +503,7 @@ if(loading){
                                   className="w-full h-full object-cover"
                                 />
                               </div>
-                            )
+                            ),
                           )}
                         </div>
                       )}
@@ -511,7 +543,7 @@ if(loading){
                                     className="w-full h-full object-cover"
                                   />
                                 </div>
-                              )
+                              ),
                             )}
                           </div>
                         )}
@@ -522,10 +554,12 @@ if(loading){
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
                     <Users className="w-4 h-4 text-teal-600" />
-                    All Participants ({challengeDetails.submissions?.length || 0})
+                    All Participants (
+                    {challengeDetails.submissions?.length || 0})
                   </h3>
                   <div className="space-y-3 max-h-64 overflow-y-auto">
-                    {challengeDetails.submissions && challengeDetails.submissions.length > 0 ? (
+                    {challengeDetails.submissions &&
+                    challengeDetails.submissions.length > 0 ? (
                       challengeDetails.submissions.map((submission, idx) => (
                         <div
                           key={submission.submissionId}
@@ -534,14 +568,18 @@ if(loading){
                           <div className="flex items-start justify-between mb-2">
                             <div>
                               <p className="text-xs font-medium text-gray-900">
-                                {submission.user?.username || `User #${submission.userId}`}
+                                {submission.user?.username ||
+                                  `User #${submission.userId}`}
                               </p>
                               <p className="text-[10px] text-gray-500">
                                 Submitted on{" "}
-                                {new Date(submission.submissionDate).toLocaleDateString()}
+                                {new Date(
+                                  submission.submissionDate,
+                                ).toLocaleDateString()}
                               </p>
                             </div>
-                            {challengeDetails.winnerId === submission.userId && (
+                            {challengeDetails.winnerId ===
+                              submission.userId && (
                               <span className="text-[10px] font-medium text-amber-700 bg-amber-100 px-2 py-1 rounded-full">
                                 Winner
                               </span>
@@ -552,22 +590,25 @@ if(loading){
                               {submission.caption}
                             </p>
                           )}
-                          {submission.images && submission.images.length > 0 && (
-                            <div className="flex gap-2">
-                              {submission.images.slice(0, 2).map((img, imgIdx) => (
-                                <div
-                                  key={imgIdx}
-                                  className="w-16 h-16 rounded overflow-hidden border border-gray-200"
-                                >
-                                  <img
-                                    src={`http://localhost:3000/${img}`}
-                                    alt={`${idx + 1}`}
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          )}
+                          {submission.images &&
+                            submission.images.length > 0 && (
+                              <div className="flex gap-2">
+                                {submission.images
+                                  .slice(0, 2)
+                                  .map((img, imgIdx) => (
+                                    <div
+                                      key={imgIdx}
+                                      className="w-16 h-16 rounded overflow-hidden border border-gray-200"
+                                    >
+                                      <img
+                                        src={`http://localhost:3000/${img}`}
+                                        alt={`${idx + 1}`}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    </div>
+                                  ))}
+                              </div>
+                            )}
                         </div>
                       ))
                     ) : (
@@ -615,7 +656,10 @@ function ChallengeCard({ challenge, index, onSubmitClick, onViewDetails }) {
 
       {/* Hover Overlay - excludes button area */}
       {isHovered && (
-        <div className="absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center z-10" style={{bottom: '5rem'}}>
+        <div
+          className="absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center z-10"
+          style={{ bottom: "5rem" }}
+        >
           <button
             onClick={onViewDetails}
             className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-teal-700 transition"

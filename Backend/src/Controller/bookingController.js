@@ -49,10 +49,10 @@ export const bookpackage = async (req, res) => {
       });
     }
 
-pkg.availability = {
-  ...pkg.availability,
-  currentBookings: pkg.availability.currentBookings + Number(travelers),
-};
+    pkg.availability = {
+      ...pkg.availability,
+      currentBookings: pkg.availability.currentBookings + Number(travelers),
+    };
 
     await pkg.save({ transaction });
 
@@ -132,12 +132,10 @@ export const bargain = async (req, res) => {
       notes,
       userId: userid,
     });
-    res
-      .status(200)
-      .send({
-        data: bargaining,
-        message: "sucessfully submitted bargain request",
-      });
+    res.status(200).send({
+      data: bargaining,
+      message: "sucessfully submitted bargain request",
+    });
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
@@ -159,6 +157,26 @@ export const getAllbookings = async (req, res) => {
     res
       .status(200)
       .send({ data: getbookings, message: "sucessfully fetched all bookings" });
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+};
+
+export const getAllPackagesAdmin = async (req, res) => {
+  console.log("api hitting - get all packages for admin");
+  try {
+    const packages = await Package.findAll({
+      include: [
+        {
+          model: Booking,
+          required: false, // Include packages even without bookings
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+    res
+      .status(200)
+      .send({ data: packages, message: "successfully fetched all packages" });
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
@@ -197,12 +215,9 @@ export const updateBargainStatus = async (req, res) => {
     }
 
     if (!["accepted", "declined", "pending"].includes(status.toLowerCase())) {
-      return res
-        .status(400)
-        .send({
-          message:
-            "Invalid status. Must be 'accepted', 'declined', or 'pending'",
-        });
+      return res.status(400).send({
+        message: "Invalid status. Must be 'accepted', 'declined', or 'pending'",
+      });
     }
 
     const bargain = await Bargain.findByPk(bargainId);
