@@ -309,30 +309,7 @@ function MyProfile() {
               </div>
             </div>
 
-            {/* STATS SECTION */}
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">
-                Your Travel Stats
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl text-center">
-                  <div className="text-2xl font-bold text-blue-600 mb-1">0</div>
-                  <div className="text-sm text-blue-700">Posts</div>
-                </div>
-                <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-xl text-center">
-                  <div className="text-2xl font-bold text-green-600 mb-1">0</div>
-                  <div className="text-sm text-green-700">Following</div>
-                </div>
-                <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-xl text-center">
-                  <div className="text-2xl font-bold text-purple-600 mb-1">0</div>
-                  <div className="text-sm text-purple-700">Followers</div>
-                </div>
-                <div className="bg-gradient-to-br from-pink-50 to-pink-100 p-4 rounded-xl text-center">
-                  <div className="text-2xl font-bold text-pink-600 mb-1">0</div>
-                  <div className="text-sm text-pink-700">Challenges Won</div>
-                </div>
-              </div>
-            </div>
+      
           </div>
         </div>
       </div>

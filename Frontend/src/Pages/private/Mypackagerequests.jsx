@@ -15,6 +15,7 @@ import {
   Target,
   Award,
   TrendingUp,
+  Search,
 } from "lucide-react";
 import api from "../../api/axios";
 import toast from "react-hot-toast";
@@ -26,6 +27,7 @@ function Mypackagerequests() {
   const [bargainPackages, setBargainPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("requests");
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -111,6 +113,20 @@ function Mypackagerequests() {
           </p>
         </div>
 
+        {/* Search Bar */}
+        <div className="max-w-xl mx-auto mb-8">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by destination or package name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent shadow-sm"
+            />
+          </div>
+        </div>
+
         {/* Tab Navigation */}
         <div className="flex justify-center mb-8">
           <div className="bg-white rounded-2xl p-2 shadow-lg border border-teal-100">
@@ -152,7 +168,16 @@ function Mypackagerequests() {
               </div>
             </div>
 
-            {packageRequests.length === 0 ? (
+            {packageRequests.filter(
+              (request) =>
+                searchTerm === "" ||
+                request.destination
+                  ?.toLowerCase()
+                  .includes(searchTerm.toLowerCase()) ||
+                request.package?.title
+                  ?.toLowerCase()
+                  .includes(searchTerm.toLowerCase()),
+            ).length === 0 ? (
               <div className="text-center py-16">
                 <Package className="w-20 h-20 text-gray-300 mx-auto mb-6" />
                 <h3 className="text-xl font-bold text-gray-600 mb-3">
@@ -172,213 +197,225 @@ function Mypackagerequests() {
               </div>
             ) : (
               <div className="grid gap-6">
-                {packageRequests.map((request) => (
-                  <div
-                    key={request.id}
-                    className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all"
-                  >
-                    {/* Request Header */}
-                    <div className="bg-gray-50 border-b border-gray-200 p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center">
-                            {getStatusIcon(request.status)}
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-bold text-gray-900">
-                              {request.destination}
-                            </h3>
-                            <p className="text-gray-600">
-                              Request #{request.id} • Submitted{" "}
-                              {formatDate(request.createdAt)}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div
-                            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold ${
-                              request.status === "processed"
-                                ? "bg-emerald-100 text-emerald-700"
-                                : request.status === "pending"
-                                  ? "bg-amber-100 text-amber-700"
-                                  : "bg-red-100 text-red-700"
-                            }`}
-                          >
-                            {request.status === "processed" && (
-                              <Award className="w-4 h-4" />
-                            )}
-                            {request.status === "pending" && (
-                              <Clock className="w-4 h-4" />
-                            )}
-                            {request.status === "cancelled" && (
-                              <XCircle className="w-4 h-4" />
-                            )}
-                            {request.status.charAt(0).toUpperCase() +
-                              request.status.slice(1)}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Request Details */}
-                    <div className="p-6">
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                        <div className="bg-blue-100 rounded-xl p-4 text-center">
-                          <Calendar className="w-6 h-6 text-teal-600 mx-auto mb-2" />
-                          <div className="text-sm text-gray-600 mb-1">
-                            Travel Date
-                          </div>
-                          <div className="font-semibold text-gray-900">
-                            {formatDate(request.travelDate)}
-                          </div>
-                        </div>
-                        <div className="bg-blue-100 rounded-xl p-4 text-center">
-                          <Clock className="w-6 h-6 text-cyan-600 mx-auto mb-2" />
-                          <div className="text-sm text-gray-600 mb-1">
-                            Duration
-                          </div>
-                          <div className="font-semibold text-gray-900">
-                            {request.duration}
-                          </div>
-                        </div>
-                        <div className="bg-blue-100 rounded-xl p-4 text-center">
-                          <Users className="w-6 h-6 text-emerald-600 mx-auto mb-2" />
-                          <div className="text-sm text-gray-600 mb-1">
-                            Travelers
-                          </div>
-                          <div className="font-semibold text-gray-900">
-                            {request.travelers}
-                          </div>
-                        </div>
-                        <div className="bg-blue-100 rounded-xl p-4 text-center">
-                          <IndianRupee className="w-6 h-6 text-amber-600 mx-auto mb-2" />
-                          <div className="text-sm text-gray-600 mb-1">
-                            Budget
-                          </div>
-                          <div className="font-semibold text-gray-900">
-                            {request.budget}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Special Requests */}
-                      {request.specialRequests && (
-                        <div className="bg-green-100 rounded-xl p-4 mb-6">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Heart className="w-5 h-5 text-blue-600" />
-                            <span className="font-semibold text-gray-900">
-                              Special Requests
-                            </span>
-                          </div>
-                          <p className="text-gray-700">
-                            {request.specialRequests}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Status Message */}
-                      <div className="flex justify-end">
-                        {request.status === "processed" && request.package ? (
-                          <>
-                            <div className="text-center bg-emerald-50 rounded-xl p-4 w-full">
-                              <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-lg text-sm font-semibold mb-2">
-                                <CheckCircle className="w-4 h-4" />
-                                Package Created!
-                              </div>
-                              <p className="text-sm text-emerald-700">
-                                Our team has created a custom package tailored
-                                to your requirements.
+                {packageRequests
+                  .filter(
+                    (request) =>
+                      searchTerm === "" ||
+                      request.destination
+                        ?.toLowerCase()
+                        .includes(searchTerm.toLowerCase()) ||
+                      request.package?.title
+                        ?.toLowerCase()
+                        .includes(searchTerm.toLowerCase()),
+                  )
+                  .map((request) => (
+                    <div
+                      key={request.id}
+                      className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all"
+                    >
+                      {/* Request Header */}
+                      <div className="bg-gray-50 border-b border-gray-200 p-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center">
+                              {getStatusIcon(request.status)}
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-bold text-gray-900">
+                                {request.destination}
+                              </h3>
+                              <p className="text-gray-600">
+                                Request #{request.id} • Submitted{" "}
+                                {formatDate(request.createdAt)}
                               </p>
-                              <div className="bg-white border border-gray-200 rounded-xl p-4 pr-6 pl-6 ">
-                                <div className="flex items-center justify-between mb-4 ">
-                                  <img
-                                    src={`http://localhost:3000/${request.package.images.coverImage}`}
-                                    alt={request.package.title}
-                                    className="w-12 h-12 rounded-full object-cover border border-gray-300"
-                                  />
-                                  <h4 className="text-lg font-bold text-gray-900">
-                                    {request.package.title}
-                                  </h4>
-                                  <div className="text-right">
-                                    <div className="text-2xl font-bold text-teal-600">
-                                      ${request.package.price?.discountedPrice}
-                                    </div>
-                                    <div className="text-xs text-gray-600">
-                                      Your Special Price
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                  <div className="flex items-center gap-3">
-                                    <MapPin className="w-5 h-5 text-teal-600" />
-                                    <div>
-                                      <div className="text-sm text-gray-600">
-                                        Destination
-                                      </div>
-                                      <div className="font-semibold text-gray-900">
-                                        {request.package.locations?.city ||
-                                          request.package.locations?.country}
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="flex items-center gap-3">
-                                    <Clock className="w-6 h-6 text-cyan-600" />
-                                    <div>
-                                      <div className="text-sm text-gray-600">
-                                        Duration
-                                      </div>
-                                      <div className="font-semibold text-gray-900">
-                                        {request.package.duration}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="flex justify-end">
-                                  <button
-                                    onClick={() =>
-                                      navigate(
-                                        `/explorepackages/${request.package.id}`,
-                                      )
-                                    }
-                                    className="bg-teal-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-teal-700 transition flex items-center gap-2"
-                                  >
-                                    View Your Package
-                                    <ArrowRight className="w-4 h-4" />
-                                  </button>
-                                </div>
-                              </div>
                             </div>
-                          </>
-                        ) : request.status === "pending" ? (
-                          <div className="text-center bg-amber-50 rounded-xl p-4">
-                            <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-700 px-4 py-2 rounded-lg text-sm font-semibold mb-2">
-                              <Clock className="w-4 h-4" />
-                              Under Review
-                            </div>
-                            <p className="text-sm text-amber-700">
-                              We're carefully reviewing your request to create
-                              the perfect package for you.
-                            </p>
                           </div>
-                        ) : (
-                          <div className="text-center bg-red-50 rounded-xl p-4">
-                            <div className="inline-flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2 rounded-lg text-sm font-semibold mb-2">
-                              <XCircle className="w-4 h-4" />
-                              Request Cancelled
+                          <div className="text-right">
+                            <div
+                              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold ${
+                                request.status === "processed"
+                                  ? "bg-emerald-100 text-emerald-700"
+                                  : request.status === "pending"
+                                    ? "bg-amber-100 text-amber-700"
+                                    : "bg-red-100 text-red-700"
+                              }`}
+                            >
+                              {request.status === "processed" && (
+                                <Award className="w-4 h-4" />
+                              )}
+                              {request.status === "pending" && (
+                                <Clock className="w-4 h-4" />
+                              )}
+                              {request.status === "cancelled" && (
+                                <XCircle className="w-4 h-4" />
+                              )}
+                              {request.status.charAt(0).toUpperCase() +
+                                request.status.slice(1)}
                             </div>
-                            <p className="text-sm text-red-700">
-                              This request has been cancelled. Please contact us
-                              if you need assistance.
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Request Details */}
+                      <div className="p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                          <div className="bg-blue-100 rounded-xl p-4 text-center">
+                            <Calendar className="w-6 h-6 text-teal-600 mx-auto mb-2" />
+                            <div className="text-sm text-gray-600 mb-1">
+                              Travel Date
+                            </div>
+                            <div className="font-semibold text-gray-900">
+                              {formatDate(request.travelDate)}
+                            </div>
+                          </div>
+                          <div className="bg-blue-100 rounded-xl p-4 text-center">
+                            <Clock className="w-6 h-6 text-cyan-600 mx-auto mb-2" />
+                            <div className="text-sm text-gray-600 mb-1">
+                              Duration
+                            </div>
+                            <div className="font-semibold text-gray-900">
+                              {request.duration}
+                            </div>
+                          </div>
+                          <div className="bg-blue-100 rounded-xl p-4 text-center">
+                            <Users className="w-6 h-6 text-emerald-600 mx-auto mb-2" />
+                            <div className="text-sm text-gray-600 mb-1">
+                              Travelers
+                            </div>
+                            <div className="font-semibold text-gray-900">
+                              {request.travelers}
+                            </div>
+                          </div>
+                          <div className="bg-blue-100 rounded-xl p-4 text-center">
+                            <IndianRupee className="w-6 h-6 text-amber-600 mx-auto mb-2" />
+                            <div className="text-sm text-gray-600 mb-1">
+                              Budget
+                            </div>
+                            <div className="font-semibold text-gray-900">
+                              {request.budget}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Special Requests */}
+                        {request.specialRequests && (
+                          <div className="bg-green-100 rounded-xl p-4 mb-6">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Heart className="w-5 h-5 text-blue-600" />
+                              <span className="font-semibold text-gray-900">
+                                Special Requests
+                              </span>
+                            </div>
+                            <p className="text-gray-700">
+                              {request.specialRequests}
                             </p>
                           </div>
                         )}
+
+                        {/* Status Message */}
+                        <div className="flex justify-end">
+                          {request.status === "processed" && request.package ? (
+                            <>
+                              <div className="text-center bg-emerald-50 rounded-xl p-4 w-full">
+                                <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-lg text-sm font-semibold mb-2">
+                                  <CheckCircle className="w-4 h-4" />
+                                  Package Created!
+                                </div>
+                                <p className="text-sm text-emerald-700">
+                                  Our team has created a custom package tailored
+                                  to your requirements.
+                                </p>
+                                <div className="bg-white border border-gray-200 rounded-xl p-4 pr-6 pl-6 overflow-x-auto">
+                                  <div className="flex items-center justify-between mb-4 ">
+                                    <img
+                                      src={`http://localhost:3000/${request.package.images.coverImage}`}
+                                      alt={request.package.title}
+                                      className="w-12 h-12 rounded-full object-cover border border-gray-300"
+                                    />
+                                    <h4 className="text-lg font-bold text-gray-900">
+                                      {request.package.title}
+                                    </h4>
+                                    <div className="text-right">
+                                      <div className="text-2xl font-bold text-teal-600">
+                                        $
+                                        {request.package.price?.discountedPrice}
+                                      </div>
+                                      <div className="text-xs text-gray-600">
+                                        Your Special Price
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div className="flex items-center gap-3">
+                                      <MapPin className="w-5 h-5 text-teal-600" />
+                                      <div>
+                                        <div className="text-sm text-gray-600">
+                                          Destination
+                                        </div>
+                                        <div className="font-semibold text-gray-900">
+                                          {request.package.locations?.city ||
+                                            request.package.locations?.country}
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-3">
+                                      <Clock className="w-6 h-6 text-cyan-600" />
+                                      <div>
+                                        <div className="text-sm text-gray-600">
+                                          Duration
+                                        </div>
+                                        <div className="font-semibold text-gray-900">
+                                          {request.package.duration}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="flex justify-end">
+                                    <button
+                                      onClick={() =>
+                                        navigate(
+                                          `/explorepackages/${request.package.id}`,
+                                        )
+                                      }
+                                      className="bg-teal-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-teal-700 transition flex items-center gap-2"
+                                    >
+                                      View Your Package
+                                      <ArrowRight className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </>
+                          ) : request.status === "pending" ? (
+                            <div className="text-center bg-amber-50 rounded-xl p-4">
+                              <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-700 px-4 py-2 rounded-lg text-sm font-semibold mb-2">
+                                <Clock className="w-4 h-4" />
+                                Under Review
+                              </div>
+                              <p className="text-sm text-amber-700">
+                                We're carefully reviewing your request to create
+                                the perfect package for you.
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="text-center bg-red-50 rounded-xl p-4">
+                              <div className="inline-flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2 rounded-lg text-sm font-semibold mb-2">
+                                <XCircle className="w-4 h-4" />
+                                Request Cancelled
+                              </div>
+                              <p className="text-sm text-red-700">
+                                This request has been cancelled. Please contact
+                                us if you need assistance.
+                              </p>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             )}
           </div>
@@ -395,7 +432,13 @@ function Mypackagerequests() {
               </div>
             </div>
 
-            {bargainPackages.length === 0 ? (
+            {bargainPackages.filter(
+              (bargain) =>
+                searchTerm === "" ||
+                bargain.package?.title
+                  ?.toLowerCase()
+                  .includes(searchTerm.toLowerCase()),
+            ).length === 0 ? (
               <div className="text-center py-12">
                 <Target className="w-24 h-24 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-2xl font-bold text-gray-600 mb-2">
@@ -413,297 +456,306 @@ function Mypackagerequests() {
               </div>
             ) : (
               <div className="grid gap-6">
-                {bargainPackages.map((bargain) => (
-                  <div
-                    key={bargain.bargainId}
-                    className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all"
-                  >
-                    {/* Bargain Header */}
-                    <div className="bg-gray-50 border-b border-gray-200 p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          {bargain.package?.images?.coverImage && (
-                            <img
-                              src={`http://localhost:3000/${bargain.package.images.coverImage}`}
-                              alt={bargain.package.title}
-                              className="w-12 h-12 rounded-xl object-cover border border-gray-200"
-                            />
-                          )}
-                          {!bargain.package?.images?.coverImage && (
-                            <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center">
-                              <Target className="w-6 h-6 text-teal-600" />
-                            </div>
-                          )}
-                          <div>
-                            <h3 className="text-lg font-bold text-gray-900">
-                              {bargain.package?.title ||
-                                `Bargain Request #${bargain.bargainId}`}
-                            </h3>
-                            <p className="text-gray-600">
-                              Submitted {formatDate(bargain.createdAt)}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div
-                            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold ${
-                              bargain.status === "accepted"
-                                ? "bg-emerald-100 text-emerald-700"
-                                : bargain.status === "pending" ||
-                                    bargain.status === "Pending"
-                                  ? "bg-amber-100 text-amber-700"
-                                  : "bg-red-100 text-red-700"
-                            }`}
-                          >
-                            {bargain.status === "accepted" && (
-                              <CheckCircle className="w-4 h-4" />
+                {bargainPackages
+                  .filter(
+                    (bargain) =>
+                      searchTerm === "" ||
+                      bargain.package?.title
+                        ?.toLowerCase()
+                        .includes(searchTerm.toLowerCase()),
+                  )
+                  .map((bargain) => (
+                    <div
+                      key={bargain.bargainId}
+                      className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all"
+                    >
+                      {/* Bargain Header */}
+                      <div className="bg-gray-50 border-b border-gray-200 p-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            {bargain.package?.images?.coverImage && (
+                              <img
+                                src={`http://localhost:3000/${bargain.package.images.coverImage}`}
+                                alt={bargain.package.title}
+                                className="w-12 h-12 rounded-xl object-cover border border-gray-200"
+                              />
                             )}
-                            {(bargain.status === "pending" ||
-                              bargain.status === "Pending") && (
-                              <Clock className="w-4 h-4" />
+                            {!bargain.package?.images?.coverImage && (
+                              <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center">
+                                <Target className="w-6 h-6 text-teal-600" />
+                              </div>
                             )}
-                            {bargain.status === "declined" && (
-                              <XCircle className="w-4 h-4" />
-                            )}
-                            {bargain.status.charAt(0).toUpperCase() +
-                              bargain.status.slice(1).toLowerCase()}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Bargain Details */}
-                    <div className="p-6">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                        <div className="bg-gray-50 rounded-xl p-4 text-center">
-                          <IndianRupee className="w-6 h-6 text-teal-600 mx-auto mb-2" />
-                          <div className="text-sm text-gray-600 mb-1">
-                            Your Offer
-                          </div>
-                          <div className="text-xl font-bold text-gray-900">
-                            ${bargain.offerprice}
-                          </div>
-                        </div>
-                        <div className="bg-gray-50 rounded-xl p-4 text-center">
-                          <Calendar className="w-6 h-6 text-cyan-600 mx-auto mb-2" />
-                          <div className="text-sm text-gray-600 mb-1">
-                            Offer Date
-                          </div>
-                          <div className="font-semibold text-gray-900">
-                            {bargain.offerdate}
-                          </div>
-                        </div>
-                        <div className="bg-gray-50 rounded-xl p-4 text-center">
-                          <Star className="w-6 h-6 text-amber-600 mx-auto mb-2" />
-                          <div className="text-sm text-gray-600 mb-1">
-                            Status
-                          </div>
-                          <div
-                            className={`font-semibold ${
-                              bargain.status === "accepted"
-                                ? "text-emerald-600"
-                                : bargain.status === "pending" ||
-                                    bargain.status === "Pending"
-                                  ? "text-amber-600"
-                                  : "text-red-600"
-                            }`}
-                          >
-                            {bargain.status.charAt(0).toUpperCase() +
-                              bargain.status.slice(1).toLowerCase()}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Original Package Info */}
-                      {bargain.package && (
-                        <div className="bg-blue-50 rounded-xl p-4 mb-6">
-                          <div className="flex items-center gap-2 mb-3">
-                            <Package className="w-5 h-5 text-blue-600" />
-                            <span className="font-semibold text-gray-900">
-                              Original Package
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              {bargain.package.images?.coverImage && (
-                                <img
-                                  src={`http://localhost:3000/${bargain.package.images.coverImage}`}
-                                  alt={bargain.package.title}
-                                  className="w-16 h-16 rounded-lg object-cover"
-                                />
-                              )}
-                              <div>
-                                <div className="font-semibold text-gray-900">
-                                  {bargain.package.title}
-                                </div>
-                                <div className="text-sm text-gray-600 flex items-center gap-1">
-                                  <MapPin className="w-3 h-3" />
-                                  {bargain.package.locations?.city ||
-                                    bargain.package.locations?.country}
-                                </div>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-lg font-bold text-gray-900">
-                                {bargain.package.price?.currency || "₹"}{" "}
-                                {bargain.package.price?.discountedPrice ||
-                                  bargain.package.price?.originalPrice}
-                              </div>
-                              <div className="text-xs text-gray-600">
-                                Original Price
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Notes */}
-                      {bargain.notes && (
-                        <div className="bg-blue-50 rounded-xl p-4 mb-6">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Heart className="w-5 h-5 text-blue-600" />
-                            <span className="font-semibold text-gray-900">
-                              Your Notes
-                            </span>
-                          </div>
-                          <p className="text-gray-700">{bargain.notes}</p>
-                        </div>
-                      )}
-
-                      {/* Package Details (if bargain was accepted) */}
-                      {bargain.privatePackage &&
-                        bargain.status === "accepted" && (
-                          <div className="border-t border-gray-200 pt-6">
-                            <div className="bg-emerald-50 rounded-xl p-4 mb-4">
-                              <div className="flex items-center gap-2 mb-3">
-                                <Award className="w-5 h-5 text-emerald-600" />
-                                <span className="font-bold text-emerald-800">
-                                  🎉 Your Bargain Was Accepted!
-                                </span>
-                              </div>
-                              <p className="text-emerald-700 text-sm">
-                                Congratulations! A custom package has been
-                                created based on your offer.
+                            <div>
+                              <h3 className="text-lg font-bold text-gray-900">
+                                {bargain.package?.title ||
+                                  `Bargain Request #${bargain.bargainId}`}
+                              </h3>
+                              <p className="text-gray-600">
+                                Submitted {formatDate(bargain.createdAt)}
                               </p>
                             </div>
+                          </div>
+                          <div className="text-right">
+                            <div
+                              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold ${
+                                bargain.status === "accepted"
+                                  ? "bg-emerald-100 text-emerald-700"
+                                  : bargain.status === "pending" ||
+                                      bargain.status === "Pending"
+                                    ? "bg-amber-100 text-amber-700"
+                                    : "bg-red-100 text-red-700"
+                              }`}
+                            >
+                              {bargain.status === "accepted" && (
+                                <CheckCircle className="w-4 h-4" />
+                              )}
+                              {(bargain.status === "pending" ||
+                                bargain.status === "Pending") && (
+                                <Clock className="w-4 h-4" />
+                              )}
+                              {bargain.status === "declined" && (
+                                <XCircle className="w-4 h-4" />
+                              )}
+                              {bargain.status.charAt(0).toUpperCase() +
+                                bargain.status.slice(1).toLowerCase()}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
 
-                            <div className="bg-white border border-gray-200 rounded-xl p-4">
-                              <div className="flex items-center justify-between mb-4">
-                                <h4 className="text-lg font-bold text-gray-900">
-                                  {bargain.privatePackage.title}
-                                </h4>
-                                <div className="text-right">
-                                  <div className="text-2xl font-bold text-teal-600">
-                                    $
-                                    {
-                                      bargain.privatePackage.price
-                                        ?.discountedPrice
-                                    }
+                      {/* Bargain Details */}
+                      <div className="p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                          <div className="bg-gray-50 rounded-xl p-4 text-center">
+                            <IndianRupee className="w-6 h-6 text-teal-600 mx-auto mb-2" />
+                            <div className="text-sm text-gray-600 mb-1">
+                              Your Offer
+                            </div>
+                            <div className="text-xl font-bold text-gray-900">
+                              ${bargain.offerprice}
+                            </div>
+                          </div>
+                          <div className="bg-gray-50 rounded-xl p-4 text-center">
+                            <Calendar className="w-6 h-6 text-cyan-600 mx-auto mb-2" />
+                            <div className="text-sm text-gray-600 mb-1">
+                              Offer Date
+                            </div>
+                            <div className="font-semibold text-gray-900">
+                              {bargain.offerdate}
+                            </div>
+                          </div>
+                          <div className="bg-gray-50 rounded-xl p-4 text-center">
+                            <Star className="w-6 h-6 text-amber-600 mx-auto mb-2" />
+                            <div className="text-sm text-gray-600 mb-1">
+                              Status
+                            </div>
+                            <div
+                              className={`font-semibold ${
+                                bargain.status === "accepted"
+                                  ? "text-emerald-600"
+                                  : bargain.status === "pending" ||
+                                      bargain.status === "Pending"
+                                    ? "text-amber-600"
+                                    : "text-red-600"
+                              }`}
+                            >
+                              {bargain.status.charAt(0).toUpperCase() +
+                                bargain.status.slice(1).toLowerCase()}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Original Package Info */}
+                        {bargain.package && (
+                          <div className="bg-blue-50 rounded-xl p-4 mb-6">
+                            <div className="flex items-center gap-2 mb-3">
+                              <Package className="w-5 h-5 text-blue-600" />
+                              <span className="font-semibold text-gray-900">
+                                Original Package
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                {bargain.package.images?.coverImage && (
+                                  <img
+                                    src={`http://localhost:3000/${bargain.package.images.coverImage}`}
+                                    alt={bargain.package.title}
+                                    className="w-16 h-16 rounded-lg object-cover"
+                                  />
+                                )}
+                                <div>
+                                  <div className="font-semibold text-gray-900">
+                                    {bargain.package.title}
                                   </div>
-                                  <div className="text-xs text-gray-600">
-                                    Your Special Price
+                                  <div className="text-sm text-gray-600 flex items-center gap-1">
+                                    <MapPin className="w-3 h-3" />
+                                    {bargain.package.locations?.city ||
+                                      bargain.package.locations?.country}
                                   </div>
                                 </div>
                               </div>
-
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                <div className="flex items-center gap-3">
-                                  <MapPin className="w-5 h-5 text-teal-600" />
-                                  <div>
-                                    <div className="text-sm text-gray-600">
-                                      Destination
-                                    </div>
-                                    <div className="font-semibold text-gray-900">
-                                      {bargain.privatePackage.locations?.city ||
-                                        bargain.privatePackage.locations
-                                          ?.country}
-                                    </div>
-                                  </div>
+                              <div className="text-right">
+                                <div className="text-lg font-bold text-gray-900">
+                                  {bargain.package.price?.currency || "₹"}{" "}
+                                  {bargain.package.price?.discountedPrice ||
+                                    bargain.package.price?.originalPrice}
                                 </div>
-                                <div className="flex items-center gap-3">
-                                  <Clock className="w-6 h-6 text-cyan-600" />
-                                  <div>
-                                    <div className="text-sm text-gray-600">
-                                      Duration
-                                    </div>
-                                    <div className="font-semibold text-gray-900">
-                                      {bargain.privatePackage.duration}
-                                    </div>
-                                  </div>
+                                <div className="text-xs text-gray-600">
+                                  Original Price
                                 </div>
-                              </div>
-
-                              <div className="flex justify-end">
-                                <button
-                                  onClick={() =>
-                                    navigate(
-                                      `/explorepackages/${bargain.privatePackage.id}`,
-                                    )
-                                  }
-                                  className="bg-teal-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-teal-700 transition flex items-center gap-2"
-                                >
-                                  View Your Package
-                                  <ArrowRight className="w-4 h-4" />
-                                </button>
                               </div>
                             </div>
                           </div>
                         )}
 
-                      {/* No Package Message */}
-                      {!bargain.privatePackage && (
-                        <div className="border-t border-gray-200 pt-6">
-                          <div className="text-center py-8">
-                            <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                            <h4 className="text-lg font-semibold text-gray-600 mb-2">
-                              No Package Generated Yet
-                            </h4>
-                            <p className="text-gray-500 text-sm max-w-md mx-auto">
-                              {bargain.status === "accepted"
-                                ? "Your offer was accepted! We're working on creating your custom package."
-                                : bargain.status === "pending" ||
-                                    bargain.status === "Pending"
-                                  ? "Your offer is under review. A package will be created once accepted."
-                                  : "Your offer was not accepted, so no package was generated."}
+                        {/* Notes */}
+                        {bargain.notes && (
+                          <div className="bg-blue-50 rounded-xl p-4 mb-6">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Heart className="w-5 h-5 text-blue-600" />
+                              <span className="font-semibold text-gray-900">
+                                Your Notes
+                              </span>
+                            </div>
+                            <p className="text-gray-700">{bargain.notes}</p>
+                          </div>
+                        )}
+
+                        {/* Package Details (if bargain was accepted) */}
+                        {bargain.privatePackage &&
+                          bargain.status === "accepted" && (
+                            <div className="border-t border-gray-200 pt-6">
+                              <div className="bg-emerald-50 rounded-xl p-4 mb-4">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <Award className="w-5 h-5 text-emerald-600" />
+                                  <span className="font-bold text-emerald-800">
+                                    🎉 Your Bargain Was Accepted!
+                                  </span>
+                                </div>
+                                <p className="text-emerald-700 text-sm">
+                                  Congratulations! A custom package has been
+                                  created based on your offer.
+                                </p>
+                              </div>
+
+                              <div className="bg-white border border-gray-200 rounded-xl p-4">
+                                <div className="flex items-center justify-between mb-4">
+                                  <h4 className="text-lg font-bold text-gray-900">
+                                    {bargain.privatePackage.title}
+                                  </h4>
+                                  <div className="text-right">
+                                    <div className="text-2xl font-bold text-teal-600">
+                                      $
+                                      {
+                                        bargain.privatePackage.price
+                                          ?.discountedPrice
+                                      }
+                                    </div>
+                                    <div className="text-xs text-gray-600">
+                                      Your Special Price
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                  <div className="flex items-center gap-3">
+                                    <MapPin className="w-5 h-5 text-teal-600" />
+                                    <div>
+                                      <div className="text-sm text-gray-600">
+                                        Destination
+                                      </div>
+                                      <div className="font-semibold text-gray-900">
+                                        {bargain.privatePackage.locations
+                                          ?.city ||
+                                          bargain.privatePackage.locations
+                                            ?.country}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    <Clock className="w-6 h-6 text-cyan-600" />
+                                    <div>
+                                      <div className="text-sm text-gray-600">
+                                        Duration
+                                      </div>
+                                      <div className="font-semibold text-gray-900">
+                                        {bargain.privatePackage.duration}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="flex justify-end">
+                                  <button
+                                    onClick={() =>
+                                      navigate(
+                                        `/explorepackages/${bargain.privatePackage.id}`,
+                                      )
+                                    }
+                                    className="bg-teal-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-teal-700 transition flex items-center gap-2"
+                                  >
+                                    View Your Package
+                                    <ArrowRight className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                        {/* No Package Message */}
+                        {!bargain.privatePackage && (
+                          <div className="border-t border-gray-200 pt-6">
+                            <div className="text-center py-8">
+                              <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                              <h4 className="text-lg font-semibold text-gray-600 mb-2">
+                                No Package Generated Yet
+                              </h4>
+                              <p className="text-gray-500 text-sm max-w-md mx-auto">
+                                {bargain.status === "accepted"
+                                  ? "Your offer was accepted! We're working on creating your custom package."
+                                  : bargain.status === "pending" ||
+                                      bargain.status === "Pending"
+                                    ? "Your offer is under review. A package will be created once accepted."
+                                    : "Your offer was not accepted, so no package was generated."}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Status Message */}
+                        {(bargain.status === "pending" ||
+                          bargain.status === "Pending") && (
+                          <div className="bg-amber-50 rounded-xl p-4">
+                            <div className="flex items-center gap-2">
+                              <Clock className="w-5 h-5 text-amber-600" />
+                              <span className="font-semibold text-amber-800">
+                                Under Review
+                              </span>
+                            </div>
+                            <p className="text-amber-700 text-sm mt-1">
+                              We're reviewing your offer. You'll be notified
+                              once a decision is made.
                             </p>
                           </div>
-                        </div>
-                      )}
+                        )}
 
-                      {/* Status Message */}
-                      {(bargain.status === "pending" ||
-                        bargain.status === "Pending") && (
-                        <div className="bg-amber-50 rounded-xl p-4">
-                          <div className="flex items-center gap-2">
-                            <Clock className="w-5 h-5 text-amber-600" />
-                            <span className="font-semibold text-amber-800">
-                              Under Review
-                            </span>
+                        {bargain.status === "declined" && (
+                          <div className="bg-red-50 rounded-xl p-4">
+                            <div className="flex items-center gap-2">
+                              <XCircle className="w-5 h-5 text-red-600" />
+                              <span className="font-semibold text-red-800">
+                                Offer Declined
+                              </span>
+                            </div>
+                            <p className="text-red-700 text-sm mt-1">
+                              Unfortunately, your offer couldn't be accepted at
+                              this time.
+                            </p>
                           </div>
-                          <p className="text-amber-700 text-sm mt-1">
-                            We're reviewing your offer. You'll be notified once
-                            a decision is made.
-                          </p>
-                        </div>
-                      )}
-
-                      {bargain.status === "declined" && (
-                        <div className="bg-red-50 rounded-xl p-4">
-                          <div className="flex items-center gap-2">
-                            <XCircle className="w-5 h-5 text-red-600" />
-                            <span className="font-semibold text-red-800">
-                              Offer Declined
-                            </span>
-                          </div>
-                          <p className="text-red-700 text-sm mt-1">
-                            Unfortunately, your offer couldn't be accepted at
-                            this time.
-                          </p>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             )}
           </div>

@@ -11,7 +11,8 @@ import {
   Star,
   Plane,
   Hotel,
-  Camera
+  Camera,
+  Search,
 } from "lucide-react";
 import api from "../../api/axios";
 import toast from "react-hot-toast";
@@ -21,6 +22,7 @@ function MyBookingStatus() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all"); // all, confirmed, pending, cancelled
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchBookings();
@@ -68,14 +70,23 @@ function MyBookingStatus() {
     }
   };
 
-  const filteredBookings = bookings.filter(booking => {
-    if (filter === "all") return true;
-    return booking.status?.toLowerCase().includes(filter.toLowerCase());
+  const filteredBookings = bookings.filter((booking) => {
+    const matchesFilter =
+      filter === "all" ||
+      booking.status?.toLowerCase().includes(filter.toLowerCase());
+    const matchesSearch =
+      searchTerm === "" ||
+      booking.package?.title?.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesFilter && matchesSearch;
   });
 
   const getTotalSpent = () => {
     return bookings
-      .filter(booking => booking.status?.toLowerCase() === "paid" || booking.status?.toLowerCase() === "confirmed")
+      .filter(
+        (booking) =>
+          booking.status?.toLowerCase() === "paid" ||
+          booking.status?.toLowerCase() === "confirmed",
+      )
       .reduce((total, booking) => total + (booking.price?.total || 0), 0);
   };
 
@@ -103,7 +114,9 @@ function MyBookingStatus() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Bookings</p>
-                <p className="text-3xl font-bold text-indigo-600">{bookings.length}</p>
+                <p className="text-3xl font-bold text-indigo-600">
+                  {bookings.length}
+                </p>
               </div>
               <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
                 <Plane className="w-6 h-6 text-indigo-600" />
@@ -116,7 +129,13 @@ function MyBookingStatus() {
               <div>
                 <p className="text-sm text-gray-600">Confirmed</p>
                 <p className="text-3xl font-bold text-emerald-600">
-                  {bookings.filter(b => b.status?.toLowerCase() === "confirmed" || b.status?.toLowerCase() === "paid").length}
+                  {
+                    bookings.filter(
+                      (b) =>
+                        b.status?.toLowerCase() === "confirmed" ||
+                        b.status?.toLowerCase() === "paid",
+                    ).length
+                  }
                 </p>
               </div>
               <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
@@ -130,7 +149,13 @@ function MyBookingStatus() {
               <div>
                 <p className="text-sm text-gray-600">Pending</p>
                 <p className="text-3xl font-bold text-amber-600">
-                  {bookings.filter(b => b.status?.toLowerCase() === "pending" || b.status?.toLowerCase() === "not paid").length}
+                  {
+                    bookings.filter(
+                      (b) =>
+                        b.status?.toLowerCase() === "pending" ||
+                        b.status?.toLowerCase() === "not paid",
+                    ).length
+                  }
                 </p>
               </div>
               <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
@@ -155,8 +180,19 @@ function MyBookingStatus() {
           </div>
         </div>
 
-        {/* FILTERS */}
+        {/* SEARCH AND FILTERS */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50 mb-8">
+          {/* Search Bar */}
+          <div className="relative mb-4">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by package name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+            />
+          </div>
           <div className="flex flex-wrap gap-4">
             <button
               onClick={() => setFilter("all")}
@@ -176,7 +212,15 @@ function MyBookingStatus() {
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              Confirmed ({bookings.filter(b => b.status?.toLowerCase() === "confirmed" || b.status?.toLowerCase() === "paid").length})
+              Confirmed (
+              {
+                bookings.filter(
+                  (b) =>
+                    b.status?.toLowerCase() === "confirmed" ||
+                    b.status?.toLowerCase() === "paid",
+                ).length
+              }
+              )
             </button>
             <button
               onClick={() => setFilter("not paid")}
@@ -186,7 +230,12 @@ function MyBookingStatus() {
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              Pending ({bookings.filter(b => b.status?.toLowerCase() === "not paid").length})
+              Pending (
+              {
+                bookings.filter((b) => b.status?.toLowerCase() === "not paid")
+                  .length
+              }
+              )
             </button>
             <button
               onClick={() => setFilter("cancelled")}
@@ -196,7 +245,12 @@ function MyBookingStatus() {
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              Cancelled ({bookings.filter(b => b.status?.toLowerCase() === "cancelled").length})
+              Cancelled (
+              {
+                bookings.filter((b) => b.status?.toLowerCase() === "cancelled")
+                  .length
+              }
+              )
             </button>
           </div>
         </div>
@@ -207,8 +261,12 @@ function MyBookingStatus() {
             <div className="w-24 h-24 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Plane className="w-12 h-12 text-indigo-400" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No bookings found</h3>
-            <p className="text-gray-600 mb-6">Start your travel journey by booking an amazing package!</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              No bookings found
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Start your travel journey by booking an amazing package!
+            </p>
             <button className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-8 py-3 rounded-full font-medium hover:shadow-lg transition-all transform hover:-translate-y-1">
               Explore Packages
             </button>
@@ -228,11 +286,17 @@ function MyBookingStatus() {
                         <MapPin className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-bold">{booking.package?.title}</h3>
-                        <p className="text-white/80">Booking #{booking.bookingId}</p>
+                        <h3 className="text-xl font-bold">
+                          {booking.package?.title}
+                        </h3>
+                        <p className="text-white/80">
+                          Booking #{booking.bookingId}
+                        </p>
                       </div>
                     </div>
-                    <div className={`px-4 py-2 rounded-full border flex items-center gap-2 font-medium ${getStatusColor(booking.status)}`}>
+                    <div
+                      className={`px-4 py-2 rounded-full border flex items-center gap-2 font-medium ${getStatusColor(booking.status)}`}
+                    >
                       {getStatusIcon(booking.status)}
                       {booking.status}
                     </div>
@@ -266,7 +330,9 @@ function MyBookingStatus() {
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-600">Travelers:</span>
-                          <span className="font-medium">{booking.Travelers}</span>
+                          <span className="font-medium">
+                            {booking.Travelers}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Date:</span>
@@ -276,7 +342,9 @@ function MyBookingStatus() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Booked by:</span>
-                          <span className="font-medium">{booking.Fullname}</span>
+                          <span className="font-medium">
+                            {booking.Fullname}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -289,40 +357,59 @@ function MyBookingStatus() {
                       </h4>
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">Total Amount:</span>
+                          <span className="text-sm text-gray-600">
+                            Total Amount:
+                          </span>
                           <span className="text-lg font-bold text-emerald-600 flex items-center">
                             <IndianRupee className="w-4 h-4" />
-                            {booking.price?.finalTotal?.toLocaleString() || booking.price?.total?.toLocaleString() || "N/A"}
+                            {booking.price?.finalTotal?.toLocaleString() ||
+                              booking.price?.total?.toLocaleString() ||
+                              "N/A"}
                           </span>
                         </div>
                         {booking.price?.couponApplied && (
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-green-600">Coupon Discount:</span>
+                            <span className="text-sm text-green-600">
+                              Coupon Discount:
+                            </span>
                             <span className="text-sm font-medium text-green-600 flex items-center">
                               -<IndianRupee className="w-3 h-3" />
                               {booking.price?.couponDiscount?.toLocaleString()}
                             </span>
                           </div>
                         )}
-                        {booking.price?.total && booking.price?.finalTotal && booking.price?.total !== booking.price?.finalTotal && (
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">Original Total:</span>
-                            <span className="text-sm text-gray-500 line-through flex items-center">
-                              <IndianRupee className="w-3 h-3" />
-                              {booking.price?.total?.toLocaleString()}
-                            </span>
-                          </div>
-                        )}
+                        {booking.price?.total &&
+                          booking.price?.finalTotal &&
+                          booking.price?.total !==
+                            booking.price?.finalTotal && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-600">
+                                Original Total:
+                              </span>
+                              <span className="text-sm text-gray-500 line-through flex items-center">
+                                <IndianRupee className="w-3 h-3" />
+                                {booking.price?.total?.toLocaleString()}
+                              </span>
+                            </div>
+                          )}
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">Per Person:</span>
+                          <span className="text-sm text-gray-600">
+                            Per Person:
+                          </span>
                           <span className="text-sm font-medium flex items-center">
                             <IndianRupee className="w-3 h-3" />
-                            {Math.round((booking.price?.finalTotal || booking.price?.total || 0) / booking.Travelers)}
+                            {Math.round(
+                              (booking.price?.finalTotal ||
+                                booking.price?.total ||
+                                0) / booking.Travelers,
+                            )}
                           </span>
                         </div>
                         {booking.bookingCoupon && (
                           <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-                            <span className="text-sm text-gray-600">Booking Coupon:</span>
+                            <span className="text-sm text-gray-600">
+                              Booking Coupon:
+                            </span>
                             <span className="text-sm font-mono font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">
                               {booking.bookingCoupon}
                             </span>
@@ -353,42 +440,47 @@ function MyBookingStatus() {
                           alt="Package"
                           className="w-32 h-24 object-cover rounded-lg flex-shrink-0"
                         />
-                        {booking.package.images.tourist?.slice(0, 4).map((img, idx) => (
-                          <img
-                            key={idx}
-                            src={`http://localhost:3000/${img}`}
-                            alt={`Tourist spot ${idx + 1}`}
-                            className="w-32 h-24 object-cover rounded-lg flex-shrink-0"
-                          />
-                        ))}
+                        {booking.package.images.tourist
+                          ?.slice(0, 4)
+                          .map((img, idx) => (
+                            <img
+                              key={idx}
+                              src={`http://localhost:3000/${img}`}
+                              alt={`Tourist spot ${idx + 1}`}
+                              className="w-32 h-24 object-cover rounded-lg flex-shrink-0"
+                            />
+                          ))}
                       </div>
                     </div>
                   )}
 
                   {/* LOCATIONS */}
-                  {booking.package?.locations && booking.package.locations.length > 0 && (
-                    <div className="border-t pt-6">
-                      <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-blue-600" />
-                        Destinations
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {booking.package.locations.slice(0, 5).map((location, idx) => (
-                          <span
-                            key={idx}
-                            className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium"
-                          >
-                            {location}
-                          </span>
-                        ))}
-                        {booking.package.locations.length > 5 && (
-                          <span className="bg-gray-50 text-gray-600 px-3 py-1 rounded-full text-sm font-medium">
-                            +{booking.package.locations.length - 5} more
-                          </span>
-                        )}
+                  {booking.package?.locations &&
+                    booking.package.locations.length > 0 && (
+                      <div className="border-t pt-6">
+                        <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                          <MapPin className="w-4 h-4 text-blue-600" />
+                          Destinations
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {booking.package.locations
+                            .slice(0, 5)
+                            .map((location, idx) => (
+                              <span
+                                key={idx}
+                                className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium"
+                              >
+                                {location}
+                              </span>
+                            ))}
+                          {booking.package.locations.length > 5 && (
+                            <span className="bg-gray-50 text-gray-600 px-3 py-1 rounded-full text-sm font-medium">
+                              +{booking.package.locations.length - 5} more
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               </div>
             ))}
