@@ -371,12 +371,12 @@ function PackageForm({
   }
 
   return (
-    <div className="pl-8 pr-8 pt-8 pb-6 bg-gray-50 min-h-screen">
-      <h1 className="text-gray-500 mt-1 text-lg mb-6">
+    <div className="px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-6 bg-gray-50 min-h-screen">
+      <h1 className="text-gray-500 mt-1 text-base sm:text-lg mb-4 sm:mb-6">
         {mode === "edit" ? "Edit Package" : "Create New Package"}
       </h1>
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-2xl shadow p-4 space-y-2">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="bg-white rounded-2xl shadow p-3 sm:p-4 space-y-2">
           {steps.map((step, index) => {
             const isCompleted = completedSteps.has(step);
             const isActive = activeIndex === index;
@@ -405,11 +405,11 @@ function PackageForm({
         </div>
 
         <FormProvider {...methods} key={formKey}>
-          <div className="lg:col-span-3 bg-white rounded-2xl shadow p-8">
+          <div className="lg:col-span-3 bg-white rounded-2xl shadow p-4 sm:p-6 lg:p-8">
             {renderSection()}
 
             {steps[activeIndex] !== "Publish" && (
-              <div className="flex justify-between mt-8 pt-6 border-t">
+              <div className="flex justify-between mt-6 sm:mt-8 pt-4 sm:pt-6 border-t">
                 <button
                   type="button"
                   onClick={handlePrevious}
@@ -467,7 +467,7 @@ function CreatePackage() {
     <>
       <AdminSidebar />
 
-      <div className="p-8 pt-2 bg-gray-50 min-h-screen ml-64">
+      <div className="p-4 sm:p-6 md:p-8 pt-2 bg-gray-50 min-h-screen ml-0 md:ml-64">
         <PackageForm refetch={getallpackages} />
 
         <AdminPackagesTable packages={allpackages} refetch={getallpackages} />
@@ -492,8 +492,8 @@ function BasicInfoSection() {
   const titleValue = watch("basicInfo.title");
   console.log("Current title value:", titleValue);
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Basic Info</h2>
+    <div className="space-y-4 sm:space-y-6">
+      <h2 className="text-xl sm:text-2xl font-semibold">Basic Info</h2>
       <input
         className="w-full p-3 border rounded-lg"
         placeholder="Title *"
@@ -563,9 +563,9 @@ function PricingSection() {
   }, [original, discount]);
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Pricing</h2>
-      <div className="grid grid-cols-2 gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      <h2 className="text-xl sm:text-2xl font-semibold">Pricing</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <input
           placeholder="Original Price *"
           className="p-3 border rounded-lg"
@@ -579,7 +579,7 @@ function PricingSection() {
         />
       </div>
       <select
-        className="p-3 border rounded-lg w-40"
+        className="p-3 border rounded-lg w-full sm:w-40"
         {...register("pricing.currency")}
       >
         <option>USD</option>
@@ -603,8 +603,8 @@ function PricingSection() {
 function LocationsSection() {
   const { register } = useFormContext();
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Locations</h2>
+    <div className="space-y-4 sm:space-y-6">
+      <h2 className="text-xl sm:text-2xl font-semibold">Locations</h2>
       <input
         placeholder="Country *"
         className="w-full p-3 border rounded-lg"
@@ -638,10 +638,10 @@ function TouristSpotsSection() {
   });
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Tourist Spots</h2>
+    <div className="space-y-4 sm:space-y-6">
+      <h2 className="text-xl sm:text-2xl font-semibold">Tourist Spots</h2>
       {fields.map((f, i) => (
-        <div key={f.id} className="border rounded-xl p-4 space-y-3">
+        <div key={f.id} className="border rounded-xl p-3 sm:p-4 space-y-3">
           <div className="flex justify-between items-center">
             <h3 className="font-medium">Spot {i + 1}</h3>
             {fields.length > 1 && (
@@ -688,10 +688,10 @@ function ItinerarySection() {
   const { fields, append } = useFieldArray({ control, name: "itinerary" });
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Itinerary</h2>
+    <div className="space-y-4 sm:space-y-6">
+      <h2 className="text-xl sm:text-2xl font-semibold">Itinerary</h2>
       {fields.map((f, i) => (
-        <div key={f.id} className="border rounded-xl p-4 space-y-3">
+        <div key={f.id} className="border rounded-xl p-3 sm:p-4 space-y-3">
           <h3 className="font-medium">Day {i + 1}</h3>
           <input
             placeholder={`Day ${i + 1} Title *`}
@@ -786,10 +786,10 @@ function HotelsSection({ mode }) {
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Hotels</h2>
+    <div className="space-y-4 sm:space-y-6">
+      <h2 className="text-xl sm:text-2xl font-semibold">Hotels</h2>
       {fields.map((hotel, i) => (
-        <div key={hotel.id} className="border rounded-xl p-4 space-y-3">
+        <div key={hotel.id} className="border rounded-xl p-3 sm:p-4 space-y-3">
           <div className="flex justify-between items-center">
             <h3 className="font-medium">Hotel {i + 1}</h3>
             {fields.length > 1 && (
@@ -876,8 +876,8 @@ function HotelsSection({ mode }) {
 function AvailabilitySection() {
   const { register } = useFormContext();
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Availability</h2>
+    <div className="space-y-4 sm:space-y-6">
+      <h2 className="text-xl sm:text-2xl font-semibold">Availability</h2>
       <div>
         <label className="block mb-2 font-medium">Start Date *</label>
         <input
@@ -996,8 +996,8 @@ function MediaSection({ mode }) {
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Media</h2>
+    <div className="space-y-4 sm:space-y-6">
+      <h2 className="text-xl sm:text-2xl font-semibold">Media</h2>
 
       {/* Cover Image */}
       <div className="space-y-2">
@@ -1009,7 +1009,7 @@ function MediaSection({ mode }) {
           className="w-full border p-2 rounded-lg cursor-pointer"
         />
         {coverPreview && (
-          <div className="mt-2 relative w-64 h-40 border rounded-xl shadow overflow-hidden">
+          <div className="mt-2 relative w-full sm:w-64 h-40 border rounded-xl shadow overflow-hidden">
             <img
               src={coverPreview}
               alt="Cover Preview"
@@ -1313,10 +1313,10 @@ function AdminPackagesTable({ packages, refetch }) {
   };
 
   return (
-    <div className="pr-8 pl-8 pt-6 pb-8 bg-gray-50 min-h-screen">
+    <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-6 sm:pb-8 bg-gray-50 min-h-screen">
       {/* Header */}
 
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-2">
         <div>
           <p className="text-gray-500 mt-1 text-lg">
             Manage all your travel packages
@@ -1340,118 +1340,120 @@ function AdminPackagesTable({ packages, refetch }) {
         </Modal>
       )}
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm font-medium">
                 Total Packages
               </p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">
                 {packages.length}
               </p>
             </div>
-            <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center">
-              <div className="w-6 h-6 bg-teal-600 rounded-lg"></div>
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-teal-100 rounded-xl flex items-center justify-center">
+              <div className="w-5 h-5 sm:w-6 sm:h-6 bg-teal-600 rounded-lg"></div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm font-medium">
                 Active Packages
               </p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">
                 {packages.filter((p) => p.status === "Active").length}
               </p>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-              <div className="w-6 h-6 bg-green-600 rounded-lg"></div>
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center">
+              <div className="w-5 h-5 sm:w-6 sm:h-6 bg-green-600 rounded-lg"></div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm font-medium">
                 Total Bookings
               </p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">
                 {packages.reduce(
                   (sum, p) => sum + (p.bookings?.length || 0),
                   0,
                 )}
               </p>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-              <div className="w-6 h-6 bg-blue-600 rounded-lg"></div>
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+              <div className="w-5 h-5 sm:w-6 sm:h-6 bg-blue-600 rounded-lg"></div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm font-medium">
                 Revenue (Est.)
               </p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">
                 {packages.reduce((sum, p) => {
                   const price = Number(p.price?.discountedPrice || 0);
                   return sum + price * (p.bookings?.length || 0);
                 }, 0)}
               </p>
             </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-              <div className="w-6 h-6 bg-purple-600 rounded-lg"></div>
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+              <div className="w-5 h-5 sm:w-6 sm:h-6 bg-purple-600 rounded-lg"></div>
             </div>
           </div>
         </div>
       </div>
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-        <div className="flex flex-col lg:flex-row gap-4">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-4 sm:mb-6">
+        <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
           {/* Search */}
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               placeholder="Search packages by title or destination..."
-              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              className="w-full pl-12 pr-4 py-2.5 sm:py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm sm:text-base"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
-          <div className="flex items-center gap-2">
-            <Filter className="w-5 h-5 text-gray-400" />
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-2">
+            <div className="flex items-center gap-2">
+              <Filter className="w-5 h-5 text-gray-400 hidden sm:block" />
+              <select
+                className="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm sm:text-base"
+                value={filterTag}
+                onChange={(e) => setFilterTag(e.target.value)}
+              >
+                {tags.map((tag) => (
+                  <option key={tag} value={tag}>
+                    {tag}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Status Filter */}
             <select
-              className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-              value={filterTag}
-              onChange={(e) => setFilterTag(e.target.value)}
+              className="px-4 py-2.5 sm:py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm sm:text-base"
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
             >
-              {tags.map((tag) => (
-                <option key={tag} value={tag}>
-                  {tag}
+              {statuses.map((status) => (
+                <option key={status} value={status}>
+                  {status}
                 </option>
               ))}
             </select>
           </div>
-
-          {/* Status Filter */}
-          <select
-            className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            {statuses.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
         </div>
       </div>
 
