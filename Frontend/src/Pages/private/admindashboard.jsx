@@ -53,7 +53,7 @@ function AdminHeader({ title }) {
   });
 
   return (
-    <header className="flex justify-between items-center p-6 bg-white border-b border-gray-100 ml-64">
+    <header className="flex justify-between items-center p-6 bg-white border-b border-gray-100">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
         <p className="text-sm text-gray-500 mt-1">{currentDate}</p>
@@ -402,16 +402,15 @@ function AdminDashboard() {
 
   if (loading) {
     return (
-      <div>
-        <AdminSidebar />
+      <AdminSidebar>
         <AdminHeader title="Dashboard" />
-        <main className="ml-64 p-6 mt-4 flex items-center justify-center min-h-[60vh]">
+        <main className="p-6 mt-4 flex items-center justify-center min-h-[60vh]">
           <div className="flex flex-col items-center gap-4">
             <div className="w-12 h-12 border-4 border-[#3ab19d] border-t-transparent rounded-full animate-spin"></div>
             <p className="text-gray-500 font-medium">Loading dashboard...</p>
           </div>
         </main>
-      </div>
+      </AdminSidebar>
     );
   }
 
@@ -476,178 +475,181 @@ function AdminDashboard() {
   ];
 
   return (
-    <div className="bg-[#fafbfc] min-h-screen">
-      <AdminSidebar />
-      <AdminHeader title="Dashboard" />
-      <main className="ml-64 p-6">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-          {statCards.map((stat) => (
-            <StatCard key={stat.title} {...stat} />
-          ))}
-        </div>
-
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Bookings Chart */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-100">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">
-                  Booking Trends
-                </h3>
-                <p className="text-sm text-gray-500">Last 12 months overview</p>
-              </div>
-              <div className="flex items-center gap-2 text-[#3ab19d]">
-                <TrendingUp className="w-5 h-5" />
-                <span className="text-sm font-medium">12 months</span>
-              </div>
-            </div>
-            <div className="h-70">
-              <Line data={bookingChartData} options={chartOptions} />
-            </div>
+    <AdminSidebar>
+      <div className="bg-[#fafbfc] min-h-screen">
+        <AdminHeader title="Dashboard" />
+        <main className="p-6">
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            {statCards.map((stat) => (
+              <StatCard key={stat.title} {...stat} />
+            ))}
           </div>
 
-          {/* Revenue Chart */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-100">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">
-                  Monthly Revenue
-                </h3>
-                <p className="text-sm text-gray-500">Revenue breakdown</p>
-              </div>
-              <div className="flex items-center gap-2 text-[#3ab19d]">
-                <DollarSign className="w-5 h-5" />
-                <span className="text-sm font-medium">INR</span>
-              </div>
-            </div>
-            <div className="h-70">
-              <Bar data={revenueChartData} options={barChartOptions} />
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Activity */}
-          <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 overflow-hidden">
-            <div className="p-6 border-b border-gray-100">
-              <div className="flex items-center justify-between">
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Bookings Chart */}
+            <div className="bg-white rounded-2xl p-6 border border-gray-100">
+              <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-lg font-bold text-gray-900">
-                    Recent Activity
+                    Booking Trends
                   </h3>
                   <p className="text-sm text-gray-500">
-                    Latest platform actions
+                    Last 12 months overview
                   </p>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-[#f0fdf9] rounded-full">
-                  <Activity className="w-4 h-4 text-[#3ab19d]" />
-                  <span className="text-sm font-medium text-[#3ab19d]">
-                    Live
-                  </span>
+                <div className="flex items-center gap-2 text-[#3ab19d]">
+                  <TrendingUp className="w-5 h-5" />
+                  <span className="text-sm font-medium">12 months</span>
                 </div>
               </div>
+              <div className="h-70">
+                <Line data={bookingChartData} options={chartOptions} />
+              </div>
             </div>
-            <div className="p-4 max-h-100 overflow-y-auto">
-              {activities.length > 0 ? (
-                <div className="space-y-2">
-                  {activities.map((activity, index) => (
-                    <ActivityItem key={index} activity={activity} />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-                  <Clock className="w-12 h-12 mb-3" />
-                  <p className="font-medium">No recent activity</p>
-                  <p className="text-sm">Activities will appear here</p>
-                </div>
-              )}
-            </div>
-          </div>
 
-          {/* Active Users */}
-          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-            <div className="p-6 border-b border-gray-100">
-              <div className="flex items-center justify-between">
+            {/* Revenue Chart */}
+            <div className="bg-white rounded-2xl p-6 border border-gray-100">
+              <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-lg font-bold text-gray-900">
-                    Active Users
+                    Monthly Revenue
                   </h3>
-                  <p className="text-sm text-gray-500">Currently online</p>
+                  <p className="text-sm text-gray-500">Revenue breakdown</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-semibold text-gray-900">
-                    {activeUsers.length}
-                  </span>
+                <div className="flex items-center gap-2 text-[#3ab19d]">
+                  <DollarSign className="w-5 h-5" />
+                  <span className="text-sm font-medium">INR</span>
                 </div>
               </div>
-            </div>
-            <div className="p-4 max-h-100 overflow-y-auto">
-              {activeUsers.length > 0 ? (
-                <div className="space-y-2">
-                  {activeUsers.map((user) => (
-                    <ActiveUserCard key={user.id} user={user} />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-                  <Users className="w-12 h-12 mb-3" />
-                  <p className="font-medium">No active users</p>
-                  <p className="text-sm text-center">
-                    Users will appear when they're online
-                  </p>
-                </div>
-              )}
+              <div className="h-70">
+                <Bar data={revenueChartData} options={barChartOptions} />
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Quick Stats Footer */}
-        <div className="mt-8 bg-white rounded-2xl p-6 border border-gray-100">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 mb-3">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+          {/* Bottom Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Recent Activity */}
+            <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 overflow-hidden">
+              <div className="p-6 border-b border-gray-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">
+                      Recent Activity
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      Latest platform actions
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-[#f0fdf9] rounded-full">
+                    <Activity className="w-4 h-4 text-[#3ab19d]" />
+                    <span className="text-sm font-medium text-[#3ab19d]">
+                      Live
+                    </span>
+                  </div>
+                </div>
               </div>
-              <p className="text-2xl font-bold text-gray-900">
-                {stats?.totalBookings - stats?.bookingsToday || 0}
-              </p>
-              <p className="text-sm text-gray-500">Completed Bookings</p>
+              <div className="p-4 max-h-100 overflow-y-auto">
+                {activities.length > 0 ? (
+                  <div className="space-y-2">
+                    {activities.map((activity, index) => (
+                      <ActivityItem key={index} activity={activity} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                    <Clock className="w-12 h-12 mb-3" />
+                    <p className="font-medium">No recent activity</p>
+                    <p className="text-sm">Activities will appear here</p>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-100 mb-3">
-                <AlertCircle className="w-6 h-6 text-amber-600" />
+
+            {/* Active Users */}
+            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+              <div className="p-6 border-b border-gray-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">
+                      Active Users
+                    </h3>
+                    <p className="text-sm text-gray-500">Currently online</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-sm font-semibold text-gray-900">
+                      {activeUsers.length}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <p className="text-2xl font-bold text-gray-900">
-                {stats?.pendingBargains || 0}
-              </p>
-              <p className="text-sm text-gray-500">Pending Approvals</p>
-            </div>
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 mb-3">
-                <Package className="w-6 h-6 text-blue-600" />
+              <div className="p-4 max-h-100 overflow-y-auto">
+                {activeUsers.length > 0 ? (
+                  <div className="space-y-2">
+                    {activeUsers.map((user) => (
+                      <ActiveUserCard key={user.id} user={user} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                    <Users className="w-12 h-12 mb-3" />
+                    <p className="font-medium">No active users</p>
+                    <p className="text-sm text-center">
+                      Users will appear when they're online
+                    </p>
+                  </div>
+                )}
               </div>
-              <p className="text-2xl font-bold text-gray-900">
-                {stats?.activePackages || 0}
-              </p>
-              <p className="text-sm text-gray-500">Live Packages</p>
-            </div>
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-100 mb-3">
-                <Trophy className="w-6 h-6 text-purple-600" />
-              </div>
-              <p className="text-2xl font-bold text-gray-900">
-                {stats?.activeChallenges || 0}
-              </p>
-              <p className="text-sm text-gray-500">Active Challenges</p>
             </div>
           </div>
-        </div>
-      </main>
-    </div>
+
+          {/* Quick Stats Footer */}
+          <div className="mt-8 bg-white rounded-2xl p-6 border border-gray-100">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 mb-3">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                </div>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats?.totalBookings - stats?.bookingsToday || 0}
+                </p>
+                <p className="text-sm text-gray-500">Completed Bookings</p>
+              </div>
+              <div className="text-center">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-100 mb-3">
+                  <AlertCircle className="w-6 h-6 text-amber-600" />
+                </div>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats?.pendingBargains || 0}
+                </p>
+                <p className="text-sm text-gray-500">Pending Approvals</p>
+              </div>
+              <div className="text-center">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 mb-3">
+                  <Package className="w-6 h-6 text-blue-600" />
+                </div>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats?.activePackages || 0}
+                </p>
+                <p className="text-sm text-gray-500">Live Packages</p>
+              </div>
+              <div className="text-center">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-100 mb-3">
+                  <Trophy className="w-6 h-6 text-purple-600" />
+                </div>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats?.activeChallenges || 0}
+                </p>
+                <p className="text-sm text-gray-500">Active Challenges</p>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </AdminSidebar>
   );
 }
 

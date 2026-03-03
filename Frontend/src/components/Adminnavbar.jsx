@@ -133,6 +133,11 @@ export default function AdminSidebar({ children }) {
           </div>
         </nav>
       </div>
+
+      {/* Main Content Wrapper */}
+      {children && (
+        <main className="min-h-screen pt-14 lg:pt-0 lg:ml-64">{children}</main>
+      )}
     </>
   );
 }

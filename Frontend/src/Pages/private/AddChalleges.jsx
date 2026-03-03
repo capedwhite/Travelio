@@ -68,7 +68,9 @@ function AddChallenges() {
       updateForm.reset({
         challengeName: challengeData.challengeName || "",
         submissionDeadline: challengeData.submissionDeadline
-          ? new Date(challengeData.submissionDeadline).toISOString().split('T')[0]
+          ? new Date(challengeData.submissionDeadline)
+              .toISOString()
+              .split("T")[0]
           : "",
         description: challengeData.description || "",
         award: challengeData.award || "",
@@ -83,7 +85,11 @@ function AddChallenges() {
   };
 
   const handleDeleteChallenge = async (challengeId) => {
-    if (!window.confirm("Are you sure you want to delete this challenge? This action cannot be undone.")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this challenge? This action cannot be undone.",
+      )
+    ) {
       return;
     }
 
@@ -93,7 +99,9 @@ function AddChallenges() {
       toast.success("Challenge deleted successfully!");
       fetchChallenges();
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to delete challenge");
+      toast.error(
+        error.response?.data?.message || "Failed to delete challenge",
+      );
     } finally {
       setDeleteLoading(null);
     }
@@ -107,7 +115,9 @@ function AddChallenges() {
       setShowUpdateModal(false);
       fetchChallenges();
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to update challenge");
+      toast.error(
+        error.response?.data?.message || "Failed to update challenge",
+      );
     } finally {
       setUpdateLoading(false);
     }
@@ -124,25 +134,23 @@ function AddChallenges() {
       fetchChallenges();
     } catch (err) {
       console.error(err);
-      toast.error(
-        err.response?.data?.message || "Failed to create challenge"
-      );
+      toast.error(err.response?.data?.message || "Failed to create challenge");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <>
-      <AdminSidebar />
-      <div className="pl-8 pr-8 pt-8 pb-6 bg-gray-50 min-h-screen ml-64">
-        <h1 className="text-gray-500 mt-1 text-[20px] mb-6">Add New Challenge</h1>
+    <AdminSidebar>
+      <div className="pl-8 pr-8 pt-8 pb-6 bg-gray-50 min-h-screen">
+        <h1 className="text-gray-500 mt-1 text-[20px] mb-6">
+          Add New Challenge
+        </h1>
 
         <div className="bg-white rounded-2xl shadow p-8 w-full">
           <h2 className="text-[16px] font-semibold mb-6">Challenge Details</h2>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-     
             <div>
               <input
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
@@ -262,8 +270,12 @@ function AddChallenges() {
                     <Sparkles className="w-5 h-5 text-teal-600" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900">Update Challenge</h2>
-                    <p className="text-sm text-gray-500">Make changes to your challenge</p>
+                    <h2 className="text-xl font-bold text-gray-900">
+                      Update Challenge
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      Make changes to your challenge
+                    </p>
                   </div>
                 </div>
                 <button
@@ -275,7 +287,10 @@ function AddChallenges() {
               </div>
 
               {/* Form */}
-              <form onSubmit={updateForm.handleSubmit(onUpdateSubmit)} className="p-6 space-y-6">
+              <form
+                onSubmit={updateForm.handleSubmit(onUpdateSubmit)}
+                className="p-6 space-y-6"
+              >
                 {/* Challenge Name */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -490,7 +505,9 @@ function AddChallenges() {
                                 <Trash2 className="w-4 h-4 group-hover:animate-bounce" />
                               )}
                               <span className="hidden sm:inline">
-                                {deleteLoading === c.id ? "Deleting..." : "Delete"}
+                                {deleteLoading === c.id
+                                  ? "Deleting..."
+                                  : "Delete"}
                               </span>
                             </div>
                             <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-400 rounded-full animate-pulse opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -505,9 +522,8 @@ function AddChallenges() {
           )}
         </div>
       </div>
-    </>
+    </AdminSidebar>
   );
 }
 
 export default AddChallenges;
-
